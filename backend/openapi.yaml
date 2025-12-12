@@ -1,0 +1,1010 @@
+openapi: 3.0.3
+info:
+  title: Smart Parcel Locker API
+  version: v1
+servers:
+  - url: http://localhost:8080/api/v1
+paths:
+  /parcels/create:
+    post:
+      summary: Create parcel (status CREATED)
+      tags: [Parcels]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ParcelCreateRequest'
+      responses:
+        '201':
+          description: Parcel created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ParcelCreateResponse'
+        '400':
+          description: Bad request (invalid uuid, missing field)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+        '409':
+          description: Conflict (invalid state for action)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+
+  /parcels/reserve:
+    post:
+      summary: Reserve compartment for parcel
+      tags: [Parcels]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ParcelIDRequest'
+      responses:
+        '200':
+          description: Parcel reserved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ParcelReserveResponse'
+        '400':
+          description: Bad request (invalid uuid, missing field, invalid status transition)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+        '404':
+          description: Not found (parcel or compartment)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+        '409':
+          description: Conflict (no available compartment, invalid state for action)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+
+  /parcels/deposit:
+    post:
+      summary: Store parcel into compartment
+      tags: [Parcels]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ParcelIDRequest'
+      responses:
+        '200':
+          description: Parcel stored
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ParcelStatusResponse'
+        '400':
+          description: Bad request (invalid uuid, missing field, invalid status transition)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+        '404':
+          description: Not found (parcel or compartment)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+        '409':
+          description: Conflict (invalid state for action)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+
+  /parcels/ready:
+    post:
+      summary: Mark parcel as pickup ready
+      tags: [Parcels]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ParcelIDRequest'
+      responses:
+        '200':
+          description: Parcel marked ready
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ParcelStatusResponse'
+        '400':
+          description: Bad request (invalid uuid, missing field, invalid status transition)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+        '404':
+          description: Parcel not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+        '409':
+          description: Conflict (invalid state for action)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+
+  /parcels/otp/request:
+    post:
+      summary: Generate OTP for parcel
+      tags: [Parcels]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ParcelIDRequest'
+      responses:
+        '201':
+          description: OTP generated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OTPCreateResponse'
+        '400':
+          description: Bad request (invalid uuid, missing field, invalid status transition)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+        '404':
+          description: Parcel not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+        '409':
+          description: Conflict (invalid state for action)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+
+  /parcels/otp/verify:
+    post:
+      summary: Verify OTP
+      tags: [Parcels]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OTPVerifyRequest'
+      responses:
+        '200':
+          description: OTP verified
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OTPVerifyResponse'
+        '400':
+          description: Bad request (invalid uuid, missing field, invalid status transition, otp already used)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+        '404':
+          description: OTP not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+        '409':
+          description: Conflict (invalid state for action, otp already used)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+        '410':
+          description: OTP expired
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+
+  /parcels/pickup:
+    post:
+      summary: Pickup parcel
+      tags: [Parcels]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PickupRequest'
+      responses:
+        '200':
+          description: Parcel picked up
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ParcelPickupResponse'
+        '400':
+          description: Bad request (invalid uuid, missing field, invalid status transition, otp already used)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+        '404':
+          description: Not found (parcel or otp)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+        '409':
+          description: Conflict (invalid state for action, otp already used)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+        '410':
+          description: Parcel expired
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+
+  /parcels/expire/run:
+    post:
+      summary: Run expire job manually
+      tags: [Parcels]
+      responses:
+        '200':
+          description: Expire job executed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExpireRunResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+
+  /admin/locations:
+    post:
+      summary: Create a location
+      tags: [Admin]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LocationCreateRequest'
+      responses:
+        '201':
+          description: Location created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LocationResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+    get:
+      summary: List all locations
+      tags: [Admin]
+      responses:
+        '200':
+          description: Locations listed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LocationListResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+
+  /admin/lockers:
+    post:
+      summary: Register a locker under a location
+      tags: [Admin]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LockerCreateRequest'
+      responses:
+        '201':
+          description: Locker created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LockerResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+        '404':
+          description: Location not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+    get:
+      summary: List lockers with location info
+      tags: [Admin]
+      responses:
+        '200':
+          description: Lockers listed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LockerListResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+
+  /admin/lockers/{locker_id}/status:
+    patch:
+      summary: Change locker status
+      tags: [Admin]
+      parameters:
+        - in: path
+          name: locker_id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LockerStatusUpdateRequest'
+      responses:
+        '200':
+          description: Locker status updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LockerStatusResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+        '404':
+          description: Locker not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+        '409':
+          description: Conflict (invalid state for action)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+
+  /admin/lockers/{locker_id}/compartments:
+    post:
+      summary: Generate compartments for a locker
+      tags: [Admin]
+      parameters:
+        - in: path
+          name: locker_id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CompartmentBatchCreateRequest'
+      responses:
+        '201':
+          description: Compartments created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CompartmentBatchCreateResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+        '404':
+          description: Locker not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+    get:
+      summary: List compartments of a locker
+      tags: [Admin]
+      parameters:
+        - in: path
+          name: locker_id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Compartments listed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CompartmentListResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+        '404':
+          description: Locker not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+
+  /admin/overview:
+    get:
+      summary: System overview
+      tags: [Admin]
+      responses:
+        '200':
+          description: Overview retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminOverviewResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+
+components:
+  schemas:
+    APIBase:
+      type: object
+      required: [success]
+      properties:
+        success:
+          type: boolean
+        error:
+          type: string
+
+    APIErrorResponse:
+      allOf:
+        - $ref: '#/components/schemas/APIBase'
+      example:
+        success: false
+        error: invalid request
+
+    ParcelStatus:
+      type: string
+      enum: [CREATED, RESERVED, STORED, PICKUP_READY, PICKED_UP, CANCELLED, EXPIRED]
+
+    ParcelCreateRequest:
+      type: object
+      required: [locker_id, size, courier_id, recipient_id]
+      properties:
+        locker_id:
+          type: string
+          format: uuid
+        size:
+          type: string
+          enum: [S, M, L]
+        courier_id:
+          type: string
+          format: uuid
+        recipient_id:
+          type: string
+          format: uuid
+
+    ParcelIDRequest:
+      type: object
+      required: [parcel_id]
+      properties:
+        parcel_id:
+          type: string
+          format: uuid
+
+    OTPVerifyRequest:
+      type: object
+      required: [otp_ref, otp_code]
+      properties:
+        otp_ref:
+          type: string
+        otp_code:
+          type: string
+
+    PickupRequest:
+      type: object
+      required: [parcel_id, otp_ref]
+      properties:
+        parcel_id:
+          type: string
+          format: uuid
+        otp_ref:
+          type: string
+
+    ParcelCreateResponse:
+      allOf:
+        - $ref: '#/components/schemas/APIBase'
+        - type: object
+          required: [data]
+          properties:
+            data:
+              type: object
+              required: [parcel_id, status]
+              properties:
+                parcel_id:
+                  type: string
+                  format: uuid
+                status:
+                  $ref: '#/components/schemas/ParcelStatus'
+      example:
+        success: true
+        data:
+          parcel_id: "d290f1ee-6c54-4b01-90e6-d701748f0851"
+          status: CREATED
+
+    ParcelReserveResponse:
+      allOf:
+        - $ref: '#/components/schemas/APIBase'
+        - type: object
+          required: [data]
+          properties:
+            data:
+              type: object
+              required: [parcel_id, compartment_id, status]
+              properties:
+                parcel_id:
+                  type: string
+                  format: uuid
+                compartment_id:
+                  type: string
+                  format: uuid
+                status:
+                  $ref: '#/components/schemas/ParcelStatus'
+      example:
+        success: true
+        data:
+          parcel_id: "d290f1ee-6c54-4b01-90e6-d701748f0851"
+          compartment_id: "c1f5c1a4-1234-4f0f-9a4b-1234567890ab"
+          status: RESERVED
+
+    ParcelStatusResponse:
+      allOf:
+        - $ref: '#/components/schemas/APIBase'
+        - type: object
+          required: [data]
+          properties:
+            data:
+              type: object
+              required: [parcel_id, status]
+              properties:
+                parcel_id:
+                  type: string
+                  format: uuid
+                status:
+                  $ref: '#/components/schemas/ParcelStatus'
+      example:
+        success: true
+        data:
+          parcel_id: "d290f1ee-6c54-4b01-90e6-d701748f0851"
+          status: STORED
+
+    ParcelPickupResponse:
+      allOf:
+        - $ref: '#/components/schemas/APIBase'
+        - type: object
+          required: [data]
+          properties:
+            data:
+              type: object
+              required: [parcel_id, status]
+              properties:
+                parcel_id:
+                  type: string
+                  format: uuid
+                status:
+                  $ref: '#/components/schemas/ParcelStatus'
+      example:
+        success: true
+        data:
+          parcel_id: "d290f1ee-6c54-4b01-90e6-d701748f0851"
+          status: PICKED_UP
+
+    OTPCreateResponse:
+      allOf:
+        - $ref: '#/components/schemas/APIBase'
+        - type: object
+          required: [data]
+          properties:
+            data:
+              type: object
+              required: [otp_ref, expires_at]
+              properties:
+                otp_ref:
+                  type: string
+                expires_at:
+                  type: string
+                  format: date-time
+      example:
+        success: true
+        data:
+          otp_ref: "otp-ref-123"
+          expires_at: "2025-01-01T12:00:00Z"
+
+    OTPVerifyResponse:
+      allOf:
+        - $ref: '#/components/schemas/APIBase'
+        - type: object
+          required: [data]
+          properties:
+            data:
+              type: object
+              required: [otp_ref, status]
+              properties:
+                otp_ref:
+                  type: string
+                status:
+                  type: string
+                  enum: [VERIFIED]
+      example:
+        success: true
+        data:
+          otp_ref: "otp-ref-123"
+          status: VERIFIED
+
+    ExpireRunResponse:
+      allOf:
+        - $ref: '#/components/schemas/APIBase'
+        - type: object
+          required: [data]
+          properties:
+        data:
+          type: object
+          required: [expired_count]
+          properties:
+            expired_count:
+              type: integer
+      example:
+        success: true
+        data:
+          expired_count: 3
+
+    Location:
+      type: object
+      properties:
+        location_id:
+          type: string
+          format: uuid
+        code:
+          type: string
+        name:
+          type: string
+        address:
+          type: string
+          nullable: true
+        is_active:
+          type: boolean
+
+    Locker:
+      type: object
+      properties:
+        locker_id:
+          type: string
+          format: uuid
+        locker_code:
+          type: string
+        location_id:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum: [ACTIVE, MAINTENANCE, DISABLED]
+
+    Compartment:
+      type: object
+      properties:
+        compartment_id:
+          type: string
+          format: uuid
+        compartment_no:
+          type: integer
+        size:
+          type: string
+          enum: [S, M, L]
+        status:
+          type: string
+          enum: [AVAILABLE, RESERVED, OCCUPIED, OUT_OF_SERVICE]
+
+    AdminOverview:
+      type: object
+      properties:
+        total_locations:
+          type: integer
+        total_lockers:
+          type: integer
+        total_compartments:
+          type: integer
+        compartments_available:
+          type: integer
+        parcels_active:
+          type: integer
+        parcels_expired:
+          type: integer
+
+    LocationCreateRequest:
+      type: object
+      required: [code, name]
+      properties:
+        code:
+          type: string
+        name:
+          type: string
+        address:
+          type: string
+        is_active:
+          type: boolean
+
+    LocationResponse:
+      allOf:
+        - $ref: '#/components/schemas/APIBase'
+        - type: object
+          required: [data]
+          properties:
+            data:
+              $ref: '#/components/schemas/Location'
+      example:
+        success: true
+        data:
+          location_id: "5e10ce9e-3e2e-42fd-9c3f-8b59af420001"
+          code: LOC-001
+          name: Main Hub
+          is_active: true
+
+    LocationListResponse:
+      allOf:
+        - $ref: '#/components/schemas/APIBase'
+        - type: object
+          required: [data]
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/Location'
+
+    LockerCreateRequest:
+      type: object
+      required: [location_id, locker_code]
+      properties:
+        location_id:
+          type: string
+          format: uuid
+        locker_code:
+          type: string
+        name:
+          type: string
+
+    LockerResponse:
+      allOf:
+        - $ref: '#/components/schemas/APIBase'
+        - type: object
+          required: [data]
+          properties:
+            data:
+              $ref: '#/components/schemas/Locker'
+      example:
+        success: true
+        data:
+          locker_id: "3c4f5a7d-1111-4b4c-a222-9f3e8d6c1111"
+          locker_code: LCK-001
+          location_id: "5e10ce9e-3e2e-42fd-9c3f-8b59af420001"
+          status: ACTIVE
+
+    LockerListResponse:
+      allOf:
+        - $ref: '#/components/schemas/APIBase'
+        - type: object
+          required: [data]
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/Locker'
+
+    LockerStatusUpdateRequest:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+          enum: [ACTIVE, MAINTENANCE, DISABLED]
+
+    LockerStatusResponse:
+      allOf:
+        - $ref: '#/components/schemas/APIBase'
+        - type: object
+          required: [data]
+          properties:
+            data:
+              type: object
+              required: [locker_id, status]
+              properties:
+                locker_id:
+                  type: string
+                  format: uuid
+                status:
+                  type: string
+                  enum: [ACTIVE, MAINTENANCE, DISABLED]
+
+    CompartmentBatchCreateRequest:
+      type: object
+      required: [compartments]
+      properties:
+        compartments:
+          type: array
+          items:
+            type: object
+            required: [compartment_no, size]
+            properties:
+              compartment_no:
+                type: integer
+              size:
+                type: string
+                enum: [S, M, L]
+
+    CompartmentBatchCreateResponse:
+      allOf:
+        - $ref: '#/components/schemas/APIBase'
+        - type: object
+          required: [data]
+          properties:
+            data:
+              type: object
+              required: [created_count]
+              properties:
+                created_count:
+                  type: integer
+
+    CompartmentListResponse:
+      allOf:
+        - $ref: '#/components/schemas/APIBase'
+        - type: object
+          required: [data]
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/Compartment'
+
+    AdminOverviewResponse:
+      allOf:
+        - $ref: '#/components/schemas/APIBase'
+        - type: object
+          required: [data]
+          properties:
+            data:
+              $ref: '#/components/schemas/AdminOverview'
+      example:
+        success: true
+        data:
+          total_locations: 2
+          total_lockers: 5
+          total_compartments: 120
+          compartments_available: 80
+          parcels_active: 25
+          parcels_expired: 3
+
+tags:
+  - name: Parcels
+    description: Parcel workflow endpoints
+  - name: Admin
+    description: Admin operations and monitoring

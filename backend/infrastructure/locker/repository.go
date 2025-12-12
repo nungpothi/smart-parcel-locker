@@ -2,6 +2,7 @@ package locker
 
 import (
 	"context"
+	"time"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -22,6 +23,66 @@ func NewGormRepository(db *gorm.DB) *GormRepository {
 
 func (r *GormRepository) WithDB(db *gorm.DB) locker.Repository {
 	return &GormRepository{db: db}
+}
+
+func (r *GormRepository) Create(ctx context.Context, l *locker.Locker) (*locker.Locker, error) {
+	model := gormmodels.Locker{
+		ID:         l.ID,
+		LocationID: l.LocationID,
+		LockerCode: l.LockerCode,
+		Name:       ptrString(l.Name),
+		Status:     l.Status,
+		CreatedAt:  time.Now(),
+	}
+	if model.ID == uuid.Nil {
+		model.ID = uuid.New()
+	}
+	if err := r.db.WithContext(ctx).Create(&model).Error; err != nil {
+		return nil, err
+	}
+	return mapLockerModelToDomain(model, nil, nil), nil
+}
+
+func (r *GormRepository) GetByID(ctx context.Context, lockerID uuid.UUID) (*locker.Locker, error) {
+	var lockerModel gormmodels.Locker
+	if err := r.db.WithContext(ctx).First(&lockerModel, "id = ?", lockerID).Error; err != nil {
+		return nil, err
+	}
+	return mapLockerModelToDomain(lockerModel, nil, nil), nil
+}
+
+func (r *GormRepository) List(ctx context.Context) ([]locker.Locker, error) {
+	var models []gormmodels.Locker
+	if err := r.db.WithContext(ctx).Order("created_at asc").Find(&models).Error; err != nil {
+		return nil, err
+	}
+	result := make([]locker.Locker, 0, len(models))
+	for _, m := range models {
+		result = append(result, *mapLockerModelToDomain(m, nil, nil))
+	}
+	return result, nil
+}
+
+func (r *GormRepository) UpdateStatus(ctx context.Context, lockerID uuid.UUID, status string) (*locker.Locker, error) {
+	var model gormmodels.Locker
+	if err := r.db.WithContext(ctx).First(&model, "id = ?", lockerID).Error; err != nil {
+		return nil, err
+	}
+	model.Status = status
+	now := time.Now()
+	model.UpdatedAt = &now
+	if err := r.db.WithContext(ctx).Save(&model).Error; err != nil {
+		return nil, err
+	}
+	return mapLockerModelToDomain(model, nil, nil), nil
+}
+
+func (r *GormRepository) Count(ctx context.Context) (int64, error) {
+	var count int64
+	if err := r.db.WithContext(ctx).Model(&gormmodels.Locker{}).Count(&count).Error; err != nil {
+		return 0, err
+	}
+	return count, nil
 }
 
 func (r *GormRepository) GetLockerWithCompartments(ctx context.Context, lockerID uuid.UUID) (*locker.Locker, error) {
@@ -112,4 +173,11 @@ func derefString(s *string) string {
 		return ""
 	}
 	return *s
+}
+
+func ptrString(s string) *string {
+	if s == "" {
+		return nil
+	}
+	return &s
 }

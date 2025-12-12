@@ -30,14 +30,24 @@ Foundational Go backend using Fiber and GORM following a clean architecture layo
    ```
 
 ## API (v1) - Parcel Workflow
-- `POST /api/v1/parcels/create` – create parcel (CREATED)
-- `POST /api/v1/parcels/reserve` – reserve compartment (RESERVED)
-- `POST /api/v1/parcels/deposit` – store parcel (STORED)
-- `POST /api/v1/parcels/ready` – mark pickup-ready (PICKUP_READY)
+- `POST /api/v1/parcels/create` - create parcel (CREATED)
+- `POST /api/v1/parcels/reserve` - reserve compartment (RESERVED)
+- `POST /api/v1/parcels/deposit` - store parcel (STORED)
+- `POST /api/v1/parcels/ready` - mark pickup-ready (PICKUP_READY)
 - `POST /api/v1/parcels/otp/request` – generate OTP (ACTIVE)
 - `POST /api/v1/parcels/otp/verify` – verify OTP (VERIFIED/EXPIRED)
-- `POST /api/v1/parcels/pickup` – pickup parcel (PICKED_UP, compartment released)
-- `POST /api/v1/parcels/expire/run` – expire ready parcels (EXPIRED, compartment released)
+- `POST /api/v1/parcels/pickup` - pickup parcel (PICKED_UP, compartment released)
+- `POST /api/v1/parcels/expire/run` - expire ready parcels (EXPIRED, compartment released)
+
+## API (v1) - Admin Operations
+- `POST /api/v1/admin/locations` - create location
+- `GET /api/v1/admin/locations` - list locations
+- `POST /api/v1/admin/lockers` - register locker
+- `GET /api/v1/admin/lockers` - list lockers
+- `PATCH /api/v1/admin/lockers/{locker_id}/status` - update locker status
+- `POST /api/v1/admin/lockers/{locker_id}/compartments` - bulk create compartments
+- `GET /api/v1/admin/lockers/{locker_id}/compartments` - list compartments
+- `GET /api/v1/admin/overview` - system overview counts
 
 ## Notes
 - PostgreSQL tables for lockers, slots, parcels, admins, and templates are auto-migrated on startup (UUID primary keys).

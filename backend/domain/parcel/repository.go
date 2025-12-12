@@ -18,4 +18,5 @@ type Repository interface {
 	UpdateOTP(ctx context.Context, otp *OTP) (*OTP, error)
 	FindReadyToExpire(ctx context.Context, now time.Time) ([]Parcel, error)
 	ExpireActiveOTPs(ctx context.Context, parcelID uuid.UUID) error
+	CountByStatus(ctx context.Context, statuses []Status) (int64, error)
 }

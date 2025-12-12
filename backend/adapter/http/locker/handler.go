@@ -5,13 +5,12 @@ package locker
 import (
 	"errors"
 	"net/http"
-
-	"github.com/gofiber/fiber/v2"
-	"github.com/google/uuid"
-
 	"smart-parcel-locker/backend/domain/locker"
 	"smart-parcel-locker/backend/pkg/response"
 	depositusecase "smart-parcel-locker/backend/usecase/locker"
+
+	"github.com/gofiber/fiber/v2"
+	"github.com/google/uuid"
 )
 
 // Handler exposes locker endpoints.

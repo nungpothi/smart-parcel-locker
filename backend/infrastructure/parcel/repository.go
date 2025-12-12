@@ -137,6 +137,21 @@ func (r *GormRepository) ExpireActiveOTPs(ctx context.Context, parcelID uuid.UUI
 		Updates(map[string]interface{}{"status": parcel.OTPStatusExpired}).Error
 }
 
+func (r *GormRepository) CountByStatus(ctx context.Context, statuses []parcel.Status) (int64, error) {
+	var count int64
+	strStatuses := make([]string, 0, len(statuses))
+	for _, s := range statuses {
+		strStatuses = append(strStatuses, string(s))
+	}
+	if err := r.db.WithContext(ctx).
+		Model(&gormmodels.Parcel{}).
+		Where("status IN ?", strStatuses).
+		Count(&count).Error; err != nil {
+		return 0, err
+	}
+	return count, nil
+}
+
 func mapParcelDomainToModel(p *parcel.Parcel) gormmodels.Parcel {
 	return gormmodels.Parcel{
 		ID:            p.ID,
