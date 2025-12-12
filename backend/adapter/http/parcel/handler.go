@@ -1,9 +1,8 @@
 package parcel
 
 import (
-	"strconv"
-
 	"github.com/gofiber/fiber/v2"
+	"github.com/google/uuid"
 
 	"smart-parcel-locker/backend/pkg/response"
 	parcelusecase "smart-parcel-locker/backend/usecase/parcel"
@@ -19,8 +18,8 @@ func NewHandler(uc *parcelusecase.UseCase) *Handler {
 }
 
 type createRequest struct {
-	LockerID uint   `json:"locker_id"`
-	SlotID   uint   `json:"slot_id"`
+	LockerID string `json:"locker_id"`
+	SlotID   string `json:"slot_id"`
 	Status   string `json:"status"`
 	Size     int    `json:"size"`
 }
@@ -28,9 +27,13 @@ type createRequest struct {
 func (h *Handler) Create(c *fiber.Ctx) error {
 	var req createRequest
 	_ = c.BodyParser(&req)
+
+	lockerID, _ := uuid.Parse(req.LockerID)
+	slotID, _ := uuid.Parse(req.SlotID)
+
 	result, err := h.uc.Create(c.Context(), parcelusecase.CreateInput{
-		LockerID: req.LockerID,
-		SlotID:   req.SlotID,
+		LockerID: lockerID,
+		SlotID:   slotID,
 		Size:     req.Size,
 		Status:   req.Status,
 	})
@@ -41,8 +44,8 @@ func (h *Handler) Create(c *fiber.Ctx) error {
 }
 
 func (h *Handler) Get(c *fiber.Ctx) error {
-	id, _ := strconv.Atoi(c.Params("id"))
-	result, err := h.uc.Get(c.Context(), uint(id))
+	id, _ := uuid.Parse(c.Params("id"))
+	result, err := h.uc.Get(c.Context(), id)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(response.APIResponse{Success: false, Error: err.Error()})
 	}

@@ -3,39 +3,52 @@ package locker
 import (
 	"context"
 
+	"github.com/google/uuid"
+	"gorm.io/gorm"
+
 	"smart-parcel-locker/backend/domain/locker"
 	"smart-parcel-locker/backend/domain/parcel"
 	"smart-parcel-locker/backend/infrastructure/database"
-
-	"gorm.io/gorm"
 )
 
 // RetrieveInput carries retrieval parameters.
 type RetrieveInput struct {
-	LockerID uint
-	ParcelID uint
+	LockerID uuid.UUID
+	ParcelID uuid.UUID
 }
 
 // RetrieveUseCase orchestrates parcel retrieval from a locker.
 type RetrieveUseCase struct {
-	lockerRepo locker.Repository
-	parcelRepo parcel.Repository
-	tx         *database.TransactionManager
+	lockerRepo interface {
+		locker.Repository
+		WithDB(db *gorm.DB) locker.Repository
+	}
+	parcelRepo interface {
+		parcel.Repository
+		WithDB(db *gorm.DB) parcel.Repository
+	}
+	tx *database.TransactionManager
 }
 
 func NewRetrieveUseCase(lockerRepo locker.Repository, parcelRepo parcel.Repository, tx *database.TransactionManager) *RetrieveUseCase {
 	return &RetrieveUseCase{
-		lockerRepo: lockerRepo,
-		parcelRepo: parcelRepo,
-		tx:         tx,
+		lockerRepo: lockerRepo.(interface {
+			locker.Repository
+			WithDB(*gorm.DB) locker.Repository
+		}),
+		parcelRepo: parcelRepo.(interface {
+			parcel.Repository
+			WithDB(*gorm.DB) parcel.Repository
+		}),
+		tx: tx,
 	}
 }
 
 func (uc *RetrieveUseCase) Execute(ctx context.Context, input RetrieveInput) (*parcel.Parcel, error) {
 	var result *parcel.Parcel
 
-	run := func() error {
-		lockerEntity, err := uc.lockerRepo.GetLockerWithSlots(ctx, input.LockerID)
+	run := func(lockerRepo locker.Repository, parcelRepo parcel.Repository) error {
+		lockerEntity, err := lockerRepo.GetLockerWithSlots(ctx, input.LockerID)
 		if err != nil {
 			return err
 		}
@@ -46,7 +59,7 @@ func (uc *RetrieveUseCase) Execute(ctx context.Context, input RetrieveInput) (*p
 			return locker.ErrParcelNotFound
 		}
 
-		parcelEntity, err := uc.parcelRepo.GetByID(ctx, input.ParcelID)
+		parcelEntity, err := parcelRepo.GetByID(ctx, input.ParcelID)
 		if err != nil {
 			return err
 		}
@@ -54,11 +67,11 @@ func (uc *RetrieveUseCase) Execute(ctx context.Context, input RetrieveInput) (*p
 		parcelEntity.SetStatus("retrieved")
 		service.ReleaseSlot(slot)
 
-		if _, err := uc.parcelRepo.Update(ctx, parcelEntity); err != nil {
+		if _, err := parcelRepo.Update(ctx, parcelEntity); err != nil {
 			return err
 		}
 
-		if _, err := uc.lockerRepo.UpdateSlot(ctx, slot); err != nil {
+		if _, err := lockerRepo.UpdateSlot(ctx, slot); err != nil {
 			return err
 		}
 
@@ -67,11 +80,15 @@ func (uc *RetrieveUseCase) Execute(ctx context.Context, input RetrieveInput) (*p
 	}
 
 	if uc.tx != nil {
-		if err := uc.tx.WithinTransaction(ctx, func(tx *gorm.DB) error { return run() }); err != nil {
+		if err := uc.tx.WithinTransaction(ctx, func(tx *gorm.DB) error {
+			lr := uc.lockerRepo.WithDB(tx)
+			pr := uc.parcelRepo.WithDB(tx)
+			return run(lr, pr)
+		}); err != nil {
 			return nil, err
 		}
 	} else {
-		if err := run(); err != nil {
+		if err := run(uc.lockerRepo, uc.parcelRepo); err != nil {
 			return nil, err
 		}
 	}
@@ -79,7 +96,7 @@ func (uc *RetrieveUseCase) Execute(ctx context.Context, input RetrieveInput) (*p
 	return result, nil
 }
 
-func findSlotByParcelID(slots []locker.Slot, parcelID uint) *locker.Slot {
+func findSlotByParcelID(slots []locker.Slot, parcelID uuid.UUID) *locker.Slot {
 	for i := range slots {
 		if slots[i].ParcelID != nil && *slots[i].ParcelID == parcelID {
 			return &slots[i]

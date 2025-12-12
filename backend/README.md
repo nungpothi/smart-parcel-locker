@@ -1,6 +1,6 @@
 # Smart Parcel Locker Backend (Phase 1)
 
-Foundational Go backend using Fiber and GORM following a clean architecture layout. This phase provides templates and wiring only—no business logic yet.
+Foundational Go backend using Fiber and GORM following a clean architecture layout with real PostgreSQL integration (auto-migrations) and a working CRUD template module.
 
 ## Stack
 - Go 1.22
@@ -14,8 +14,8 @@ Foundational Go backend using Fiber and GORM following a clean architecture layo
 - `usecase` – application use cases
 - `adapter` – inbound/outbound adapters (HTTP handlers live here)
 - `infrastructure` – framework integrations (DB, HTTP, logging, etc.)
-- `pkg` – shared utilities (config, error/response templates)
-- `adapter/template`, `domain/template`, `usecase/template`, `infrastructure/template` - reusable module template
+- `pkg` - shared utilities (config, error/response templates)
+- `adapter/template`, `domain/template`, `usecase/template`, `infrastructure/template` - reusable module template (real CRUD)
 
 ## Getting Started
 1. Copy `.env.example` to `.env` and adjust values.
@@ -24,13 +24,13 @@ Foundational Go backend using Fiber and GORM following a clean architecture layo
    cd backend
    go mod tidy
    ```
-3. Run the server:
+3. Run the server (ensure PostgreSQL is reachable):
    ```bash
    go run ./cmd/server
    ```
 
 ## Notes
-- Routes are placeholders; add real endpoints in future phases.
-- Template module illustrates the standard for new modules: CRUD structure (entity, repository interface + GORM stub, use case CRUD signatures, HTTP handlers/routes at `/api/v1/templates`, and a minimal unit test).
-- Phase 2 modules: Locker (deposit/retrieve at `/api/v1/lockers`), Parcel (create/get), Admin (CRUD at `/api/v1/admins`), all using stubbed repositories and receiver-driven domain hooks.
+- PostgreSQL tables for lockers, slots, parcels, admins, and templates are auto-migrated on startup (UUID primary keys).
+- Template module illustrates the standard for new modules: real CRUD (entity, repository, transaction-aware use case, HTTP handlers/routes at `/api/v1/templates`, and a minimal unit test).
+- Locker/Parcel/Admin modules are scaffolded with real repositories and endpoints but minimal domain rules; extend their receivers/use cases in later phases.
 - Keep requirements documents at the repository root in sync with code changes.

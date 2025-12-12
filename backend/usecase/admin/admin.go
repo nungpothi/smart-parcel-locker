@@ -3,6 +3,8 @@ package admin
 import (
 	"context"
 
+	"github.com/google/uuid"
+
 	"smart-parcel-locker/backend/domain/admin"
 )
 
@@ -17,7 +19,7 @@ type CreateInput struct {
 }
 
 type UpdateInput struct {
-	ID    uint
+	ID    uuid.UUID
 	Email string
 	Name  string
 }
@@ -35,7 +37,7 @@ func (uc *UseCase) Create(ctx context.Context, input CreateInput) (*admin.Admin,
 	return uc.repo.Create(ctx, entity)
 }
 
-func (uc *UseCase) Get(ctx context.Context, id uint) (*admin.Admin, error) {
+func (uc *UseCase) Get(ctx context.Context, id uuid.UUID) (*admin.Admin, error) {
 	return uc.repo.GetByID(ctx, id)
 }
 
@@ -49,6 +51,6 @@ func (uc *UseCase) Update(ctx context.Context, input UpdateInput) (*admin.Admin,
 	return uc.repo.Update(ctx, entity)
 }
 
-func (uc *UseCase) Delete(ctx context.Context, id uint) error {
+func (uc *UseCase) Delete(ctx context.Context, id uuid.UUID) error {
 	return uc.repo.Delete(ctx, id)
 }

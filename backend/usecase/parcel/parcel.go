@@ -2,8 +2,9 @@ package parcel
 
 import (
 	"context"
-
 	"smart-parcel-locker/backend/domain/parcel"
+
+	"github.com/google/uuid"
 )
 
 // UseCase handles parcel operations.
@@ -12,8 +13,8 @@ type UseCase struct {
 }
 
 type CreateInput struct {
-	LockerID uint
-	SlotID   uint
+	LockerID uuid.UUID
+	SlotID   uuid.UUID
 	Size     int
 	Status   string
 }
@@ -33,6 +34,6 @@ func (uc *UseCase) Create(ctx context.Context, input CreateInput) (*parcel.Parce
 	return uc.repo.Create(ctx, entity)
 }
 
-func (uc *UseCase) Get(ctx context.Context, id uint) (*parcel.Parcel, error) {
+func (uc *UseCase) Get(ctx context.Context, id uuid.UUID) (*parcel.Parcel, error) {
 	return uc.repo.GetByID(ctx, id)
 }

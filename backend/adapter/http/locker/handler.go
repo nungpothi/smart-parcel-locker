@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/google/uuid"
 
 	"smart-parcel-locker/backend/domain/locker"
 	"smart-parcel-locker/backend/pkg/response"
@@ -24,21 +25,23 @@ func NewHandler(depositUC *depositusecase.DepositUseCase, retrieveUC *deposituse
 }
 
 type depositRequest struct {
-	LockerID   uint `json:"locker_id"`
-	ParcelSize int  `json:"parcel_size"`
+	LockerID   string `json:"locker_id"`
+	ParcelSize int    `json:"parcel_size"`
 }
 
 type retrieveRequest struct {
-	LockerID uint `json:"locker_id"`
-	ParcelID uint `json:"parcel_id"`
+	LockerID string `json:"locker_id"`
+	ParcelID string `json:"parcel_id"`
 }
 
 func (h *Handler) Deposit(c *fiber.Ctx) error {
 	var req depositRequest
 	_ = c.BodyParser(&req)
 
+	lockerID, _ := uuid.Parse(req.LockerID)
+
 	result, err := h.depositUC.Execute(c.Context(), depositusecase.DepositInput{
-		LockerID:   req.LockerID,
+		LockerID:   lockerID,
 		ParcelSize: req.ParcelSize,
 	})
 	if err != nil {
@@ -52,9 +55,12 @@ func (h *Handler) Retrieve(c *fiber.Ctx) error {
 	var req retrieveRequest
 	_ = c.BodyParser(&req)
 
+	lockerID, _ := uuid.Parse(req.LockerID)
+	parcelID, _ := uuid.Parse(req.ParcelID)
+
 	result, err := h.retrieveUC.Execute(c.Context(), depositusecase.RetrieveInput{
-		LockerID: req.LockerID,
-		ParcelID: req.ParcelID,
+		LockerID: lockerID,
+		ParcelID: parcelID,
 	})
 	if err != nil {
 		return mapError(c, err)

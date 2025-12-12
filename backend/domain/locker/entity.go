@@ -1,21 +1,32 @@
 package locker
 
-import "smart-parcel-locker/backend/domain/parcel"
+import (
+	"time"
+
+	"github.com/google/uuid"
+
+	"smart-parcel-locker/backend/domain/parcel"
+)
 
 // Locker represents a locker bank containing multiple slots.
 type Locker struct {
-	ID    uint   `gorm:"primaryKey"`
-	Name  string `gorm:"size:255"`
-	Slots []Slot
+	ID        uuid.UUID `gorm:"type:uuid;default:gen_random_uuid();primaryKey"`
+	Name      string    `gorm:"size:255;not null"`
+	Location  string    `gorm:"size:255"`
+	Slots     []Slot    `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+	CreatedAt time.Time
+	UpdatedAt time.Time
 }
 
 // Slot represents an individual compartment in a locker.
 type Slot struct {
-	ID       uint `gorm:"primaryKey"`
-	LockerID uint
-	Size     int
-	Occupied bool
-	ParcelID *uint
+	ID        uuid.UUID  `gorm:"type:uuid;default:gen_random_uuid();primaryKey"`
+	LockerID  uuid.UUID  `gorm:"type:uuid;not null;index"`
+	Size      int        `gorm:"not null"`
+	Occupied  bool       `gorm:"not null;default:false"`
+	ParcelID  *uuid.UUID `gorm:"type:uuid"`
+	CreatedAt time.Time
+	UpdatedAt time.Time
 }
 
 // LockerService encapsulates locker business rules using receiver methods.
@@ -45,7 +56,7 @@ func (s *LockerService) SelectBestFitSlot(p *parcel.Parcel) (*Slot, error) {
 }
 
 // MarkOccupied sets the slot as occupied by the parcel.
-func (s *LockerService) MarkOccupied(slot *Slot, parcelID uint) {
+func (s *LockerService) MarkOccupied(slot *Slot, parcelID uuid.UUID) {
 	slot.Occupied = true
 	slot.ParcelID = &parcelID
 }

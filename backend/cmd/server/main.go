@@ -12,6 +12,7 @@ import (
 	lockeradapter "smart-parcel-locker/backend/adapter/http/locker"
 	parceladapter "smart-parcel-locker/backend/adapter/http/parcel"
 	templateadapter "smart-parcel-locker/backend/adapter/http/template"
+	"smart-parcel-locker/backend/domain/template"
 	admininfra "smart-parcel-locker/backend/infrastructure/admin"
 	"smart-parcel-locker/backend/infrastructure/database"
 	httpserver "smart-parcel-locker/backend/infrastructure/http"
@@ -35,6 +36,9 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to init database: %v", err)
 	}
+	if err := database.Prepare(db); err != nil {
+		log.Fatalf("failed to prepare database: %v", err)
+	}
 
 	app := httpserver.NewFiberApp(cfg)
 	wireModules(app, db)
@@ -51,7 +55,9 @@ func wireModules(app *fiber.App, db *gorm.DB) {
 
 	// Template module
 	templateRepo := templatemodule.NewGormRepository(db)
-	templateUC := templateusecase.NewUseCase(templateRepo)
+	templateUC := templateusecase.NewUseCase(templateRepo, db, txManager, func(db *gorm.DB) template.Repository {
+		return templatemodule.NewGormRepository(db)
+	})
 	templateHandler := templateadapter.NewHandler(templateUC)
 
 	// Locker & parcel modules

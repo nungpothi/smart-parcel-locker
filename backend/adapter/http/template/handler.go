@@ -1,8 +1,6 @@
 package template
 
 import (
-	"strconv"
-
 	"github.com/gofiber/fiber/v2"
 
 	"smart-parcel-locker/backend/pkg/response"
@@ -21,11 +19,12 @@ func NewHandler(uc *templateusecase.UseCase) *Handler {
 // Create handles Template creation.
 func (h *Handler) Create(c *fiber.Ctx) error {
 	var req struct {
-		Name string `json:"name"`
+		Name        string `json:"name"`
+		Description string `json:"description"`
 	}
 	_ = c.BodyParser(&req)
 
-	result, err := h.uc.Create(c.Context(), templateusecase.CreateInput{Name: req.Name})
+	result, err := h.uc.Create(c.Context(), templateusecase.CreateInput{Name: req.Name, Description: req.Description})
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(response.APIResponse{Success: false, Error: err.Error()})
 	}
@@ -33,10 +32,19 @@ func (h *Handler) Create(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusCreated).JSON(response.APIResponse{Success: true, Data: result})
 }
 
+// List returns all templates.
+func (h *Handler) List(c *fiber.Ctx) error {
+	result, err := h.uc.List(c.Context())
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(response.APIResponse{Success: false, Error: err.Error()})
+	}
+	return c.JSON(response.APIResponse{Success: true, Data: result})
+}
+
 // Get retrieves a Template by ID.
 func (h *Handler) Get(c *fiber.Ctx) error {
-	id, _ := strconv.Atoi(c.Params("id"))
-	result, err := h.uc.Get(c.Context(), uint(id))
+	id := c.Params("id")
+	result, err := h.uc.Get(c.Context(), id)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(response.APIResponse{Success: false, Error: err.Error()})
 	}
@@ -45,13 +53,14 @@ func (h *Handler) Get(c *fiber.Ctx) error {
 
 // Update modifies a Template.
 func (h *Handler) Update(c *fiber.Ctx) error {
-	id, _ := strconv.Atoi(c.Params("id"))
+	id := c.Params("id")
 	var req struct {
-		Name string `json:"name"`
+		Name        string `json:"name"`
+		Description string `json:"description"`
 	}
 	_ = c.BodyParser(&req)
 
-	result, err := h.uc.Update(c.Context(), templateusecase.UpdateInput{ID: uint(id), Name: req.Name})
+	result, err := h.uc.Update(c.Context(), templateusecase.UpdateInput{ID: id, Name: req.Name, Description: req.Description})
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(response.APIResponse{Success: false, Error: err.Error()})
 	}
@@ -60,8 +69,8 @@ func (h *Handler) Update(c *fiber.Ctx) error {
 
 // Delete removes a Template.
 func (h *Handler) Delete(c *fiber.Ctx) error {
-	id, _ := strconv.Atoi(c.Params("id"))
-	if err := h.uc.Delete(c.Context(), uint(id)); err != nil {
+	id := c.Params("id")
+	if err := h.uc.Delete(c.Context(), id); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(response.APIResponse{Success: false, Error: err.Error()})
 	}
 	return c.JSON(response.APIResponse{Success: true})

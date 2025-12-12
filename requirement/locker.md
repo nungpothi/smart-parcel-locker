@@ -5,7 +5,7 @@ APIs:
 - `POST /api/v1/lockers/retrieve` to retrieve a parcel from a slot.
 
 Domain:
-- Locker entity with slots; Slot entity.
+- Locker entity with slots; Slot entity. UUID primary keys; Slot references Locker; Slot may reference Parcel.
 - LockerService domain service handles deposit validation and best-fit slot selection via receiver methods.
 
 Behavior (Phase 2 scope):
@@ -22,4 +22,3 @@ Constraints:
 - Keep business rules in domain receivers, not in handlers.
 - Use transaction helper for multi-step flows.
 - Map typed domain errors to HTTP responses in adapters.
-

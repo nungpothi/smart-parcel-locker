@@ -1,15 +1,15 @@
-# Phase 1/2 Overview
+# Phase 1 – Working Foundation (Real DB + APIs)
 
-Scope: backend clean architecture skeleton in Go using Fiber and GORM, plus Phase 2 core modules (locker, parcel, admin) using the template pattern.
+Scope: runnable Go backend using Fiber + GORM + PostgreSQL with clean architecture, auto-migrated schema, and a working CRUD template module.
 
 What exists:
-- Project bootstrap under `/backend` with Go module, environment example, and gitignore.
-- Configuration loader reads env variables into structured config (app, HTTP, database).
-- Infrastructure wiring for Fiber app creation and PostgreSQL GORM initialization; transaction helper placeholder.
-- Template module to copy for future features: entity, CRUD repository interface, GORM repository stubs, use case CRUD signatures, HTTP CRUD handlers and router at `/api/v1/templates`, and a minimal unit test.
-- Locker module: domain entities (Locker, Slot), domain service with validation and best-fit selection hooks, typed errors, repository interface + GORM stub, deposit/retrieve use cases with transaction orchestration, HTTP endpoints at `/api/v1/lockers/deposit` and `/api/v1/lockers/retrieve`.
-- Parcel module: entity with status, repository interface + GORM stub, create/get use cases, minimal HTTP endpoints.
-- Admin module: entity, CRUD repository interface + GORM stub, CRUD use case, HTTP CRUD endpoints at `/api/v1/admins`.
-- Shared error (`pkg/errorx`) and standard API response (`pkg/response`) templates.
+- Bootstrap under `/backend` with env-driven config and PostgreSQL connection (pgcrypto extension enabled).
+- AutoMigrate on startup for tables: `lockers`, `slots`, `parcels`, `admins`, `templates` (UUID primary keys, relations).
+- Transaction helper using GORM transactions for write flows.
+- Template module: CRUD entity, repository (GORM), transaction-aware use case, and HTTP CRUD API at `/api/v1/templates`.
+- Locker module scaffolding: domain service for validation/slot selection, repo with GORM, deposit/retrieve use cases and HTTP endpoints at `/api/v1/lockers/deposit` and `/api/v1/lockers/retrieve` (logic minimal).
+- Parcel module: entity with status, repo and use case, minimal HTTP endpoints at `/api/v1/parcels`.
+- Admin module: entity and CRUD repo/use case, HTTP endpoints at `/api/v1/admins`.
+- Standard API response and typed errors under `pkg/response` and `pkg/errorx`.
 
-Out of scope: production-ready logic, real SQL/GORM operations, advanced auth, and full business workflows.
+Out of scope: advanced business rules, authentication, production hardening.
