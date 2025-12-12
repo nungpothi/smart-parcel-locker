@@ -4,7 +4,6 @@ import (
 	"github.com/gofiber/fiber/v2"
 
 	adminadapter "smart-parcel-locker/backend/adapter/http/admin"
-	lockeradapter "smart-parcel-locker/backend/adapter/http/locker"
 	parceladapter "smart-parcel-locker/backend/adapter/http/parcel"
 	templateadapter "smart-parcel-locker/backend/adapter/http/template"
 )
@@ -13,7 +12,6 @@ import (
 func Register(
 	app *fiber.App,
 	templateHandler *templateadapter.Handler,
-	lockerHandler *lockeradapter.Handler,
 	parcelHandler *parceladapter.Handler,
 	adminHandler *adminadapter.Handler,
 ) {
@@ -21,9 +19,6 @@ func Register(
 
 	templateGroup := api.Group("/templates")
 	templateadapter.RegisterRoutes(templateGroup, templateHandler)
-
-	lockerGroup := api.Group("/lockers")
-	lockeradapter.RegisterRoutes(lockerGroup, lockerHandler)
 
 	parcelGroup := api.Group("/parcels")
 	parceladapter.RegisterRoutes(parcelGroup, parcelHandler)

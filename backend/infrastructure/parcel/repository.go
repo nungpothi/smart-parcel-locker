@@ -2,6 +2,7 @@ package parcel
 
 import (
 	"context"
+	"time"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -47,6 +48,95 @@ func (r *GormRepository) Update(ctx context.Context, p *parcel.Parcel) (*parcel.
 	return mapParcelModelToDomain(model), nil
 }
 
+func (r *GormRepository) CreateEvent(ctx context.Context, event *parcel.Event) error {
+	model := gormmodels.ParcelEvent{
+		ID:        event.ID,
+		ParcelID:  event.ParcelID,
+		EventType: event.EventType,
+		CreatedAt: event.CreatedAt,
+	}
+	if model.ID == uuid.Nil {
+		model.ID = uuid.New()
+	}
+	if model.CreatedAt.IsZero() {
+		model.CreatedAt = time.Now()
+	}
+	if err := r.db.WithContext(ctx).Create(&model).Error; err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r *GormRepository) CreateOTP(ctx context.Context, otp *parcel.OTP) (*parcel.OTP, error) {
+	model := gormmodels.ParcelOTP{
+		ID:         otp.ID,
+		ParcelID:   otp.ParcelID,
+		OtpRef:     otp.OTPRef,
+		OtpHash:    otp.OTPHash,
+		Status:     otp.Status,
+		ExpiresAt:  otp.ExpiresAt,
+		VerifiedAt: otp.VerifiedAt,
+		CreatedAt:  otp.CreatedAt,
+	}
+	if model.ID == uuid.Nil {
+		model.ID = uuid.New()
+	}
+	if model.CreatedAt.IsZero() {
+		model.CreatedAt = time.Now()
+	}
+	if err := r.db.WithContext(ctx).Create(&model).Error; err != nil {
+		return nil, err
+	}
+	return mapOTPModelToDomain(model), nil
+}
+
+func (r *GormRepository) GetOTPByRef(ctx context.Context, ref string) (*parcel.OTP, error) {
+	var model gormmodels.ParcelOTP
+	if err := r.db.WithContext(ctx).Where("otp_ref = ?", ref).Order("created_at desc").First(&model).Error; err != nil {
+		return nil, err
+	}
+	return mapOTPModelToDomain(model), nil
+}
+
+func (r *GormRepository) UpdateOTP(ctx context.Context, otp *parcel.OTP) (*parcel.OTP, error) {
+	model := gormmodels.ParcelOTP{
+		ID:         otp.ID,
+		ParcelID:   otp.ParcelID,
+		OtpRef:     otp.OTPRef,
+		OtpHash:    otp.OTPHash,
+		Status:     otp.Status,
+		ExpiresAt:  otp.ExpiresAt,
+		VerifiedAt: otp.VerifiedAt,
+		CreatedAt:  otp.CreatedAt,
+	}
+	if err := r.db.WithContext(ctx).Save(&model).Error; err != nil {
+		return nil, err
+	}
+	return mapOTPModelToDomain(model), nil
+}
+
+func (r *GormRepository) FindReadyToExpire(ctx context.Context, now time.Time) ([]parcel.Parcel, error) {
+	var models []gormmodels.Parcel
+	if err := r.db.WithContext(ctx).
+		Where("status = ?", string(parcel.StatusPickupReady)).
+		Where("expires_at IS NOT NULL AND expires_at <= ?", now).
+		Find(&models).Error; err != nil {
+		return nil, err
+	}
+	parcels := make([]parcel.Parcel, 0, len(models))
+	for _, m := range models {
+		parcels = append(parcels, *mapParcelModelToDomain(m))
+	}
+	return parcels, nil
+}
+
+func (r *GormRepository) ExpireActiveOTPs(ctx context.Context, parcelID uuid.UUID) error {
+	return r.db.WithContext(ctx).
+		Model(&gormmodels.ParcelOTP{}).
+		Where("parcel_id = ? AND status = ?", parcelID, parcel.OTPStatusActive).
+		Updates(map[string]interface{}{"status": parcel.OTPStatusExpired}).Error
+}
+
 func mapParcelDomainToModel(p *parcel.Parcel) gormmodels.Parcel {
 	return gormmodels.Parcel{
 		ID:            p.ID,
@@ -85,4 +175,17 @@ func mapParcelModelToDomain(model gormmodels.Parcel) *parcel.Parcel {
 	}
 
 	return domainParcel
+}
+
+func mapOTPModelToDomain(model gormmodels.ParcelOTP) *parcel.OTP {
+	return &parcel.OTP{
+		ID:         model.ID,
+		ParcelID:   model.ParcelID,
+		OTPRef:     model.OtpRef,
+		OTPHash:    model.OtpHash,
+		Status:     model.Status,
+		ExpiresAt:  model.ExpiresAt,
+		VerifiedAt: model.VerifiedAt,
+		CreatedAt:  model.CreatedAt,
+	}
 }

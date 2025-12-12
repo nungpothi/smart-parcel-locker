@@ -2,6 +2,7 @@ package parcel
 
 import (
 	"context"
+	"time"
 
 	"github.com/google/uuid"
 )
@@ -11,4 +12,10 @@ type Repository interface {
 	Create(ctx context.Context, parcel *Parcel) (*Parcel, error)
 	GetByID(ctx context.Context, id uuid.UUID) (*Parcel, error)
 	Update(ctx context.Context, parcel *Parcel) (*Parcel, error)
+	CreateEvent(ctx context.Context, event *Event) error
+	CreateOTP(ctx context.Context, otp *OTP) (*OTP, error)
+	GetOTPByRef(ctx context.Context, ref string) (*OTP, error)
+	UpdateOTP(ctx context.Context, otp *OTP) (*OTP, error)
+	FindReadyToExpire(ctx context.Context, now time.Time) ([]Parcel, error)
+	ExpireActiveOTPs(ctx context.Context, parcelID uuid.UUID) error
 }

@@ -9,7 +9,6 @@ import (
 
 	"smart-parcel-locker/backend/adapter/http"
 	adminadapter "smart-parcel-locker/backend/adapter/http/admin"
-	lockeradapter "smart-parcel-locker/backend/adapter/http/locker"
 	parceladapter "smart-parcel-locker/backend/adapter/http/parcel"
 	templateadapter "smart-parcel-locker/backend/adapter/http/template"
 	"smart-parcel-locker/backend/domain/template"
@@ -21,7 +20,6 @@ import (
 	templatemodule "smart-parcel-locker/backend/infrastructure/template"
 	"smart-parcel-locker/backend/pkg/config"
 	adminusecase "smart-parcel-locker/backend/usecase/admin"
-	lockerusecase "smart-parcel-locker/backend/usecase/locker"
 	parcelusecase "smart-parcel-locker/backend/usecase/parcel"
 	templateusecase "smart-parcel-locker/backend/usecase/template"
 )
@@ -63,11 +61,7 @@ func wireModules(app *fiber.App, db *gorm.DB) {
 	// Locker & parcel modules
 	lockerRepo := lockerinfra.NewGormRepository(db)
 	parcelRepo := parcelinfra.NewGormRepository(db)
-	depositUC := lockerusecase.NewDepositUseCase(lockerRepo, parcelRepo, txManager)
-	retrieveUC := lockerusecase.NewRetrieveUseCase(lockerRepo, parcelRepo, txManager)
-	lockerHandler := lockeradapter.NewHandler(depositUC, retrieveUC)
-
-	parcelUC := parcelusecase.NewUseCase(parcelRepo)
+	parcelUC := parcelusecase.NewUseCase(parcelRepo, lockerRepo, txManager)
 	parcelHandler := parceladapter.NewHandler(parcelUC)
 
 	// Admin module
@@ -75,5 +69,5 @@ func wireModules(app *fiber.App, db *gorm.DB) {
 	adminUC := adminusecase.NewUseCase(adminRepo)
 	adminHandler := adminadapter.NewHandler(adminUC)
 
-	http.Register(app, templateHandler, lockerHandler, parcelHandler, adminHandler)
+	http.Register(app, templateHandler, parcelHandler, adminHandler)
 }

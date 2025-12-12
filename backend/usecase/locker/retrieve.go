@@ -1,16 +1,17 @@
+//go:build ignore
+
 package locker
 
 import (
 	"context"
-	"time"
-
-	"github.com/google/uuid"
-	"gorm.io/gorm"
-
 	"smart-parcel-locker/backend/domain/compartment"
 	"smart-parcel-locker/backend/domain/locker"
 	"smart-parcel-locker/backend/domain/parcel"
 	"smart-parcel-locker/backend/infrastructure/database"
+	"time"
+
+	"github.com/google/uuid"
+	"gorm.io/gorm"
 )
 
 // RetrieveInput carries retrieval parameters.

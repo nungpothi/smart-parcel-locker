@@ -29,8 +29,18 @@ Foundational Go backend using Fiber and GORM following a clean architecture layo
    go run ./cmd/server
    ```
 
+## API (v1) - Parcel Workflow
+- `POST /api/v1/parcels/create` – create parcel (CREATED)
+- `POST /api/v1/parcels/reserve` – reserve compartment (RESERVED)
+- `POST /api/v1/parcels/deposit` – store parcel (STORED)
+- `POST /api/v1/parcels/ready` – mark pickup-ready (PICKUP_READY)
+- `POST /api/v1/parcels/otp/request` – generate OTP (ACTIVE)
+- `POST /api/v1/parcels/otp/verify` – verify OTP (VERIFIED/EXPIRED)
+- `POST /api/v1/parcels/pickup` – pickup parcel (PICKED_UP, compartment released)
+- `POST /api/v1/parcels/expire/run` – expire ready parcels (EXPIRED, compartment released)
+
 ## Notes
 - PostgreSQL tables for lockers, slots, parcels, admins, and templates are auto-migrated on startup (UUID primary keys).
 - Template module illustrates the standard for new modules: real CRUD (entity, repository, transaction-aware use case, HTTP handlers/routes at `/api/v1/templates`, and a minimal unit test).
-- Locker/Parcel/Admin modules are scaffolded with real repositories and endpoints but minimal domain rules; extend their receivers/use cases in later phases.
+- Locker/Parcel/Admin modules are scaffolded with real repositories and endpoints; parcel flow now includes compartment reservation, deposit, pickup, OTP verification, and expiration.
 - Keep requirements documents at the repository root in sync with code changes.

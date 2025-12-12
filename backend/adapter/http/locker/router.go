@@ -1,3 +1,5 @@
+//go:build ignore
+
 package locker
 
 import "github.com/gofiber/fiber/v2"

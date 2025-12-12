@@ -59,10 +59,11 @@ func (r *GormRepository) GetLockerWithCompartments(ctx context.Context, lockerID
 
 func (r *GormRepository) UpdateCompartment(ctx context.Context, c *compartment.Compartment) (*compartment.Compartment, error) {
 	model := gormmodels.Compartment{
-		ID:       c.ID,
-		LockerID: c.LockerID,
-		Status:   c.Status,
-		Size:     c.Size,
+		ID:            c.ID,
+		LockerID:      c.LockerID,
+		CompartmentNo: c.CompartmentNo,
+		Status:        c.Status,
+		Size:          c.Size,
 	}
 
 	if err := r.db.WithContext(ctx).Model(&gormmodels.Compartment{}).Where("id = ?", c.ID).Updates(model).Error; err != nil {

@@ -21,6 +21,12 @@ type Locker struct {
 	UpdatedAt    *time.Time
 }
 
+const (
+	StatusActive      = "ACTIVE"
+	StatusMaintenance = "MAINTENANCE"
+	StatusDisabled    = "DISABLED"
+)
+
 // LockerService encapsulates locker business rules using receiver methods.
 type LockerService struct {
 	locker *Locker
@@ -48,12 +54,15 @@ func (s *LockerService) SelectBestFitCompartment(p *parcel.Parcel) (*compartment
 
 // MarkOccupied sets the compartment as occupied by the parcel.
 func (s *LockerService) MarkOccupied(c *compartment.Compartment, parcelID uuid.UUID) {
-	c.Status = compartment.StatusOccupied
-	c.ParcelID = &parcelID
+	_ = c.Occupy(parcelID)
 }
 
 // ReleaseCompartment frees up a compartment when a parcel is retrieved.
 func (s *LockerService) ReleaseCompartment(c *compartment.Compartment) {
-	c.Status = compartment.StatusAvailable
-	c.ParcelID = nil
+	_ = c.Release()
+}
+
+// IsActive returns whether locker is active.
+func (l *Locker) IsActive() bool {
+	return l.Status == StatusActive
 }
