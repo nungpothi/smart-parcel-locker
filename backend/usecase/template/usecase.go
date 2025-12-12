@@ -30,6 +30,18 @@ type UpdateInput struct {
 }
 
 func NewUseCase(repo template.Repository, db *gorm.DB, tx *database.TransactionManager, repoFactory func(db *gorm.DB) template.Repository) *UseCase {
+	if tx == nil {
+		tx = database.NewTransactionManager(nil)
+	}
+	if repoFactory == nil {
+		if r, ok := repo.(interface {
+			WithDB(*gorm.DB) template.Repository
+		}); ok {
+			repoFactory = func(db *gorm.DB) template.Repository { return r.WithDB(db) }
+		} else {
+			repoFactory = func(db *gorm.DB) template.Repository { return repo }
+		}
+	}
 	return &UseCase{
 		repo:        repo,
 		db:          db,
@@ -44,10 +56,18 @@ func (uc *UseCase) Create(ctx context.Context, input CreateInput) (*template.Tem
 		Name:        input.Name,
 		Description: input.Description,
 	}
-	return uc.runInTx(ctx, func(repo template.Repository) (*template.Template, error) {
+	var created *template.Template
+	err := uc.tx.WithinTransaction(ctx, func(tx *gorm.DB) error {
+		repo := uc.repoFactory(tx)
 		// TODO: add validation and business rules.
-		return repo.Create(ctx, entity)
+		var err error
+		created, err = repo.Create(ctx, entity)
+		return err
 	})
+	if err != nil {
+		return nil, err
+	}
+	return created, nil
 }
 
 // Get retrieves a Template by ID.
@@ -66,37 +86,25 @@ func (uc *UseCase) Update(ctx context.Context, input UpdateInput) (*template.Tem
 		Name:        input.Name,
 		Description: input.Description,
 	}
-	return uc.runInTx(ctx, func(repo template.Repository) (*template.Template, error) {
-		// TODO: add validation and business rules.
-		return repo.Update(ctx, entity)
-	})
-}
-
-// Delete removes a Template by ID.
-func (uc *UseCase) Delete(ctx context.Context, id string) error {
-	_, err := uc.runInTx(ctx, func(repo template.Repository) (*template.Template, error) {
-		return nil, repo.Delete(ctx, id)
-	})
-	return err
-}
-
-func (uc *UseCase) runInTx(ctx context.Context, fn func(repo template.Repository) (*template.Template, error)) (*template.Template, error) {
-	if uc.tx == nil {
-		return fn(uc.repo)
-	}
-
-	var res *template.Template
+	var updated *template.Template
 	err := uc.tx.WithinTransaction(ctx, func(tx *gorm.DB) error {
-		repo := uc.repo
-		if uc.repoFactory != nil && tx != nil {
-			repo = uc.repoFactory(tx)
-		}
+		repo := uc.repoFactory(tx)
+		// TODO: add validation and business rules.
 		var err error
-		res, err = fn(repo)
+		updated, err = repo.Update(ctx, entity)
 		return err
 	})
 	if err != nil {
 		return nil, err
 	}
-	return res, nil
+	return updated, nil
+}
+
+// Delete removes a Template by ID.
+func (uc *UseCase) Delete(ctx context.Context, id string) error {
+	return uc.tx.WithinTransaction(ctx, func(tx *gorm.DB) error {
+		repo := uc.repoFactory(tx)
+		// TODO: add business rules.
+		return repo.Delete(ctx, id)
+	})
 }

@@ -1,7 +1,11 @@
 package template
 
 import (
+	"errors"
+
 	"github.com/gofiber/fiber/v2"
+	"github.com/google/uuid"
+	"gorm.io/gorm"
 
 	"smart-parcel-locker/backend/pkg/response"
 	templateusecase "smart-parcel-locker/backend/usecase/template"
@@ -22,7 +26,12 @@ func (h *Handler) Create(c *fiber.Ctx) error {
 		Name        string `json:"name"`
 		Description string `json:"description"`
 	}
-	_ = c.BodyParser(&req)
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(response.APIResponse{Success: false, Error: "invalid request body"})
+	}
+	if req.Name == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(response.APIResponse{Success: false, Error: "name is required"})
+	}
 
 	result, err := h.uc.Create(c.Context(), templateusecase.CreateInput{Name: req.Name, Description: req.Description})
 	if err != nil {
@@ -44,8 +53,14 @@ func (h *Handler) List(c *fiber.Ctx) error {
 // Get retrieves a Template by ID.
 func (h *Handler) Get(c *fiber.Ctx) error {
 	id := c.Params("id")
+	if _, err := uuid.Parse(id); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(response.APIResponse{Success: false, Error: "invalid id"})
+	}
 	result, err := h.uc.Get(c.Context(), id)
 	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return c.Status(fiber.StatusNotFound).JSON(response.APIResponse{Success: false, Error: "not found"})
+		}
 		return c.Status(fiber.StatusInternalServerError).JSON(response.APIResponse{Success: false, Error: err.Error()})
 	}
 	return c.JSON(response.APIResponse{Success: true, Data: result})
@@ -54,14 +69,25 @@ func (h *Handler) Get(c *fiber.Ctx) error {
 // Update modifies a Template.
 func (h *Handler) Update(c *fiber.Ctx) error {
 	id := c.Params("id")
+	if _, err := uuid.Parse(id); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(response.APIResponse{Success: false, Error: "invalid id"})
+	}
 	var req struct {
 		Name        string `json:"name"`
 		Description string `json:"description"`
 	}
-	_ = c.BodyParser(&req)
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(response.APIResponse{Success: false, Error: "invalid request body"})
+	}
+	if req.Name == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(response.APIResponse{Success: false, Error: "name is required"})
+	}
 
 	result, err := h.uc.Update(c.Context(), templateusecase.UpdateInput{ID: id, Name: req.Name, Description: req.Description})
 	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return c.Status(fiber.StatusNotFound).JSON(response.APIResponse{Success: false, Error: "not found"})
+		}
 		return c.Status(fiber.StatusInternalServerError).JSON(response.APIResponse{Success: false, Error: err.Error()})
 	}
 	return c.JSON(response.APIResponse{Success: true, Data: result})
@@ -70,7 +96,13 @@ func (h *Handler) Update(c *fiber.Ctx) error {
 // Delete removes a Template.
 func (h *Handler) Delete(c *fiber.Ctx) error {
 	id := c.Params("id")
+	if _, err := uuid.Parse(id); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(response.APIResponse{Success: false, Error: "invalid id"})
+	}
 	if err := h.uc.Delete(c.Context(), id); err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return c.Status(fiber.StatusNotFound).JSON(response.APIResponse{Success: false, Error: "not found"})
+		}
 		return c.Status(fiber.StatusInternalServerError).JSON(response.APIResponse{Success: false, Error: err.Error()})
 	}
 	return c.JSON(response.APIResponse{Success: true})

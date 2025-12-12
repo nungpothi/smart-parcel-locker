@@ -1,8 +1,11 @@
 package parcel
 
 import (
+	"errors"
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
+	"gorm.io/gorm"
 
 	"smart-parcel-locker/backend/pkg/response"
 	parcelusecase "smart-parcel-locker/backend/usecase/parcel"
@@ -26,10 +29,17 @@ type createRequest struct {
 
 func (h *Handler) Create(c *fiber.Ctx) error {
 	var req createRequest
-	_ = c.BodyParser(&req)
-
-	lockerID, _ := uuid.Parse(req.LockerID)
-	slotID, _ := uuid.Parse(req.SlotID)
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(response.APIResponse{Success: false, Error: "invalid request body"})
+	}
+	lockerID, err := uuid.Parse(req.LockerID)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(response.APIResponse{Success: false, Error: "invalid locker_id"})
+	}
+	slotID, err := uuid.Parse(req.SlotID)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(response.APIResponse{Success: false, Error: "invalid slot_id"})
+	}
 
 	result, err := h.uc.Create(c.Context(), parcelusecase.CreateInput{
 		LockerID: lockerID,
@@ -44,9 +54,15 @@ func (h *Handler) Create(c *fiber.Ctx) error {
 }
 
 func (h *Handler) Get(c *fiber.Ctx) error {
-	id, _ := uuid.Parse(c.Params("id"))
+	id, err := uuid.Parse(c.Params("id"))
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(response.APIResponse{Success: false, Error: "invalid id"})
+	}
 	result, err := h.uc.Get(c.Context(), id)
 	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return c.Status(fiber.StatusNotFound).JSON(response.APIResponse{Success: false, Error: "not found"})
+		}
 		return c.Status(fiber.StatusInternalServerError).JSON(response.APIResponse{Success: false, Error: err.Error()})
 	}
 	return c.JSON(response.APIResponse{Success: true, Data: result})

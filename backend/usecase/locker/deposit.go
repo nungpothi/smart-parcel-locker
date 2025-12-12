@@ -31,6 +31,9 @@ type DepositUseCase struct {
 }
 
 func NewDepositUseCase(lockerRepo locker.Repository, parcelRepo parcel.Repository, tx *database.TransactionManager) *DepositUseCase {
+	if tx == nil {
+		tx = database.NewTransactionManager(nil)
+	}
 	return &DepositUseCase{
 		lockerRepo: lockerRepo.(interface {
 			locker.Repository
@@ -46,7 +49,11 @@ func NewDepositUseCase(lockerRepo locker.Repository, parcelRepo parcel.Repositor
 
 func (uc *DepositUseCase) Execute(ctx context.Context, input DepositInput) (*parcel.Parcel, error) {
 	var result *parcel.Parcel
-	run := func(lockerRepo locker.Repository, parcelRepo parcel.Repository) error {
+
+	err := uc.tx.WithinTransaction(ctx, func(tx *gorm.DB) error {
+		lockerRepo := uc.lockerRepo.WithDB(tx)
+		parcelRepo := uc.parcelRepo.WithDB(tx)
+
 		lockerEntity, err := lockerRepo.GetLockerWithSlots(ctx, input.LockerID)
 		if err != nil {
 			return err
@@ -88,20 +95,10 @@ func (uc *DepositUseCase) Execute(ctx context.Context, input DepositInput) (*par
 
 		result = created
 		return nil
-	}
+	})
 
-	if uc.tx != nil {
-		if err := uc.tx.WithinTransaction(ctx, func(tx *gorm.DB) error {
-			lr := uc.lockerRepo.WithDB(tx)
-			pr := uc.parcelRepo.WithDB(tx)
-			return run(lr, pr)
-		}); err != nil {
-			return nil, err
-		}
-	} else {
-		if err := run(uc.lockerRepo, uc.parcelRepo); err != nil {
-			return nil, err
-		}
+	if err != nil {
+		return nil, err
 	}
 
 	return result, nil

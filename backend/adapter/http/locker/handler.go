@@ -1,6 +1,7 @@
 package locker
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/gofiber/fiber/v2"
@@ -36,9 +37,17 @@ type retrieveRequest struct {
 
 func (h *Handler) Deposit(c *fiber.Ctx) error {
 	var req depositRequest
-	_ = c.BodyParser(&req)
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(response.APIResponse{Success: false, Error: "invalid request body"})
+	}
+	if req.LockerID == "" || req.ParcelSize <= 0 {
+		return c.Status(fiber.StatusBadRequest).JSON(response.APIResponse{Success: false, Error: "locker_id and parcel_size are required"})
+	}
 
-	lockerID, _ := uuid.Parse(req.LockerID)
+	lockerID, err := uuid.Parse(req.LockerID)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(response.APIResponse{Success: false, Error: "invalid locker_id"})
+	}
 
 	result, err := h.depositUC.Execute(c.Context(), depositusecase.DepositInput{
 		LockerID:   lockerID,
@@ -53,10 +62,18 @@ func (h *Handler) Deposit(c *fiber.Ctx) error {
 
 func (h *Handler) Retrieve(c *fiber.Ctx) error {
 	var req retrieveRequest
-	_ = c.BodyParser(&req)
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(response.APIResponse{Success: false, Error: "invalid request body"})
+	}
 
-	lockerID, _ := uuid.Parse(req.LockerID)
-	parcelID, _ := uuid.Parse(req.ParcelID)
+	lockerID, err := uuid.Parse(req.LockerID)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(response.APIResponse{Success: false, Error: "invalid locker_id"})
+	}
+	parcelID, err := uuid.Parse(req.ParcelID)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(response.APIResponse{Success: false, Error: "invalid parcel_id"})
+	}
 
 	result, err := h.retrieveUC.Execute(c.Context(), depositusecase.RetrieveInput{
 		LockerID: lockerID,
@@ -70,12 +87,12 @@ func (h *Handler) Retrieve(c *fiber.Ctx) error {
 }
 
 func mapError(c *fiber.Ctx, err error) error {
-	switch err {
-	case locker.ErrNoAvailableSlot:
+	switch {
+	case errors.Is(err, locker.ErrNoAvailableSlot):
 		return c.Status(http.StatusConflict).JSON(response.APIResponse{Success: false, Error: err.Error()})
-	case locker.ErrInvalidDeposit:
+	case errors.Is(err, locker.ErrInvalidDeposit):
 		return c.Status(http.StatusBadRequest).JSON(response.APIResponse{Success: false, Error: err.Error()})
-	case locker.ErrParcelNotFound:
+	case errors.Is(err, locker.ErrParcelNotFound):
 		return c.Status(http.StatusNotFound).JSON(response.APIResponse{Success: false, Error: err.Error()})
 	default:
 		return c.Status(http.StatusInternalServerError).JSON(response.APIResponse{Success: false, Error: err.Error()})

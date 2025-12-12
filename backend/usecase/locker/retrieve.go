@@ -31,6 +31,9 @@ type RetrieveUseCase struct {
 }
 
 func NewRetrieveUseCase(lockerRepo locker.Repository, parcelRepo parcel.Repository, tx *database.TransactionManager) *RetrieveUseCase {
+	if tx == nil {
+		tx = database.NewTransactionManager(nil)
+	}
 	return &RetrieveUseCase{
 		lockerRepo: lockerRepo.(interface {
 			locker.Repository
@@ -47,7 +50,10 @@ func NewRetrieveUseCase(lockerRepo locker.Repository, parcelRepo parcel.Reposito
 func (uc *RetrieveUseCase) Execute(ctx context.Context, input RetrieveInput) (*parcel.Parcel, error) {
 	var result *parcel.Parcel
 
-	run := func(lockerRepo locker.Repository, parcelRepo parcel.Repository) error {
+	err := uc.tx.WithinTransaction(ctx, func(tx *gorm.DB) error {
+		lockerRepo := uc.lockerRepo.WithDB(tx)
+		parcelRepo := uc.parcelRepo.WithDB(tx)
+
 		lockerEntity, err := lockerRepo.GetLockerWithSlots(ctx, input.LockerID)
 		if err != nil {
 			return err
@@ -77,20 +83,10 @@ func (uc *RetrieveUseCase) Execute(ctx context.Context, input RetrieveInput) (*p
 
 		result = parcelEntity
 		return nil
-	}
+	})
 
-	if uc.tx != nil {
-		if err := uc.tx.WithinTransaction(ctx, func(tx *gorm.DB) error {
-			lr := uc.lockerRepo.WithDB(tx)
-			pr := uc.parcelRepo.WithDB(tx)
-			return run(lr, pr)
-		}); err != nil {
-			return nil, err
-		}
-	} else {
-		if err := run(uc.lockerRepo, uc.parcelRepo); err != nil {
-			return nil, err
-		}
+	if err != nil {
+		return nil, err
 	}
 
 	return result, nil
