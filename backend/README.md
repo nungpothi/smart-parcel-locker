@@ -32,4 +32,5 @@ Foundational Go backend using Fiber and GORM following a clean architecture layo
 ## Notes
 - Routes are placeholders; add real endpoints in future phases.
 - Template module illustrates the standard for new modules: CRUD structure (entity, repository interface + GORM stub, use case CRUD signatures, HTTP handlers/routes at `/api/v1/templates`, and a minimal unit test).
+- Phase 2 modules: Locker (deposit/retrieve at `/api/v1/lockers`), Parcel (create/get), Admin (CRUD at `/api/v1/admins`), all using stubbed repositories and receiver-driven domain hooks.
 - Keep requirements documents at the repository root in sync with code changes.
