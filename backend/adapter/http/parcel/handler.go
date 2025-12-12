@@ -2,17 +2,16 @@ package parcel
 
 import (
 	"errors"
-	"time"
-
-	"github.com/gofiber/fiber/v2"
-	"github.com/google/uuid"
-	"gorm.io/gorm"
-
 	"smart-parcel-locker/backend/domain/compartment"
 	lockerdomain "smart-parcel-locker/backend/domain/locker"
 	"smart-parcel-locker/backend/domain/parcel"
 	"smart-parcel-locker/backend/pkg/response"
 	parcelusecase "smart-parcel-locker/backend/usecase/parcel"
+	"time"
+
+	"github.com/gofiber/fiber/v2"
+	"github.com/google/uuid"
+	"gorm.io/gorm"
 )
 
 // Handler exposes parcel workflow endpoints.
