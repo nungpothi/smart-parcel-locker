@@ -4,7 +4,7 @@ Scope: runnable Go backend using Fiber + GORM + PostgreSQL with clean architectu
 
 What exists:
 - Bootstrap under `/backend` with env-driven config and PostgreSQL connection (pgcrypto extension enabled).
-- AutoMigrate on startup for tables: `lockers`, `slots`, `parcels`, `admins`, `templates` (UUID primary keys, relations).
+- AutoMigrate on startup for tables: `lockers`, `slots`, `parcels`, `admins`, `templates` (UUID primary keys, relations) following canonical schema.
 - Transaction helper using GORM transactions for write flows.
 - Template module: CRUD entity, repository (GORM), transaction-aware use case, and HTTP CRUD API at `/api/v1/templates`.
 - Locker module scaffolding: domain service for validation/slot selection, repo with GORM, deposit/retrieve use cases and HTTP endpoints at `/api/v1/lockers/deposit` and `/api/v1/lockers/retrieve` (logic minimal).

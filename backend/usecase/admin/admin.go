@@ -14,14 +14,16 @@ type UseCase struct {
 }
 
 type CreateInput struct {
-	Email string
-	Name  string
+	Username     string
+	PasswordHash string
+	Role         string
 }
 
 type UpdateInput struct {
-	ID    uuid.UUID
-	Email string
-	Name  string
+	ID           uuid.UUID
+	Username     string
+	PasswordHash string
+	Role         string
 }
 
 func NewUseCase(repo admin.Repository) *UseCase {
@@ -30,8 +32,9 @@ func NewUseCase(repo admin.Repository) *UseCase {
 
 func (uc *UseCase) Create(ctx context.Context, input CreateInput) (*admin.Admin, error) {
 	entity := &admin.Admin{
-		Email: input.Email,
-		Name:  input.Name,
+		Username:     input.Username,
+		PasswordHash: input.PasswordHash,
+		Role:         input.Role,
 	}
 	// TODO: add validations.
 	return uc.repo.Create(ctx, entity)
@@ -43,9 +46,10 @@ func (uc *UseCase) Get(ctx context.Context, id uuid.UUID) (*admin.Admin, error) 
 
 func (uc *UseCase) Update(ctx context.Context, input UpdateInput) (*admin.Admin, error) {
 	entity := &admin.Admin{
-		ID:    input.ID,
-		Email: input.Email,
-		Name:  input.Name,
+		ID:           input.ID,
+		Username:     input.Username,
+		PasswordHash: input.PasswordHash,
+		Role:         input.Role,
 	}
 	// TODO: add validations.
 	return uc.repo.Update(ctx, entity)

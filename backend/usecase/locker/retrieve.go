@@ -2,6 +2,7 @@ package locker
 
 import (
 	"context"
+	"time"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -70,7 +71,9 @@ func (uc *RetrieveUseCase) Execute(ctx context.Context, input RetrieveInput) (*p
 			return err
 		}
 
-		parcelEntity.SetStatus("retrieved")
+		now := time.Now()
+		parcelEntity.SetStatus(parcel.StatusRetrieved)
+		parcelEntity.RetrievedAt = &now
 		service.ReleaseSlot(slot)
 
 		if _, err := parcelRepo.Update(ctx, parcelEntity); err != nil {

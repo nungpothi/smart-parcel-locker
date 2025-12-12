@@ -21,8 +21,9 @@ func NewHandler(uc *adminusecase.UseCase) *Handler {
 }
 
 type createRequest struct {
-	Email string `json:"email"`
-	Name  string `json:"name"`
+	Username     string `json:"username"`
+	PasswordHash string `json:"password_hash"`
+	Role         string `json:"role"`
 }
 
 func (h *Handler) Create(c *fiber.Ctx) error {
@@ -30,12 +31,13 @@ func (h *Handler) Create(c *fiber.Ctx) error {
 	if err := c.BodyParser(&req); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(response.APIResponse{Success: false, Error: "invalid request body"})
 	}
-	if req.Email == "" || req.Name == "" {
-		return c.Status(fiber.StatusBadRequest).JSON(response.APIResponse{Success: false, Error: "email and name are required"})
+	if req.Username == "" || req.PasswordHash == "" || req.Role == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(response.APIResponse{Success: false, Error: "username, password_hash, and role are required"})
 	}
 	result, err := h.uc.Create(c.Context(), adminusecase.CreateInput{
-		Email: req.Email,
-		Name:  req.Name,
+		Username:     req.Username,
+		PasswordHash: req.PasswordHash,
+		Role:         req.Role,
 	})
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(response.APIResponse{Success: false, Error: err.Error()})
@@ -67,13 +69,14 @@ func (h *Handler) Update(c *fiber.Ctx) error {
 	if err := c.BodyParser(&req); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(response.APIResponse{Success: false, Error: "invalid request body"})
 	}
-	if req.Email == "" || req.Name == "" {
-		return c.Status(fiber.StatusBadRequest).JSON(response.APIResponse{Success: false, Error: "email and name are required"})
+	if req.Username == "" || req.PasswordHash == "" || req.Role == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(response.APIResponse{Success: false, Error: "username, password_hash, and role are required"})
 	}
 	result, err := h.uc.Update(c.Context(), adminusecase.UpdateInput{
-		ID:    id,
-		Email: req.Email,
-		Name:  req.Name,
+		ID:           id,
+		Username:     req.Username,
+		PasswordHash: req.PasswordHash,
+		Role:         req.Role,
 	})
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {

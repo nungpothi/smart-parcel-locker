@@ -5,7 +5,7 @@ APIs:
 - `POST /api/v1/lockers/retrieve` to retrieve a parcel from a slot.
 
 Domain:
-- Locker entity with slots; Slot entity. UUID primary keys; Slot references Locker; Slot may reference Parcel.
+- Locker entity with slots; Slot entity. UUID primary keys; Locker fields: code (unique), name, location, timestamps. Slot fields: locker_id, size (1/2/3), occupied, parcel_id, timestamps.
 - LockerService domain service handles deposit validation and best-fit slot selection via receiver methods.
 
 Behavior (Phase 2 scope):

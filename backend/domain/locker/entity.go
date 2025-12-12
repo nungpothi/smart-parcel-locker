@@ -11,7 +11,8 @@ import (
 // Locker represents a locker bank containing multiple slots.
 type Locker struct {
 	ID        uuid.UUID `gorm:"type:uuid;default:gen_random_uuid();primaryKey"`
-	Name      string    `gorm:"size:255;not null"`
+	Code      string    `gorm:"size:255;uniqueIndex;not null"`
+	Name      string    `gorm:"size:255"`
 	Location  string    `gorm:"size:255"`
 	Slots     []Slot    `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 	CreatedAt time.Time

@@ -2,6 +2,7 @@ package locker
 
 import (
 	"context"
+	"time"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -61,9 +62,11 @@ func (uc *DepositUseCase) Execute(ctx context.Context, input DepositInput) (*par
 
 		service := locker.NewLockerService(lockerEntity)
 		parcelEntity := &parcel.Parcel{
-			LockerID: input.LockerID,
-			Size:     input.ParcelSize,
-			Status:   "pending",
+			LockerID:    input.LockerID,
+			Size:        input.ParcelSize,
+			Status:      parcel.StatusDeposited,
+			PickupCode:  uuid.New().String(),
+			DepositedAt: time.Now(),
 		}
 
 		if err := service.ValidateDeposit(parcelEntity); err != nil {
@@ -76,7 +79,6 @@ func (uc *DepositUseCase) Execute(ctx context.Context, input DepositInput) (*par
 		}
 
 		parcelEntity.SlotID = slot.ID
-		parcelEntity.SetStatus("deposited")
 
 		created, err := parcelRepo.Create(ctx, parcelEntity)
 		if err != nil {

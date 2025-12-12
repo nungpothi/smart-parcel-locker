@@ -2,11 +2,13 @@ package parcel
 
 import (
 	"errors"
+	"strings"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 
+	"smart-parcel-locker/backend/domain/parcel"
 	"smart-parcel-locker/backend/pkg/response"
 	parcelusecase "smart-parcel-locker/backend/usecase/parcel"
 )
@@ -21,10 +23,11 @@ func NewHandler(uc *parcelusecase.UseCase) *Handler {
 }
 
 type createRequest struct {
-	LockerID string `json:"locker_id"`
-	SlotID   string `json:"slot_id"`
-	Status   string `json:"status"`
-	Size     int    `json:"size"`
+	LockerID   string `json:"locker_id"`
+	SlotID     string `json:"slot_id"`
+	Status     string `json:"status"`
+	Size       int    `json:"size"`
+	PickupCode string `json:"pickup_code"`
 }
 
 func (h *Handler) Create(c *fiber.Ctx) error {
@@ -40,12 +43,24 @@ func (h *Handler) Create(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(response.APIResponse{Success: false, Error: "invalid slot_id"})
 	}
+	if strings.TrimSpace(req.PickupCode) == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(response.APIResponse{Success: false, Error: "pickup_code is required"})
+	}
+	if req.Size <= 0 {
+		return c.Status(fiber.StatusBadRequest).JSON(response.APIResponse{Success: false, Error: "size is required"})
+	}
+
+	status := parcel.StatusPending
+	if req.Status != "" {
+		status = parcel.Status(strings.ToUpper(req.Status))
+	}
 
 	result, err := h.uc.Create(c.Context(), parcelusecase.CreateInput{
-		LockerID: lockerID,
-		SlotID:   slotID,
-		Size:     req.Size,
-		Status:   req.Status,
+		LockerID:   lockerID,
+		SlotID:     slotID,
+		Size:       req.Size,
+		Status:     status,
+		PickupCode: req.PickupCode,
 	})
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(response.APIResponse{Success: false, Error: err.Error()})

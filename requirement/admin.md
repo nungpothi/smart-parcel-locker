@@ -1,7 +1,7 @@
 # Admin Module Requirements
 
 Scope:
-- Minimal admin entity with CRUD (UUID primary key, unique email).
+- Minimal admin entity with CRUD (UUID primary key, username unique, password_hash, role).
 - Repository interface and GORM implementation (stubbed logic).
 - Use case CRUD signatures following the template.
 - HTTP CRUD endpoints (versioned) without real authentication (stub).
