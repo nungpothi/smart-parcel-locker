@@ -2,13 +2,9 @@ package database
 
 import (
 	"fmt"
+	gormmodels "smart-parcel-locker/backend/infrastructure/persistence/gorm/models"
 
 	"gorm.io/gorm"
-
-	"smart-parcel-locker/backend/domain/admin"
-	"smart-parcel-locker/backend/domain/locker"
-	"smart-parcel-locker/backend/domain/parcel"
-	"smart-parcel-locker/backend/domain/template"
 )
 
 // Prepare applies DB-level setup (extensions + migrations).
@@ -16,17 +12,19 @@ func Prepare(db *gorm.DB) error {
 	if err := ensureUUIDExtension(db); err != nil {
 		return err
 	}
-	return AutoMigrate(db)
+	return AutoMigrateSchema(db)
 }
 
-// AutoMigrate runs schema migration for core entities.
-func AutoMigrate(db *gorm.DB) error {
+// AutoMigrateSchema runs schema migration for core entities using schema models only.
+func AutoMigrateSchema(db *gorm.DB) error {
 	if err := db.AutoMigrate(
-		&admin.Admin{},
-		&locker.Locker{},
-		&locker.Slot{},
-		&parcel.Parcel{},
-		&template.Template{},
+		&gormmodels.Location{},
+		&gormmodels.Locker{},
+		&gormmodels.Compartment{},
+		&gormmodels.User{},
+		&gormmodels.Parcel{},
+		&gormmodels.ParcelEvent{},
+		&gormmodels.ParcelOTP{},
 	); err != nil {
 		return fmt.Errorf("auto migrate: %w", err)
 	}
