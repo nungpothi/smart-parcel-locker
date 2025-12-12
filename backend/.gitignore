@@ -1,0 +1,15 @@
+# Binaries
+/bin/
+/build/
+.gocache/
+.gotmp/
+
+# Go coverage
+*.out
+
+# IDE
+.vscode/
+.idea/
+
+# Env files
+.env
