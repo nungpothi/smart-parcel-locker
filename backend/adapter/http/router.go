@@ -8,7 +8,7 @@ import (
 
 // Register attaches all HTTP routes to the Fiber app.
 func Register(app *fiber.App, templateHandler *templateadapter.Handler) {
-	api := app.Group("/api")
+	api := app.Group("/api/v1")
 
 	templateGroup := api.Group("/templates")
 	templateadapter.RegisterRoutes(templateGroup, templateHandler)

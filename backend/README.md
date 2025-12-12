@@ -15,7 +15,7 @@ Foundational Go backend using Fiber and GORM following a clean architecture layo
 - `adapter` – inbound/outbound adapters (HTTP handlers live here)
 - `infrastructure` – framework integrations (DB, HTTP, logging, etc.)
 - `pkg` – shared utilities (config, error/response templates)
-- `adapter/template`, `domain/template`, `usecase/template`, `infrastructure/template` – reusable module template
+- `adapter/template`, `domain/template`, `usecase/template`, `infrastructure/template` - reusable module template
 
 ## Getting Started
 1. Copy `.env.example` to `.env` and adjust values.
@@ -31,6 +31,5 @@ Foundational Go backend using Fiber and GORM following a clean architecture layo
 
 ## Notes
 - Routes are placeholders; add real endpoints in future phases.
-- Template module illustrates the standard for new modules (entity, repository, use case, handler, router, test).
+- Template module illustrates the standard for new modules: CRUD structure (entity, repository interface + GORM stub, use case CRUD signatures, HTTP handlers/routes at `/api/v1/templates`, and a minimal unit test).
 - Keep requirements documents at the repository root in sync with code changes.
-
