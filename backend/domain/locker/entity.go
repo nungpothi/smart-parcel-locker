@@ -5,29 +5,20 @@ import (
 
 	"github.com/google/uuid"
 
+	"smart-parcel-locker/backend/domain/compartment"
 	"smart-parcel-locker/backend/domain/parcel"
 )
 
-// Locker represents a locker bank containing multiple slots.
+// Locker represents a locker bank containing multiple compartments.
 type Locker struct {
-	ID        uuid.UUID `gorm:"type:uuid;default:gen_random_uuid();primaryKey"`
-	Code      string    `gorm:"size:255;uniqueIndex;not null"`
-	Name      string    `gorm:"size:255"`
-	Location  string    `gorm:"size:255"`
-	Slots     []Slot    `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
-	CreatedAt time.Time
-	UpdatedAt time.Time
-}
-
-// Slot represents an individual compartment in a locker.
-type Slot struct {
-	ID        uuid.UUID  `gorm:"type:uuid;default:gen_random_uuid();primaryKey"`
-	LockerID  uuid.UUID  `gorm:"type:uuid;not null;index"`
-	Size      int        `gorm:"not null"`
-	Occupied  bool       `gorm:"not null;default:false"`
-	ParcelID  *uuid.UUID `gorm:"type:uuid"`
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	ID           uuid.UUID
+	LocationID   uuid.UUID
+	LockerCode   string
+	Name         string
+	Status       string
+	Compartments []compartment.Compartment
+	CreatedAt    time.Time
+	UpdatedAt    *time.Time
 }
 
 // LockerService encapsulates locker business rules using receiver methods.
@@ -45,25 +36,24 @@ func (s *LockerService) ValidateDeposit(p *parcel.Parcel) error {
 	return nil
 }
 
-// SelectBestFitSlot finds the best slot for a parcel.
-func (s *LockerService) SelectBestFitSlot(p *parcel.Parcel) (*Slot, error) {
-	// TODO: implement best-fit selection logic.
-	for i := range s.locker.Slots {
-		if !s.locker.Slots[i].Occupied {
-			return &s.locker.Slots[i], nil
+// SelectBestFitCompartment finds the best compartment for a parcel.
+func (s *LockerService) SelectBestFitCompartment(p *parcel.Parcel) (*compartment.Compartment, error) {
+	for i := range s.locker.Compartments {
+		if s.locker.Compartments[i].Status == compartment.StatusAvailable {
+			return &s.locker.Compartments[i], nil
 		}
 	}
 	return nil, ErrNoAvailableSlot
 }
 
-// MarkOccupied sets the slot as occupied by the parcel.
-func (s *LockerService) MarkOccupied(slot *Slot, parcelID uuid.UUID) {
-	slot.Occupied = true
-	slot.ParcelID = &parcelID
+// MarkOccupied sets the compartment as occupied by the parcel.
+func (s *LockerService) MarkOccupied(c *compartment.Compartment, parcelID uuid.UUID) {
+	c.Status = compartment.StatusOccupied
+	c.ParcelID = &parcelID
 }
 
-// ReleaseSlot frees up a slot when a parcel is retrieved.
-func (s *LockerService) ReleaseSlot(slot *Slot) {
-	slot.Occupied = false
-	slot.ParcelID = nil
+// ReleaseCompartment frees up a compartment when a parcel is retrieved.
+func (s *LockerService) ReleaseCompartment(c *compartment.Compartment) {
+	c.Status = compartment.StatusAvailable
+	c.ParcelID = nil
 }

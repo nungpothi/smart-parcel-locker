@@ -12,6 +12,19 @@ import (
 	"smart-parcel-locker/backend/infrastructure/database"
 )
 
+func sizeIntToString(size int) string {
+	switch size {
+	case 1:
+		return "S"
+	case 2:
+		return "M"
+	case 3:
+		return "L"
+	default:
+		return "M"
+	}
+}
+
 // DepositInput carries deposit parameters.
 type DepositInput struct {
 	LockerID   uuid.UUID
@@ -55,43 +68,44 @@ func (uc *DepositUseCase) Execute(ctx context.Context, input DepositInput) (*par
 		lockerRepo := uc.lockerRepo.WithDB(tx)
 		parcelRepo := uc.parcelRepo.WithDB(tx)
 
-		lockerEntity, err := lockerRepo.GetLockerWithSlots(ctx, input.LockerID)
+		lockerEntity, err := lockerRepo.GetLockerWithCompartments(ctx, input.LockerID)
 		if err != nil {
 			return err
 		}
 
 		service := locker.NewLockerService(lockerEntity)
 		parcelEntity := &parcel.Parcel{
-			LockerID:    input.LockerID,
-			Size:        input.ParcelSize,
-			Status:      parcel.StatusDeposited,
-			PickupCode:  uuid.New().String(),
-			DepositedAt: time.Now(),
+			LockerID:   input.LockerID,
+			Size:       sizeIntToString(input.ParcelSize),
+			Status:     parcel.StatusDeposited,
+			ParcelCode: uuid.New().String(),
 		}
+		now := time.Now()
+		parcelEntity.DepositedAt = &now
 
 		if err := service.ValidateDeposit(parcelEntity); err != nil {
 			return err
 		}
 
-		slot, err := service.SelectBestFitSlot(parcelEntity)
+		compartmentEntity, err := service.SelectBestFitCompartment(parcelEntity)
 		if err != nil {
 			return err
 		}
 
-		parcelEntity.SlotID = slot.ID
+		parcelEntity.CompartmentID = &compartmentEntity.ID
 
 		created, err := parcelRepo.Create(ctx, parcelEntity)
 		if err != nil {
 			return err
 		}
 
-		service.MarkOccupied(slot, created.ID)
+		service.MarkOccupied(compartmentEntity, created.ID)
 
 		if _, err := parcelRepo.Update(ctx, created); err != nil {
 			return err
 		}
 
-		if _, err := lockerRepo.UpdateSlot(ctx, slot); err != nil {
+		if _, err := lockerRepo.UpdateCompartment(ctx, compartmentEntity); err != nil {
 			return err
 		}
 

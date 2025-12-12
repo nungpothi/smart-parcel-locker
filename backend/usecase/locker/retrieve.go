@@ -7,6 +7,7 @@ import (
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 
+	"smart-parcel-locker/backend/domain/compartment"
 	"smart-parcel-locker/backend/domain/locker"
 	"smart-parcel-locker/backend/domain/parcel"
 	"smart-parcel-locker/backend/infrastructure/database"
@@ -55,14 +56,14 @@ func (uc *RetrieveUseCase) Execute(ctx context.Context, input RetrieveInput) (*p
 		lockerRepo := uc.lockerRepo.WithDB(tx)
 		parcelRepo := uc.parcelRepo.WithDB(tx)
 
-		lockerEntity, err := lockerRepo.GetLockerWithSlots(ctx, input.LockerID)
+		lockerEntity, err := lockerRepo.GetLockerWithCompartments(ctx, input.LockerID)
 		if err != nil {
 			return err
 		}
 
 		service := locker.NewLockerService(lockerEntity)
-		slot := findSlotByParcelID(lockerEntity.Slots, input.ParcelID)
-		if slot == nil {
+		comp := findCompartmentByParcelID(lockerEntity.Compartments, input.ParcelID)
+		if comp == nil {
 			return locker.ErrParcelNotFound
 		}
 
@@ -73,14 +74,14 @@ func (uc *RetrieveUseCase) Execute(ctx context.Context, input RetrieveInput) (*p
 
 		now := time.Now()
 		parcelEntity.SetStatus(parcel.StatusRetrieved)
-		parcelEntity.RetrievedAt = &now
-		service.ReleaseSlot(slot)
+		parcelEntity.PickedUpAt = &now
+		service.ReleaseCompartment(comp)
 
 		if _, err := parcelRepo.Update(ctx, parcelEntity); err != nil {
 			return err
 		}
 
-		if _, err := lockerRepo.UpdateSlot(ctx, slot); err != nil {
+		if _, err := lockerRepo.UpdateCompartment(ctx, comp); err != nil {
 			return err
 		}
 
@@ -95,10 +96,10 @@ func (uc *RetrieveUseCase) Execute(ctx context.Context, input RetrieveInput) (*p
 	return result, nil
 }
 
-func findSlotByParcelID(slots []locker.Slot, parcelID uuid.UUID) *locker.Slot {
-	for i := range slots {
-		if slots[i].ParcelID != nil && *slots[i].ParcelID == parcelID {
-			return &slots[i]
+func findCompartmentByParcelID(comps []compartment.Compartment, parcelID uuid.UUID) *compartment.Compartment {
+	for i := range comps {
+		if comps[i].ParcelID != nil && *comps[i].ParcelID == parcelID {
+			return &comps[i]
 		}
 	}
 	return nil

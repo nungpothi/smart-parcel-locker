@@ -6,7 +6,6 @@ import (
 	"github.com/google/uuid"
 )
 
-// Status enumerates parcel lifecycle states.
 type Status string
 
 const (
@@ -16,19 +15,22 @@ const (
 	StatusExpired   Status = "EXPIRED"
 )
 
-// Parcel represents a package stored in a locker.
+// Parcel represents a package stored in a locker compartment.
 type Parcel struct {
-	ID          uuid.UUID `gorm:"type:uuid;default:gen_random_uuid();primaryKey"`
-	LockerID    uuid.UUID `gorm:"type:uuid;index;not null"`
-	SlotID      uuid.UUID `gorm:"type:uuid;index;not null"`
-	PickupCode  string    `gorm:"size:255;uniqueIndex;not null"`
-	Size        int       `gorm:"not null"`
-	Status      Status    `gorm:"size:20;not null"`
-	DepositedAt time.Time `gorm:"not null"`
-	RetrievedAt *time.Time
-	ExpiredAt   *time.Time
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
+	ID            uuid.UUID
+	ParcelCode    string
+	LockerID      uuid.UUID
+	CompartmentID *uuid.UUID
+	Size          string // S | M | L
+	CourierID     uuid.UUID
+	RecipientID   uuid.UUID
+	Status        Status
+	ReservedAt    *time.Time
+	DepositedAt   *time.Time
+	PickedUpAt    *time.Time
+	ExpiresAt     *time.Time
+	CreatedAt     time.Time
+	UpdatedAt     *time.Time
 }
 
 // SetStatus updates the parcel status.

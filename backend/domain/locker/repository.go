@@ -4,10 +4,12 @@ import (
 	"context"
 
 	"github.com/google/uuid"
+
+	"smart-parcel-locker/backend/domain/compartment"
 )
 
-// Repository defines data access for lockers and slots.
+// Repository defines data access for lockers and compartments.
 type Repository interface {
-	GetLockerWithSlots(ctx context.Context, lockerID uuid.UUID) (*Locker, error)
-	UpdateSlot(ctx context.Context, slot *Slot) (*Slot, error)
+	GetLockerWithCompartments(ctx context.Context, lockerID uuid.UUID) (*Locker, error)
+	UpdateCompartment(ctx context.Context, c *compartment.Compartment) (*compartment.Compartment, error)
 }
