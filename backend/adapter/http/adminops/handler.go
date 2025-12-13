@@ -8,6 +8,7 @@ import (
 	"gorm.io/gorm"
 
 	"smart-parcel-locker/backend/domain/locker"
+	"smart-parcel-locker/backend/pkg/errorx"
 	"smart-parcel-locker/backend/pkg/response"
 	adminopsusecase "smart-parcel-locker/backend/usecase/adminops"
 )
@@ -29,10 +30,10 @@ func (h *Handler) CreateLocation(c *fiber.Ctx) error {
 		IsActive *bool   `json:"is_active"`
 	}
 	if err := c.BodyParser(&req); err != nil {
-		return badRequest(c, "invalid request body")
+		return opsInvalidRequest(c, "invalid request body")
 	}
 	if req.Code == "" || req.Name == "" {
-		return badRequest(c, "code and name are required")
+		return opsInvalidRequest(c, "code and name are required")
 	}
 	result, err := h.uc.CreateLocation(c.Context(), adminopsusecase.CreateLocationInput{
 		Code:     req.Code,
@@ -78,14 +79,14 @@ func (h *Handler) CreateLocker(c *fiber.Ctx) error {
 		Name       string `json:"name"`
 	}
 	if err := c.BodyParser(&req); err != nil {
-		return badRequest(c, "invalid request body")
+		return opsInvalidRequest(c, "invalid request body")
 	}
 	if req.LocationID == "" || req.LockerCode == "" {
-		return badRequest(c, "location_id and locker_code are required")
+		return opsInvalidRequest(c, "location_id and locker_code are required")
 	}
 	locationID, err := uuid.Parse(req.LocationID)
 	if err != nil {
-		return badRequest(c, "invalid location_id")
+		return opsInvalidUUID(c, "location_id")
 	}
 	result, err := h.uc.CreateLocker(c.Context(), adminopsusecase.CreateLockerInput{
 		LocationID: locationID,
@@ -126,16 +127,16 @@ func (h *Handler) UpdateLockerStatus(c *fiber.Ctx) error {
 	lockerIDStr := c.Params("locker_id")
 	lockerID, err := uuid.Parse(lockerIDStr)
 	if err != nil {
-		return badRequest(c, "invalid locker_id")
+		return opsInvalidUUID(c, "locker_id")
 	}
 	var req struct {
 		Status string `json:"status"`
 	}
 	if err := c.BodyParser(&req); err != nil {
-		return badRequest(c, "invalid request body")
+		return opsInvalidRequest(c, "invalid request body")
 	}
 	if req.Status == "" {
-		return badRequest(c, "status is required")
+		return opsInvalidRequest(c, "status is required")
 	}
 	result, err := h.uc.UpdateLockerStatus(c.Context(), adminopsusecase.UpdateLockerStatusInput{
 		LockerID: lockerID,
@@ -157,7 +158,7 @@ func (h *Handler) CreateCompartments(c *fiber.Ctx) error {
 	lockerIDStr := c.Params("locker_id")
 	lockerID, err := uuid.Parse(lockerIDStr)
 	if err != nil {
-		return badRequest(c, "invalid locker_id")
+		return opsInvalidUUID(c, "locker_id")
 	}
 	var req struct {
 		Compartments []struct {
@@ -166,18 +167,18 @@ func (h *Handler) CreateCompartments(c *fiber.Ctx) error {
 		} `json:"compartments"`
 	}
 	if err := c.BodyParser(&req); err != nil {
-		return badRequest(c, "invalid request body")
+		return opsInvalidRequest(c, "invalid request body")
 	}
 	if len(req.Compartments) == 0 {
-		return badRequest(c, "compartments are required")
+		return opsInvalidRequest(c, "compartments are required")
 	}
 	specs := make([]adminopsusecase.CompartmentSpec, 0, len(req.Compartments))
 	for _, cpt := range req.Compartments {
 		if cpt.CompartmentNo <= 0 {
-			return badRequest(c, "compartment_no must be greater than 0")
+			return opsInvalidInput(c, "compartment_no must be greater than 0")
 		}
 		if cpt.Size != "S" && cpt.Size != "M" && cpt.Size != "L" {
-			return badRequest(c, "size must be one of S, M, L")
+			return opsInvalidInput(c, "size must be one of S, M, L")
 		}
 		specs = append(specs, adminopsusecase.CompartmentSpec{
 			CompartmentNo: cpt.CompartmentNo,
@@ -203,7 +204,7 @@ func (h *Handler) ListCompartments(c *fiber.Ctx) error {
 	lockerIDStr := c.Params("locker_id")
 	lockerID, err := uuid.Parse(lockerIDStr)
 	if err != nil {
-		return badRequest(c, "invalid locker_id")
+		return opsInvalidUUID(c, "locker_id")
 	}
 	result, err := h.uc.ListCompartments(c.Context(), lockerID)
 	if err != nil {
@@ -240,18 +241,45 @@ func (h *Handler) Overview(c *fiber.Ctx) error {
 }
 
 func handleError(c *fiber.Ctx, err error) error {
+	if err == nil {
+		return nil
+	}
 	if errors.Is(err, gorm.ErrRecordNotFound) {
-		return c.Status(fiber.StatusNotFound).JSON(response.APIResponse{Success: false, Error: "not found"})
+		return opsError(c, fiber.StatusNotFound, "NOT_FOUND", "not found")
 	}
-	if errors.Is(err, locker.ErrNoAvailableSlot) || errors.Is(err, locker.ErrInvalidDeposit) {
-		return c.Status(fiber.StatusConflict).JSON(response.APIResponse{Success: false, Error: err.Error()})
+	var appErr errorx.Error
+	if errors.As(err, &appErr) {
+		return opsError(c, statusFromCode(appErr.Code), appErr.Code, appErr.Message)
 	}
-	if err != nil && err.Error() == "invalid status" {
-		return c.Status(fiber.StatusBadRequest).JSON(response.APIResponse{Success: false, Error: err.Error()})
+	if err.Error() == "invalid status" {
+		return opsInvalidInput(c, err.Error())
 	}
-	return c.Status(fiber.StatusInternalServerError).JSON(response.APIResponse{Success: false, Error: err.Error()})
+	return opsError(c, fiber.StatusInternalServerError, "INTERNAL_ERROR", err.Error())
 }
 
-func badRequest(c *fiber.Ctx, msg string) error {
-	return c.Status(fiber.StatusBadRequest).JSON(response.APIResponse{Success: false, Error: msg})
+func statusFromCode(code string) int {
+	switch code {
+	case "INVALID_REQUEST", "INVALID_UUID", "INVALID_INPUT":
+		return fiber.StatusBadRequest
+	case "NO_AVAILABLE_COMPARTMENT", "INVALID_STATUS_TRANSITION", "LOCKER_INACTIVE":
+		return fiber.StatusConflict
+	default:
+		return fiber.StatusInternalServerError
+	}
+}
+
+func opsError(c *fiber.Ctx, status int, code, msg string) error {
+	return c.Status(status).JSON(response.Error(code, msg))
+}
+
+func opsInvalidRequest(c *fiber.Ctx, msg string) error {
+	return opsError(c, fiber.StatusBadRequest, "INVALID_REQUEST", msg)
+}
+
+func opsInvalidInput(c *fiber.Ctx, msg string) error {
+	return opsError(c, fiber.StatusBadRequest, "INVALID_INPUT", msg)
+}
+
+func opsInvalidUUID(c *fiber.Ctx, field string) error {
+	return opsError(c, fiber.StatusBadRequest, "INVALID_UUID", "invalid "+field)
 }

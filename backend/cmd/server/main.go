@@ -10,11 +10,12 @@ import (
 	"smart-parcel-locker/backend/adapter/http"
 	adminadapter "smart-parcel-locker/backend/adapter/http/admin"
 	adminopsadapter "smart-parcel-locker/backend/adapter/http/adminops"
+	lockeradapter "smart-parcel-locker/backend/adapter/http/locker"
 	parceladapter "smart-parcel-locker/backend/adapter/http/parcel"
 	templateadapter "smart-parcel-locker/backend/adapter/http/template"
 	"smart-parcel-locker/backend/domain/template"
-	compartmentinfra "smart-parcel-locker/backend/infrastructure/compartment"
 	admininfra "smart-parcel-locker/backend/infrastructure/admin"
+	compartmentinfra "smart-parcel-locker/backend/infrastructure/compartment"
 	"smart-parcel-locker/backend/infrastructure/database"
 	httpserver "smart-parcel-locker/backend/infrastructure/http"
 	locationinfra "smart-parcel-locker/backend/infrastructure/location"
@@ -24,6 +25,7 @@ import (
 	"smart-parcel-locker/backend/pkg/config"
 	adminusecase "smart-parcel-locker/backend/usecase/admin"
 	adminopsusecase "smart-parcel-locker/backend/usecase/adminops"
+	lockerqueryusecase "smart-parcel-locker/backend/usecase/lockerquery"
 	parcelusecase "smart-parcel-locker/backend/usecase/parcel"
 	templateusecase "smart-parcel-locker/backend/usecase/template"
 )
@@ -79,5 +81,9 @@ func wireModules(app *fiber.App, db *gorm.DB) {
 	adminOpsUC := adminopsusecase.NewUseCase(locationRepo, lockerRepo, compRepo, parcelRepo, txManager)
 	adminOpsHandler := adminopsadapter.NewHandler(adminOpsUC)
 
-	http.Register(app, templateHandler, parcelHandler, adminHandler, adminOpsHandler)
+	// Locker query module
+	lockerQueryUC := lockerqueryusecase.NewUseCase(lockerRepo, locationRepo)
+	lockerHandler := lockeradapter.NewHandler(lockerQueryUC)
+
+	http.Register(app, templateHandler, parcelHandler, adminHandler, adminOpsHandler, lockerHandler)
 }

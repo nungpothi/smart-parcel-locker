@@ -5,6 +5,7 @@ import (
 
 	adminadapter "smart-parcel-locker/backend/adapter/http/admin"
 	adminopsadapter "smart-parcel-locker/backend/adapter/http/adminops"
+	lockeradapter "smart-parcel-locker/backend/adapter/http/locker"
 	parceladapter "smart-parcel-locker/backend/adapter/http/parcel"
 	templateadapter "smart-parcel-locker/backend/adapter/http/template"
 )
@@ -16,6 +17,7 @@ func Register(
 	parcelHandler *parceladapter.Handler,
 	adminHandler *adminadapter.Handler,
 	adminOpsHandler *adminopsadapter.Handler,
+	lockerHandler *lockeradapter.Handler,
 ) {
 	api := app.Group("/api/v1")
 
@@ -24,6 +26,9 @@ func Register(
 
 	parcelGroup := api.Group("/parcels")
 	parceladapter.RegisterRoutes(parcelGroup, parcelHandler)
+
+	lockerGroup := api.Group("/lockers")
+	lockeradapter.RegisterRoutes(lockerGroup, lockerHandler)
 
 	adminGroup := api.Group("/admins")
 	adminadapter.RegisterRoutes(adminGroup, adminHandler)

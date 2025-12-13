@@ -3,5 +3,5 @@ package compartment
 import "smart-parcel-locker/backend/pkg/errorx"
 
 var (
-	ErrInvalidCompartmentStatus = errorx.Error{Code: "COMPARTMENT_INVALID_STATUS", Message: "invalid compartment status"}
+	ErrInvalidCompartmentStatus = errorx.Error{Code: "INVALID_STATUS_TRANSITION", Message: "invalid compartment status"}
 )

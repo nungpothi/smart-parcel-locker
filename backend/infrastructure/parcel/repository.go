@@ -40,6 +40,17 @@ func (r *GormRepository) GetByID(ctx context.Context, id uuid.UUID) (*parcel.Par
 	return mapParcelModelToDomain(model), nil
 }
 
+func (r *GormRepository) GetByRecipientAndStatus(ctx context.Context, recipientID uuid.UUID, status parcel.Status) (*parcel.Parcel, error) {
+	var model gormmodels.Parcel
+	if err := r.db.WithContext(ctx).
+		Where("recipient_id = ? AND status = ?", recipientID, string(status)).
+		Order("created_at desc").
+		First(&model).Error; err != nil {
+		return nil, err
+	}
+	return mapParcelModelToDomain(model), nil
+}
+
 func (r *GormRepository) Update(ctx context.Context, p *parcel.Parcel) (*parcel.Parcel, error) {
 	model := mapParcelDomainToModel(p)
 	if err := r.db.WithContext(ctx).Save(&model).Error; err != nil {

@@ -29,10 +29,10 @@ type createRequest struct {
 func (h *Handler) Create(c *fiber.Ctx) error {
 	var req createRequest
 	if err := c.BodyParser(&req); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(response.APIResponse{Success: false, Error: "invalid request body"})
+		return adminInvalidRequest(c, "invalid request body")
 	}
 	if req.Username == "" || req.PasswordHash == "" || req.Role == "" {
-		return c.Status(fiber.StatusBadRequest).JSON(response.APIResponse{Success: false, Error: "username, password_hash, and role are required"})
+		return adminInvalidRequest(c, "username, password_hash, and role are required")
 	}
 	result, err := h.uc.Create(c.Context(), adminusecase.CreateInput{
 		Username:     req.Username,
@@ -40,7 +40,7 @@ func (h *Handler) Create(c *fiber.Ctx) error {
 		Role:         req.Role,
 	})
 	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(response.APIResponse{Success: false, Error: err.Error()})
+		return adminError(c, fiber.StatusInternalServerError, "INTERNAL_ERROR", err.Error())
 	}
 	return c.Status(fiber.StatusCreated).JSON(response.APIResponse{Success: true, Data: result})
 }
@@ -48,14 +48,14 @@ func (h *Handler) Create(c *fiber.Ctx) error {
 func (h *Handler) Get(c *fiber.Ctx) error {
 	id, err := uuid.Parse(c.Params("id"))
 	if err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(response.APIResponse{Success: false, Error: "invalid id"})
+		return adminError(c, fiber.StatusBadRequest, "INVALID_UUID", "invalid id")
 	}
 	result, err := h.uc.Get(c.Context(), id)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return c.Status(fiber.StatusNotFound).JSON(response.APIResponse{Success: false, Error: "not found"})
+			return adminError(c, fiber.StatusNotFound, "NOT_FOUND", "not found")
 		}
-		return c.Status(fiber.StatusInternalServerError).JSON(response.APIResponse{Success: false, Error: err.Error()})
+		return adminError(c, fiber.StatusInternalServerError, "INTERNAL_ERROR", err.Error())
 	}
 	return c.JSON(response.APIResponse{Success: true, Data: result})
 }
@@ -63,14 +63,14 @@ func (h *Handler) Get(c *fiber.Ctx) error {
 func (h *Handler) Update(c *fiber.Ctx) error {
 	id, err := uuid.Parse(c.Params("id"))
 	if err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(response.APIResponse{Success: false, Error: "invalid id"})
+		return adminError(c, fiber.StatusBadRequest, "INVALID_UUID", "invalid id")
 	}
 	var req createRequest
 	if err := c.BodyParser(&req); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(response.APIResponse{Success: false, Error: "invalid request body"})
+		return adminInvalidRequest(c, "invalid request body")
 	}
 	if req.Username == "" || req.PasswordHash == "" || req.Role == "" {
-		return c.Status(fiber.StatusBadRequest).JSON(response.APIResponse{Success: false, Error: "username, password_hash, and role are required"})
+		return adminInvalidRequest(c, "username, password_hash, and role are required")
 	}
 	result, err := h.uc.Update(c.Context(), adminusecase.UpdateInput{
 		ID:           id,
@@ -80,9 +80,9 @@ func (h *Handler) Update(c *fiber.Ctx) error {
 	})
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return c.Status(fiber.StatusNotFound).JSON(response.APIResponse{Success: false, Error: "not found"})
+			return adminError(c, fiber.StatusNotFound, "NOT_FOUND", "not found")
 		}
-		return c.Status(fiber.StatusInternalServerError).JSON(response.APIResponse{Success: false, Error: err.Error()})
+		return adminError(c, fiber.StatusInternalServerError, "INTERNAL_ERROR", err.Error())
 	}
 	return c.JSON(response.APIResponse{Success: true, Data: result})
 }
@@ -90,13 +90,21 @@ func (h *Handler) Update(c *fiber.Ctx) error {
 func (h *Handler) Delete(c *fiber.Ctx) error {
 	id, err := uuid.Parse(c.Params("id"))
 	if err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(response.APIResponse{Success: false, Error: "invalid id"})
+		return adminError(c, fiber.StatusBadRequest, "INVALID_UUID", "invalid id")
 	}
 	if err := h.uc.Delete(c.Context(), id); err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return c.Status(fiber.StatusNotFound).JSON(response.APIResponse{Success: false, Error: "not found"})
+			return adminError(c, fiber.StatusNotFound, "NOT_FOUND", "not found")
 		}
-		return c.Status(fiber.StatusInternalServerError).JSON(response.APIResponse{Success: false, Error: err.Error()})
+		return adminError(c, fiber.StatusInternalServerError, "INTERNAL_ERROR", err.Error())
 	}
 	return c.JSON(response.APIResponse{Success: true})
+}
+
+func adminError(c *fiber.Ctx, status int, code, msg string) error {
+	return c.Status(status).JSON(response.Error(code, msg))
+}
+
+func adminInvalidRequest(c *fiber.Ctx, msg string) error {
+	return adminError(c, fiber.StatusBadRequest, "INVALID_REQUEST", msg)
 }

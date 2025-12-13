@@ -27,6 +27,12 @@ type OTP struct {
 // Verify marks OTP as verified when active and not expired.
 func (o *OTP) Verify(now time.Time) error {
 	if o.Status != OTPStatusActive {
+		if o.Status == OTPStatusVerified {
+			return ErrOTPAlreadyUsed
+		}
+		if o.Status == OTPStatusExpired {
+			return ErrOTPExpired
+		}
 		return ErrOTPInvalid
 	}
 	if now.After(o.ExpiresAt) || now.Equal(o.ExpiresAt) {

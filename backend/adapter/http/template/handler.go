@@ -27,15 +27,15 @@ func (h *Handler) Create(c *fiber.Ctx) error {
 		Description string `json:"description"`
 	}
 	if err := c.BodyParser(&req); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(response.APIResponse{Success: false, Error: "invalid request body"})
+		return templateInvalidRequest(c, "invalid request body")
 	}
 	if req.Name == "" {
-		return c.Status(fiber.StatusBadRequest).JSON(response.APIResponse{Success: false, Error: "name is required"})
+		return templateInvalidRequest(c, "name is required")
 	}
 
 	result, err := h.uc.Create(c.Context(), templateusecase.CreateInput{Name: req.Name, Description: req.Description})
 	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(response.APIResponse{Success: false, Error: err.Error()})
+		return templateError(c, fiber.StatusInternalServerError, "INTERNAL_ERROR", err.Error())
 	}
 
 	return c.Status(fiber.StatusCreated).JSON(response.APIResponse{Success: true, Data: result})
@@ -45,7 +45,7 @@ func (h *Handler) Create(c *fiber.Ctx) error {
 func (h *Handler) List(c *fiber.Ctx) error {
 	result, err := h.uc.List(c.Context())
 	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(response.APIResponse{Success: false, Error: err.Error()})
+		return templateError(c, fiber.StatusInternalServerError, "INTERNAL_ERROR", err.Error())
 	}
 	return c.JSON(response.APIResponse{Success: true, Data: result})
 }
@@ -54,14 +54,14 @@ func (h *Handler) List(c *fiber.Ctx) error {
 func (h *Handler) Get(c *fiber.Ctx) error {
 	id := c.Params("id")
 	if _, err := uuid.Parse(id); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(response.APIResponse{Success: false, Error: "invalid id"})
+		return templateError(c, fiber.StatusBadRequest, "INVALID_UUID", "invalid id")
 	}
 	result, err := h.uc.Get(c.Context(), id)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return c.Status(fiber.StatusNotFound).JSON(response.APIResponse{Success: false, Error: "not found"})
+			return templateError(c, fiber.StatusNotFound, "NOT_FOUND", "not found")
 		}
-		return c.Status(fiber.StatusInternalServerError).JSON(response.APIResponse{Success: false, Error: err.Error()})
+		return templateError(c, fiber.StatusInternalServerError, "INTERNAL_ERROR", err.Error())
 	}
 	return c.JSON(response.APIResponse{Success: true, Data: result})
 }
@@ -70,25 +70,25 @@ func (h *Handler) Get(c *fiber.Ctx) error {
 func (h *Handler) Update(c *fiber.Ctx) error {
 	id := c.Params("id")
 	if _, err := uuid.Parse(id); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(response.APIResponse{Success: false, Error: "invalid id"})
+		return templateError(c, fiber.StatusBadRequest, "INVALID_UUID", "invalid id")
 	}
 	var req struct {
 		Name        string `json:"name"`
 		Description string `json:"description"`
 	}
 	if err := c.BodyParser(&req); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(response.APIResponse{Success: false, Error: "invalid request body"})
+		return templateInvalidRequest(c, "invalid request body")
 	}
 	if req.Name == "" {
-		return c.Status(fiber.StatusBadRequest).JSON(response.APIResponse{Success: false, Error: "name is required"})
+		return templateInvalidRequest(c, "name is required")
 	}
 
 	result, err := h.uc.Update(c.Context(), templateusecase.UpdateInput{ID: id, Name: req.Name, Description: req.Description})
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return c.Status(fiber.StatusNotFound).JSON(response.APIResponse{Success: false, Error: "not found"})
+			return templateError(c, fiber.StatusNotFound, "NOT_FOUND", "not found")
 		}
-		return c.Status(fiber.StatusInternalServerError).JSON(response.APIResponse{Success: false, Error: err.Error()})
+		return templateError(c, fiber.StatusInternalServerError, "INTERNAL_ERROR", err.Error())
 	}
 	return c.JSON(response.APIResponse{Success: true, Data: result})
 }
@@ -97,13 +97,21 @@ func (h *Handler) Update(c *fiber.Ctx) error {
 func (h *Handler) Delete(c *fiber.Ctx) error {
 	id := c.Params("id")
 	if _, err := uuid.Parse(id); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(response.APIResponse{Success: false, Error: "invalid id"})
+		return templateError(c, fiber.StatusBadRequest, "INVALID_UUID", "invalid id")
 	}
 	if err := h.uc.Delete(c.Context(), id); err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return c.Status(fiber.StatusNotFound).JSON(response.APIResponse{Success: false, Error: "not found"})
+			return templateError(c, fiber.StatusNotFound, "NOT_FOUND", "not found")
 		}
-		return c.Status(fiber.StatusInternalServerError).JSON(response.APIResponse{Success: false, Error: err.Error()})
+		return templateError(c, fiber.StatusInternalServerError, "INTERNAL_ERROR", err.Error())
 	}
 	return c.JSON(response.APIResponse{Success: true})
+}
+
+func templateError(c *fiber.Ctx, status int, code, msg string) error {
+	return c.Status(status).JSON(response.Error(code, msg))
+}
+
+func templateInvalidRequest(c *fiber.Ctx, msg string) error {
+	return templateError(c, fiber.StatusBadRequest, "INVALID_REQUEST", msg)
 }

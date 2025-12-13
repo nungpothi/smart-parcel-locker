@@ -2,6 +2,7 @@ package parcel
 
 import (
 	"context"
+	"errors"
 	"smart-parcel-locker/backend/domain/compartment"
 	"smart-parcel-locker/backend/domain/locker"
 	"smart-parcel-locker/backend/domain/parcel"
@@ -48,9 +49,10 @@ type ReadyInput struct {
 }
 
 type OTPRequestInput struct {
-	ParcelID  uuid.UUID
-	OTPCode   string
-	ExpiresAt time.Time
+	ParcelID    *uuid.UUID
+	RecipientID *uuid.UUID
+	OTPCode     string
+	ExpiresAt   time.Time
 }
 
 type OTPVerifyInput struct {
@@ -78,6 +80,16 @@ func NewUseCase(parcelRepo parcel.Repository, lockerRepo locker.Repository, tx *
 		}),
 		tx: tx,
 	}
+}
+
+// GetByID fetches a parcel by identifier.
+func (uc *UseCase) GetByID(ctx context.Context, id uuid.UUID) (*parcel.Parcel, error) {
+	return uc.parcelRepo.GetByID(ctx, id)
+}
+
+// GetActiveByRecipient fetches the latest pickup-ready parcel for a recipient.
+func (uc *UseCase) GetActiveByRecipient(ctx context.Context, recipientID uuid.UUID) (*parcel.Parcel, error) {
+	return uc.parcelRepo.GetByRecipientAndStatus(ctx, recipientID, parcel.StatusPickupReady)
 }
 
 // Create initializes a parcel in CREATED state.
@@ -252,12 +264,24 @@ func (uc *UseCase) RequestOTP(ctx context.Context, input OTPRequestInput) (*parc
 	var result *parcel.OTP
 	err := uc.tx.WithinTransaction(ctx, func(tx *gorm.DB) error {
 		parcelRepo := uc.parcelRepo.WithDB(tx)
-		p, err := parcelRepo.GetByID(ctx, input.ParcelID)
+		var p *parcel.Parcel
+		var err error
+		switch {
+		case input.ParcelID != nil:
+			p, err = parcelRepo.GetByID(ctx, *input.ParcelID)
+		case input.RecipientID != nil:
+			p, err = parcelRepo.GetByRecipientAndStatus(ctx, *input.RecipientID, parcel.StatusPickupReady)
+		default:
+			return parcel.ErrInvalidRequest
+		}
 		if err != nil {
 			return err
 		}
 		if p.Status != parcel.StatusPickupReady {
 			return parcel.ErrInvalidStatusTransition
+		}
+		if p.ExpiresAt != nil && time.Now().After(*p.ExpiresAt) {
+			return parcel.ErrParcelExpired
 		}
 		hash, err := bcrypt.GenerateFromPassword([]byte(input.OTPCode), 12)
 		if err != nil {
@@ -292,6 +316,9 @@ func (uc *UseCase) VerifyOTP(ctx context.Context, input OTPVerifyInput) (*parcel
 		parcelRepo := uc.parcelRepo.WithDB(tx)
 		otp, err := parcelRepo.GetOTPByRef(ctx, input.OTPRef)
 		if err != nil {
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				return parcel.ErrOTPNotFound
+			}
 			return err
 		}
 		now := time.Now()
@@ -336,6 +363,9 @@ func (uc *UseCase) Pickup(ctx context.Context, input PickupInput) (*parcel.Parce
 		}
 		if p.Status != parcel.StatusPickupReady {
 			return parcel.ErrInvalidStatusTransition
+		}
+		if p.ExpiresAt != nil && now.After(*p.ExpiresAt) {
+			return parcel.ErrParcelExpired
 		}
 		otp, err := parcelRepo.GetOTPByRef(ctx, input.OTPRef)
 		if err != nil {

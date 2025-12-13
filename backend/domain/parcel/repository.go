@@ -11,6 +11,7 @@ import (
 type Repository interface {
 	Create(ctx context.Context, parcel *Parcel) (*Parcel, error)
 	GetByID(ctx context.Context, id uuid.UUID) (*Parcel, error)
+	GetByRecipientAndStatus(ctx context.Context, recipientID uuid.UUID, status Status) (*Parcel, error)
 	Update(ctx context.Context, parcel *Parcel) (*Parcel, error)
 	CreateEvent(ctx context.Context, event *Event) error
 	CreateOTP(ctx context.Context, otp *OTP) (*OTP, error)
