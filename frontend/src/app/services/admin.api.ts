@@ -21,8 +21,8 @@ export const createLocation = async (req: LocationCreateRequest) => {
 };
 
 export const listLocations = async () => {
-  const res = await request<LocationListResponse>("GET", "/admin/locations");
-  return unwrapApiResponse<LocationListResponse>(res);
+  const res = await request<any>("GET", "/admin/locations");
+  return unwrapApiResponse<LocationListResponse["locations"]>(res);
 };
 
 export const createLocker = async (req: LockerCreateRequest) => {
@@ -31,8 +31,8 @@ export const createLocker = async (req: LockerCreateRequest) => {
 };
 
 export const listLockers = async () => {
-  const res = await request<LockerListResponse>("GET", "/admin/lockers");
-  return unwrapApiResponse<LockerListResponse>(res);
+  const res = await request<any>("GET", "/admin/lockers");
+  return unwrapApiResponse<LockerResponse[]>(res);
 };
 
 export const updateLockerStatus = async (lockerId: string, req: LockerStatusUpdateRequest) => {

@@ -95,6 +95,11 @@ body {
   color: #7a3a3a;
 }
 
+.badge-soft-yellow {
+  background-color: #fff4cc;
+  color: #7a652d;
+}
+
 .btn:disabled,
 button:disabled {
   opacity: 0.6;

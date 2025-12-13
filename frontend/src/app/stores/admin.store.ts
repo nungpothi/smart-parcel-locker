@@ -21,24 +21,31 @@ type AdminState = {
   locations: Location[];
   lockers: Locker[];
   compartments: Compartment[];
+  lastLocationId: string | null;
+  lastLockerId: string | null;
 };
 
 type AdminActions = {
   loadOverview: () => Promise<void>;
+  fetchOverview: () => Promise<void>;
   loadLocations: () => Promise<void>;
+  fetchLocations: () => Promise<void>;
   createLocation: (payload: LocationCreateRequest) => Promise<void>;
   loadLockers: () => Promise<void>;
+  fetchLockers: () => Promise<void>;
   createLocker: (payload: LockerCreateRequest) => Promise<void>;
   updateLockerStatus: (lockerId: string, status: string) => Promise<void>;
   loadCompartments: (lockerId: string) => Promise<void>;
-  createCompartments: (lockerId: string, payload: CompartmentBatchCreateRequest) => Promise<void>;
+  createCompartments: (lockerId: string, payload: CompartmentBatchCreateRequest) => Promise<CompartmentBatchCreateResponse | void>;
 };
 
 const initialState: AdminState = {
   overview: null,
   locations: [],
   lockers: [],
-  compartments: []
+  compartments: [],
+  lastLocationId: null,
+  lastLockerId: null
 };
 
 export const useAdminStore = create<AdminState & AdminActions>((set, get) => ({
@@ -49,26 +56,47 @@ export const useAdminStore = create<AdminState & AdminActions>((set, get) => ({
     set({ overview: res.metrics ?? null });
   },
 
+  fetchOverview: async () => {
+    const res = await adminApi.getOverview();
+    set({ overview: res.metrics ?? null });
+  },
+
   loadLocations: async () => {
     const res = await adminApi.listLocations();
-    set({ locations: res.locations ?? [] });
+    set({ locations: res ?? [] });
+  },
+
+  fetchLocations: async () => {
+    const res = await adminApi.listLocations();
+    set({ locations: res ?? [] });
   },
 
   createLocation: async (payload) => {
     const res = await adminApi.createLocation(payload);
     const locations = get().locations ?? [];
-    set({ locations: [...locations, { location_id: res.location_id, name: res.name, address: res.address }] });
+    set({
+      locations: [
+        ...locations,
+        { location_id: res.location_id, name: res.name, address: res.address, code: res.code, is_active: res.is_active }
+      ],
+      lastLocationId: res.location_id ?? null
+    });
   },
 
   loadLockers: async () => {
     const res = await adminApi.listLockers();
-    set({ lockers: res.lockers ?? [] });
+    set({ lockers: res ?? [] });
+  },
+
+  fetchLockers: async () => {
+    const res = await adminApi.listLockers();
+    set({ lockers: res ?? [] });
   },
 
   createLocker: async (payload) => {
     const res = await adminApi.createLocker(payload);
     const lockers = get().lockers ?? [];
-    set({ lockers: [...lockers, res] });
+    set({ lockers: [...lockers, res], lastLockerId: res.locker_id ?? null });
   },
 
   updateLockerStatus: async (lockerId, status) => {
@@ -85,8 +113,9 @@ export const useAdminStore = create<AdminState & AdminActions>((set, get) => ({
   },
 
   createCompartments: async (lockerId, payload) => {
-    await adminApi.createCompartments(lockerId, payload);
+    const created = await adminApi.createCompartments(lockerId, payload);
     const refreshed = await adminApi.listCompartments(lockerId);
     set({ compartments: refreshed.compartments ?? [] });
+    return created;
   }
 }));

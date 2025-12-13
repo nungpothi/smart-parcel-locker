@@ -53,7 +53,7 @@ const CreateParcelPage = () => {
         size,
         courier_id: courierId,
         recipient_id: recipientId
-      } as any);
+      });
       const parcelId = useParcelStore.getState().parcelId;
       const status = useParcelStore.getState().status;
       await showSuccess("Parcel created", `Parcel: ${parcelId} | Status: ${status ?? ""}`);

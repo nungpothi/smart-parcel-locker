@@ -16,8 +16,8 @@ export type ParcelStatus =
 export type ParcelCreateRequest = {
   locker_id: string;
   recipient_id: string;
-  size?: string;
-  weight?: number;
+  courier_id: string;
+  size: string;
 };
 
 export type ParcelIDRequest = {
@@ -88,35 +88,44 @@ export type ExpireRunResponse = APIBase & {
 };
 
 export type LocationCreateRequest = {
+  code: string;
   name: string;
   address?: string;
+  is_active?: boolean;
 };
 
 export type LocationResponse = APIBase & {
   location_id: string;
+  code: string;
   name: string;
   address?: string;
+  is_active?: boolean;
 };
 
 export type LocationListResponse = APIBase & {
   locations: {
     location_id: string;
+    code: string;
     name: string;
     address?: string;
+    is_active?: boolean;
   }[];
 };
 
 export type LockerCreateRequest = {
   location_id: string;
-  code: string;
-  description?: string;
+  locker_code: string;
+  name?: string;
+  status?: string;
 };
 
 export type LockerResponse = APIBase & {
   locker_id: string;
   location_id: string;
-  code: string;
-  description?: string;
+  locker_code: string;
+  name?: string;
+  location_name?: string;
+  status?: string;
 };
 
 export type LockerListResponse = APIBase & {
@@ -134,7 +143,7 @@ export type LockerStatusResponse = APIBase & {
 
 export type CompartmentBatchCreateRequest = {
   compartments: {
-    code: string;
+    compartment_no: string;
     size?: string;
   }[];
 };

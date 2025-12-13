@@ -8,7 +8,7 @@ import { DashboardPage } from "./pages/admin/DashboardPage";
 import { LocationListPage } from "./pages/admin/locations/LocationListPage";
 import { LocationCreatePage } from "./pages/admin/locations/LocationCreatePage";
 import { LockerListPage } from "./pages/admin/lockers/LockerListPage";
-import { LockerWizardPage } from "./pages/admin/lockers/LockerWizardPage";
+import { LockerCreatePage } from "./pages/admin/lockers/LockerCreatePage";
 import { CompartmentListPage } from "./pages/admin/compartments/CompartmentListPage";
 import { ExpireJobPage } from "./pages/admin/tools/ExpireJobPage";
 import { CreateParcelPage } from "./pages/courier/parcels/CreateParcelPage";
@@ -42,7 +42,7 @@ export const Router = () => (
       <Route path="locations" element={<LocationListPage />} />
       <Route path="locations/create" element={<LocationCreatePage />} />
       <Route path="lockers" element={<LockerListPage />} />
-      <Route path="lockers/create" element={<LockerWizardPage />} />
+      <Route path="lockers/create" element={<LockerCreatePage />} />
       <Route path="lockers/:lockerId/compartments" element={<CompartmentListPage />} />
       <Route path="tools/expire" element={<ExpireJobPage />} />
     </Route>
