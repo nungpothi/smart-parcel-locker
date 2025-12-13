@@ -6,17 +6,17 @@ import (
 	"github.com/google/uuid"
 )
 
+// User represents a system user who can authenticate.
+type User struct {
+	ID           uuid.UUID
+	Phone        string
+	PasswordHash string
+	UserType     string
+	CreatedAt    time.Time
+}
+
 const (
 	TypeAdmin     = "ADMIN"
 	TypeCourier   = "COURIER"
 	TypeRecipient = "RECIPIENT"
 )
-
-// User represents a system user (admin, courier, or recipient).
-type User struct {
-	ID          uuid.UUID
-	UserType    string
-	Phone       *string
-	DisplayName *string
-	CreatedAt   time.Time
-}

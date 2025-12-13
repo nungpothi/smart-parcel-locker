@@ -5,6 +5,106 @@ info:
 servers:
   - url: http://localhost:8080/api/v1
 paths:
+  /auth/login:
+    post:
+      summary: Login with phone and password
+      tags: [Auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+
+  /auth/register:
+    post:
+      summary: Register a new user
+      tags: [Auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '201':
+          description: User registered
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegisterResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+        '409':
+          description: Phone already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+
+  /auth/me:
+    get:
+      summary: Get current authenticated user
+      tags: [Auth]
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Current user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MeResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+
+  /auth/logout:
+    post:
+      summary: Logout current user
+      tags: [Auth]
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Logged out
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIBase'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+
   /parcels/create:
     post:
       summary: Create parcel (status CREATED)
@@ -665,6 +765,11 @@ paths:
                 $ref: '#/components/schemas/APIErrorResponse'
 
 components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+
   schemas:
     APIBase:
       type: object
@@ -684,6 +789,93 @@ components:
         success: false
         error_code: INVALID_REQUEST
         error: invalid request
+
+    LoginRequest:
+      type: object
+      required: [phone, password]
+      properties:
+        phone:
+          type: string
+        password:
+          type: string
+
+    LoginResponse:
+      allOf:
+        - $ref: '#/components/schemas/APIBase'
+        - type: object
+          required: [data]
+          properties:
+            data:
+              type: object
+              required: [user_id, role, access_token]
+              properties:
+                user_id:
+                  type: string
+                  format: uuid
+                role:
+                  type: string
+                  enum: [ADMIN, COURIER, RECIPIENT]
+                access_token:
+                  type: string
+      example:
+        success: true
+        data:
+          user_id: "91b6b3c4-1234-4567-8901-abcdefabcdef"
+          role: COURIER
+          access_token: "token-123"
+
+    RegisterRequest:
+      type: object
+      required: [phone, password, role]
+      properties:
+        phone:
+          type: string
+        password:
+          type: string
+        role:
+          type: string
+          enum: [ADMIN, COURIER, RECIPIENT]
+
+    RegisterResponse:
+      allOf:
+        - $ref: '#/components/schemas/APIBase'
+        - type: object
+          required: [data]
+          properties:
+            data:
+              type: object
+              required: [user_id, role]
+              properties:
+                user_id:
+                  type: string
+                  format: uuid
+                role:
+                  type: string
+                  enum: [ADMIN, COURIER, RECIPIENT]
+      example:
+        success: true
+        data:
+          user_id: "91b6b3c4-1234-4567-8901-abcdefabcdef"
+          role: RECIPIENT
+
+    MeResponse:
+      allOf:
+        - $ref: '#/components/schemas/APIBase'
+        - type: object
+          required: [data]
+          properties:
+            data:
+              type: object
+              required: [user_id, role, phone]
+              properties:
+                user_id:
+                  type: string
+                  format: uuid
+                role:
+                  type: string
+                  enum: [ADMIN, COURIER, RECIPIENT]
+                phone:
+                  type: string
 
     ParcelStatus:
       type: string
@@ -1261,3 +1453,5 @@ tags:
     description: OTP lifecycle endpoints
   - name: Admin
     description: Admin operations and monitoring
+  - name: Auth
+    description: Authentication endpoints

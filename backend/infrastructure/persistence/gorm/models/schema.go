@@ -49,11 +49,12 @@ func (Compartment) TableName() string {
 }
 
 type User struct {
-	ID          uuid.UUID `gorm:"column:id;type:uuid;primaryKey"`
-	UserType    string    `gorm:"column:user_type;type:varchar(20);not null;index:idx_users_user_type"`
-	Phone       *string   `gorm:"column:phone;type:varchar(30);index:idx_users_phone"`
-	DisplayName *string   `gorm:"column:display_name;type:varchar(200)"`
-	CreatedAt   time.Time `gorm:"column:created_at;type:timestamptz;not null"`
+	ID           uuid.UUID `gorm:"column:id;type:uuid;primaryKey"`
+	UserType     string    `gorm:"column:user_type;type:varchar(20);not null;index:idx_users_user_type"`
+	Phone        *string   `gorm:"column:phone;type:varchar(30);uniqueIndex:uidx_users_phone"`
+	PasswordHash string    `gorm:"column:password_hash;type:varchar(255);not null"`
+	DisplayName  *string   `gorm:"column:display_name;type:varchar(200)"`
+	CreatedAt    time.Time `gorm:"column:created_at;type:timestamptz;not null"`
 }
 
 func (User) TableName() string {

@@ -29,6 +29,12 @@ Foundational Go backend using Fiber and GORM following a clean architecture layo
    go run ./cmd/server
    ```
 
+## API (v1) - Auth
+- `POST /api/v1/auth/register` - create user (hashes password, unique phone)
+- `POST /api/v1/auth/login` - login with phone/password, returns `access_token`
+- `GET /api/v1/auth/me` - current user (Bearer token)
+- `POST /api/v1/auth/logout` - revoke token (best effort)
+
 ## API (v1) - Parcel Workflow
 - `POST /api/v1/parcels/create` - create parcel (CREATED)
 - `POST /api/v1/parcels/reserve` - reserve compartment (RESERVED)
