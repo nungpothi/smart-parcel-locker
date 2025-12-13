@@ -16,6 +16,7 @@ type AuthActions = {
   fetchMe: () => Promise<void>;
   logout: () => Promise<void>;
   reset: () => void;
+  hydrateAuth: () => Promise<void>;
 };
 
 type AuthResponse = {
@@ -38,6 +39,10 @@ export const useAuthStore = create<AuthState & AuthActions>((set) => ({
 
   login: async (phone, password) => {
     const res = (await authApi.login({ phone, password })) as AuthResponse;
+    console.log("Login response:", res);
+    if (res.access_token) {
+      localStorage.setItem("AUTH_ACCESS_TOKEN", res.access_token);
+    }
     set({
       userId: res.user_id ?? null,
       role: res.role ?? null,
@@ -64,8 +69,21 @@ export const useAuthStore = create<AuthState & AuthActions>((set) => ({
 
   logout: async () => {
     await authApi.logout();
+    localStorage.removeItem("AUTH_ACCESS_TOKEN");
     set({ ...initialState });
   },
 
-  reset: () => set({ ...initialState })
+  reset: () => set({ ...initialState }),
+
+  hydrateAuth: async () => {
+    const token = localStorage.getItem("AUTH_ACCESS_TOKEN");
+    if (!token) return;
+    set({ accessToken: token, isAuthenticated: true });
+    try {
+      await useAuthStore.getState().fetchMe();
+    } catch (_error) {
+      localStorage.removeItem("AUTH_ACCESS_TOKEN");
+      set({ ...initialState });
+    }
+  }
 }));

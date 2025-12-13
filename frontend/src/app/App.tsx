@@ -6,11 +6,11 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "./theme/variables.css";
 
 export const App = () => {
-  const fetchMe = useAuthStore((state) => state.fetchMe);
+  const hydrateAuth = useAuthStore((state) => state.hydrateAuth);
 
   useEffect(() => {
-    fetchMe().catch(() => undefined);
-  }, [fetchMe]);
+    hydrateAuth().catch(() => undefined);
+  }, [hydrateAuth]);
 
   return (
     <BrowserRouter>

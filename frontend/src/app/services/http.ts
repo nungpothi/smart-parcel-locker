@@ -30,7 +30,10 @@ export const request = async <T>(method: string, path: string, body?: unknown): 
 
   try {
     const { useAuthStore } = await import("../stores/auth.store");
-    const token = useAuthStore.getState().accessToken;
+    let token = useAuthStore.getState().accessToken;
+    if (!token) {
+      token = localStorage.getItem("AUTH_ACCESS_TOKEN") || undefined;
+    }
     if (token) {
       headers.Authorization = `Bearer ${token}`;
     }
