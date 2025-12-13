@@ -1,13 +1,13 @@
 import { ReactNode } from "react";
 import { Navigate, Outlet } from "react-router-dom";
-import { mockRole } from "../stores/auth.store";
+import { useAuthStore } from "../stores/auth.store";
 
 type GuardProps = {
   children: ReactNode;
 };
 
 export const CourierGuard = ({ children }: GuardProps) => {
-  const role = mockRole;
+  const role = useAuthStore((state) => state.role);
 
   if (role !== "COURIER") {
     return <Navigate to="/login" replace />;

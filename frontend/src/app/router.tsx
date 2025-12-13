@@ -21,12 +21,14 @@ import { PickupResultPage } from "./pages/recipient/pickup/PickupResultPage";
 import { AdminLayout } from "./components/layout/AdminLayout";
 import { CourierLayout } from "./components/layout/CourierLayout";
 import { RecipientLayout } from "./components/layout/RecipientLayout";
+import TestRoutePage from "../pages/TestRoutePage";
 
 export const Router = () => (
   <Routes>
     <Route path="/" element={<Navigate to="/login" replace />} />
     <Route path="/login" element={<LoginPage />} />
     <Route path="/register" element={<RegisterPage />} />
+    <Route path="/test-route" element={<TestRoutePage />} />
 
     <Route
       path="/admin"
@@ -71,5 +73,7 @@ export const Router = () => (
       <Route path="verify-otp" element={<VerifyOTPPage />} />
       <Route path="result" element={<PickupResultPage />} />
     </Route>
+
+    <Route path="/parcels/*" element={<Navigate to="/courier/parcels/create" replace />} />
   </Routes>
 );

@@ -50,14 +50,24 @@ export const useParcelStore = create<ParcelState & ParcelActions>((set, get) => 
     const parcelId = get().parcelId;
     if (!parcelId) throw new Error("No parcel to reserve");
     const res = await parcelApi.reserveParcel({ parcel_id: parcelId });
-    set({ status: res.status ?? null });
+    const anyRes = res as any;
+    set({
+      status: res.status ?? null,
+      compartmentId: anyRes?.compartment_id ?? null,
+      expiresAt: anyRes?.expires_at ?? null
+    });
   },
 
   depositParcel: async () => {
     const parcelId = get().parcelId;
     if (!parcelId) throw new Error("No parcel to deposit");
     const res = await parcelApi.depositParcel({ parcel_id: parcelId } as ParcelIDRequest);
-    set({ status: res.status ?? null });
+    const anyRes = res as any;
+    set({
+      status: res.status ?? null,
+      compartmentId: anyRes?.compartment_id ?? get().compartmentId,
+      expiresAt: anyRes?.expires_at ?? get().expiresAt
+    });
   },
 
   readyParcel: async () => {
@@ -69,9 +79,12 @@ export const useParcelStore = create<ParcelState & ParcelActions>((set, get) => 
 
   fetchParcelById: async (parcelId) => {
     const res = await parcelApi.getParcelById(parcelId);
+    const parcel = res.parcel;
     set({
-      parcelId: res.parcel.parcel_id,
-      status: res.parcel.status ?? null
+      parcelId: parcel.parcel_id,
+      status: parcel.status ?? null,
+      compartmentId: (parcel as any).compartment_id ?? null,
+      expiresAt: (parcel as any).expires_at ?? null
     });
   },
 
@@ -81,7 +94,9 @@ export const useParcelStore = create<ParcelState & ParcelActions>((set, get) => 
     if (first) {
       set({
         parcelId: first.parcel_id,
-        status: first.status ?? null
+        status: first.status ?? null,
+        compartmentId: (first as any).compartment_id ?? null,
+        expiresAt: (first as any).expires_at ?? null
       });
     }
   },
