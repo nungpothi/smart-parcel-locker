@@ -156,7 +156,7 @@ export type CompartmentBatchCreateResponse = APIBase & {
 export type CompartmentListResponse = APIBase & {
   compartments: {
     compartment_id: string;
-    code: string;
+    compartment_no: number;
     size?: string;
     status?: string;
   }[];

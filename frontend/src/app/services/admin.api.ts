@@ -46,8 +46,8 @@ export const createCompartments = async (lockerId: string, req: CompartmentBatch
 };
 
 export const listCompartments = async (lockerId: string) => {
-  const res = await request<CompartmentListResponse>("GET", `/admin/lockers/${lockerId}/compartments`);
-  return unwrapApiResponse<CompartmentListResponse>(res);
+  const res = await request<any>("GET", `/admin/lockers/${lockerId}/compartments`);
+  return unwrapApiResponse<CompartmentListResponse["compartments"]>(res);
 };
 
 export const getOverview = async () => {

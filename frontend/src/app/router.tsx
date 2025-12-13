@@ -10,6 +10,7 @@ import { LocationCreatePage } from "./pages/admin/locations/LocationCreatePage";
 import { LockerListPage } from "./pages/admin/lockers/LockerListPage";
 import { LockerCreatePage } from "./pages/admin/lockers/LockerCreatePage";
 import { CompartmentListPage } from "./pages/admin/compartments/CompartmentListPage";
+import { CompartmentBatchCreatePage } from "./pages/admin/lockers/CompartmentBatchCreatePage";
 import { ExpireJobPage } from "./pages/admin/tools/ExpireJobPage";
 import { CreateParcelPage } from "./pages/courier/parcels/CreateParcelPage";
 import { ReserveParcelPage } from "./pages/courier/parcels/ReserveParcelPage";
@@ -44,6 +45,7 @@ export const Router = () => (
       <Route path="lockers" element={<LockerListPage />} />
       <Route path="lockers/create" element={<LockerCreatePage />} />
       <Route path="lockers/:lockerId/compartments" element={<CompartmentListPage />} />
+      <Route path="lockers/:lockerId/compartments/create" element={<CompartmentBatchCreatePage />} />
       <Route path="tools/expire" element={<ExpireJobPage />} />
     </Route>
 

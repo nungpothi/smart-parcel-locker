@@ -36,6 +36,7 @@ type AdminActions = {
   createLocker: (payload: LockerCreateRequest) => Promise<void>;
   updateLockerStatus: (lockerId: string, status: string) => Promise<void>;
   loadCompartments: (lockerId: string) => Promise<void>;
+  fetchCompartments: (lockerId: string) => Promise<void>;
   createCompartments: (lockerId: string, payload: CompartmentBatchCreateRequest) => Promise<CompartmentBatchCreateResponse | void>;
 };
 
@@ -109,7 +110,12 @@ export const useAdminStore = create<AdminState & AdminActions>((set, get) => ({
 
   loadCompartments: async (lockerId) => {
     const res = await adminApi.listCompartments(lockerId);
-    set({ compartments: res.compartments ?? [] });
+    set({ compartments: res ?? [] });
+  },
+
+  fetchCompartments: async (lockerId) => {
+    const res = await adminApi.listCompartments(lockerId);
+    set({ compartments: res ?? [] });
   },
 
   createCompartments: async (lockerId, payload) => {
