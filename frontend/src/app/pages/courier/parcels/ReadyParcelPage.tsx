@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useParcelStore } from "../../../stores/parcel.store";
 import { useUiStore } from "../../../stores/ui.store";
 import { showError, showSuccess, showWarning } from "../../../utils/swal";
+import { mapErrorToMessage } from "../../../utils/errorMapper";
 import { APIError } from "../../../services/http";
 
 const ReadyParcelPage = () => {
@@ -39,8 +40,7 @@ const ReadyParcelPage = () => {
       const updatedStatus = useParcelStore.getState().status;
       await showSuccess("Parcel marked ready", `Status: ${updatedStatus ?? "PICKUP_READY"}`);
     } catch (error) {
-      const apiError = error as APIError;
-      await showError("Mark ready failed", [apiError.message, apiError.errorCode].filter(Boolean).join(" | "));
+      await showError("Mark ready failed", mapErrorToMessage(error));
     } finally {
       setLoading(false);
     }

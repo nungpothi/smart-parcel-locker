@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useParcelStore } from "../../../stores/parcel.store";
 import { useUiStore } from "../../../stores/ui.store";
 import { showError, showSuccess, showWarning } from "../../../utils/swal";
+import { mapErrorToMessage } from "../../../utils/errorMapper";
 import { APIError } from "../../../services/http";
 
 const ReserveParcelPage = () => {
@@ -43,8 +44,7 @@ const ReserveParcelPage = () => {
       );
       navigate("/courier/parcels/deposit");
     } catch (error) {
-      const apiError = error as APIError;
-      await showError("Reserve failed", [apiError.message, apiError.errorCode].filter(Boolean).join(" | "));
+      await showError("Reserve failed", mapErrorToMessage(error));
     } finally {
       setLoading(false);
     }

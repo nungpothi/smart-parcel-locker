@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useParcelStore } from "../../../stores/parcel.store";
 import { useUiStore } from "../../../stores/ui.store";
 import { showError, showSuccess, showWarning } from "../../../utils/swal";
+import { mapErrorToMessage } from "../../../utils/errorMapper";
 import { APIError } from "../../../services/http";
 
 const DepositParcelPage = () => {
@@ -40,8 +41,7 @@ const DepositParcelPage = () => {
       await showSuccess("Parcel deposited", `Status: ${updated.status ?? status ?? "N/A"}`);
       navigate("/courier/parcels/ready");
     } catch (error) {
-      const apiError = error as APIError;
-      await showError("Deposit failed", [apiError.message, apiError.errorCode].filter(Boolean).join(" | "));
+      await showError("Deposit failed", mapErrorToMessage(error));
     } finally {
       setLoading(false);
     }

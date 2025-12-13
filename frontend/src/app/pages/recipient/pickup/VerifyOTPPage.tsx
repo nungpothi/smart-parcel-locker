@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useParcelStore } from "../../../stores/parcel.store";
 import { useUiStore } from "../../../stores/ui.store";
 import { showError, showSuccess, showWarning } from "../../../utils/swal";
+import { mapErrorToMessage } from "../../../utils/errorMapper";
 
 const VerifyOTPPage = () => {
   const navigate = useNavigate();
@@ -35,7 +36,7 @@ const VerifyOTPPage = () => {
       await showSuccess("OTP verified", "Proceed to pickup");
       navigate("/pickup/result");
     } catch (error) {
-      await showError("Verification failed", (error as Error).message);
+      await showError("Verification failed", mapErrorToMessage(error));
     } finally {
       setLoading(false);
     }

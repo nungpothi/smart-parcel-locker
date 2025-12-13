@@ -6,6 +6,7 @@ import { useUiStore } from "../../../stores/ui.store";
 import { listAvailableLockers } from "../../../services/lockers.api";
 import { LockerAvailable } from "../../../types/domain";
 import { showError, showSuccess, showWarning } from "../../../utils/swal";
+import { mapErrorToMessage } from "../../../utils/errorMapper";
 import { APIError } from "../../../services/http";
 
 const CreateParcelPage = () => {
@@ -28,7 +29,7 @@ const CreateParcelPage = () => {
         const res = await listAvailableLockers();
         setLockers(res.lockers ?? []);
       } catch (error) {
-        showError("Failed to load lockers", (error as Error).message);
+        showError("Failed to load lockers", mapErrorToMessage(error));
       }
     };
     loadLockers();
@@ -58,8 +59,7 @@ const CreateParcelPage = () => {
       await showSuccess("Parcel created", `Parcel: ${parcelId} | Status: ${status ?? ""}`);
       navigate("/courier/parcels/reserve");
     } catch (error) {
-      const apiError = error as APIError;
-      await showError("Create failed", [apiError.message, apiError.errorCode].filter(Boolean).join(" | "));
+      await showError("Create failed", mapErrorToMessage(error));
     } finally {
       setLoading(false);
     }

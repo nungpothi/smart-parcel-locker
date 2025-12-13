@@ -8,6 +8,7 @@ type AuthState = {
   phone: string | null;
   accessToken: string | null;
   isAuthenticated: boolean;
+  isHydrated: boolean;
 };
 
 type AuthActions = {
@@ -31,10 +32,11 @@ const initialState: AuthState = {
   role: null,
   phone: null,
   accessToken: null,
-  isAuthenticated: false
+  isAuthenticated: false,
+  isHydrated: false
 };
 
-export const useAuthStore = create<AuthState & AuthActions>((set) => ({
+export const useAuthStore = create<AuthState & AuthActions>((set, get) => ({
   ...initialState,
 
   login: async (phone, password) => {
@@ -46,7 +48,8 @@ export const useAuthStore = create<AuthState & AuthActions>((set) => ({
       userId: res.user_id ?? null,
       role: res.role ?? null,
       accessToken: res.access_token ?? null,
-      isAuthenticated: true
+      isAuthenticated: true,
+      isHydrated: true
     });
   },
 
@@ -56,33 +59,43 @@ export const useAuthStore = create<AuthState & AuthActions>((set) => ({
   },
 
   fetchMe: async () => {
-    const res = (await authApi.me()) as AuthResponse;
-    set((state) => ({
-      userId: res.user_id ?? null,
-      role: res.role ?? null,
-      phone: res.phone ?? null,
-      accessToken: state.accessToken,
-      isAuthenticated: true
-    }));
+    try {
+      const res = (await authApi.me()) as AuthResponse;
+      set((state) => ({
+        userId: res.user_id ?? null,
+        role: res.role ?? null,
+        phone: res.phone ?? null,
+        accessToken: state.accessToken,
+        isAuthenticated: true,
+        isHydrated: true
+      }));
+    } catch (error) {
+      localStorage.removeItem("AUTH_ACCESS_TOKEN");
+      set({ ...initialState, isHydrated: true });
+      throw error;
+    }
   },
 
   logout: async () => {
     await authApi.logout();
     localStorage.removeItem("AUTH_ACCESS_TOKEN");
-    set({ ...initialState });
+    set({ ...initialState, isHydrated: true });
   },
 
   reset: () => set({ ...initialState }),
 
   hydrateAuth: async () => {
     const token = localStorage.getItem("AUTH_ACCESS_TOKEN");
-    if (!token) return;
-    set({ accessToken: token, isAuthenticated: true });
+    if (!token) {
+      set({ ...initialState, isHydrated: true });
+      return;
+    }
+    set({ accessToken: token, isAuthenticated: true, isHydrated: false });
     try {
-      await useAuthStore.getState().fetchMe();
+      await get().fetchMe();
     } catch (_error) {
       localStorage.removeItem("AUTH_ACCESS_TOKEN");
-      set({ ...initialState });
+      set({ ...initialState, isHydrated: true });
     }
   }
 }));

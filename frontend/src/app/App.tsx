@@ -9,7 +9,7 @@ export const App = () => {
   const hydrateAuth = useAuthStore((state) => state.hydrateAuth);
 
   useEffect(() => {
-    hydrateAuth().catch(() => undefined);
+    hydrateAuth();
   }, [hydrateAuth]);
 
   return (

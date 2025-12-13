@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useParcelStore } from "../../../stores/parcel.store";
 import { useUiStore } from "../../../stores/ui.store";
 import { showError, showSuccess, showWarning } from "../../../utils/swal";
+import { mapErrorToMessage } from "../../../utils/errorMapper";
 
 const PickupResultPage = () => {
   const navigate = useNavigate();
@@ -36,7 +37,7 @@ const PickupResultPage = () => {
       await showSuccess("Parcel picked up", "Thank you!");
       resetParcel();
     } catch (error) {
-      await showError("Pickup failed", (error as Error).message);
+      await showError("Pickup failed", mapErrorToMessage(error));
     } finally {
       setLoading(false);
     }

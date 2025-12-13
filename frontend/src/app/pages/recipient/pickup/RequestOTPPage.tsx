@@ -4,6 +4,7 @@ import { useAuthStore } from "../../../stores/auth.store";
 import { useParcelStore } from "../../../stores/parcel.store";
 import { useUiStore } from "../../../stores/ui.store";
 import { showError, showSuccess } from "../../../utils/swal";
+import { mapErrorToMessage } from "../../../utils/errorMapper";
 
 const RequestOTPPage = () => {
   const navigate = useNavigate();
@@ -37,7 +38,7 @@ const RequestOTPPage = () => {
           setInfo({ message: null });
         }
       } catch (error) {
-        setInfo({ message: (error as Error).message });
+        setInfo({ message: mapErrorToMessage(error) });
       } finally {
         setLoading(false);
       }
@@ -53,7 +54,7 @@ const RequestOTPPage = () => {
       await showSuccess("OTP sent", "Please check your phone.");
       navigate("/pickup/verify-otp");
     } catch (error) {
-      await showError("Failed to send OTP", (error as Error).message);
+      await showError("Failed to send OTP", mapErrorToMessage(error));
     } finally {
       setLoading(false);
     }
