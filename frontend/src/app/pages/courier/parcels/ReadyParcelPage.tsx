@@ -1,7 +1,5 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Card } from "../../../components/ui/Card";
-import { Button } from "../../../components/ui/Button";
 import { useParcelStore } from "../../../stores/parcel.store";
 import { useUiStore } from "../../../stores/ui.store";
 import { showError, showSuccess, showWarning } from "../../../utils/swal";
@@ -55,30 +53,30 @@ const ReadyParcelPage = () => {
 
   return (
     <div className="container py-4">
-      <h3 className="mb-3">Courier - Mark Pickup Ready</h3>
-      <div className="card shadow-sm">
-        <div className="card-body">
-          <p className="mb-2">
-            <strong>Parcel ID:</strong> {parcelId ?? "N/A"}
-          </p>
-          <p className="mb-3">
-            <strong>Status:</strong> {status ?? "N/A"}
-          </p>
-          <div className="d-flex gap-2 justify-content-end">
-            <button className="btn btn-warning" onClick={handleReady} disabled={loading}>
-              {loading ? (
-                <>
-                  <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true" />
-                  Updating...
-                </>
-              ) : (
-                "Mark Ready"
-              )}
-            </button>
-            <button className="btn btn-outline-secondary" type="button" onClick={handleNewParcel} disabled={loading}>
-              Start New Parcel
-            </button>
-          </div>
+      <h3 className="mb-3 fw-semibold" style={{ color: "var(--color-text-main)" }}>
+        Courier - Mark Pickup Ready
+      </h3>
+      <div className="card p-4 p-md-5">
+        <p className="mb-2">
+          <strong>Parcel ID:</strong> {parcelId ?? "N/A"}
+        </p>
+        <p className="mb-3">
+          <strong>Status:</strong> {status ?? "N/A"}
+        </p>
+        <div className="d-flex gap-2 justify-content-end">
+          <button className="btn btn-primary" onClick={handleReady} disabled={loading}>
+            {loading ? (
+              <>
+                <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true" />
+                Updating...
+              </>
+            ) : (
+              "Mark Ready"
+            )}
+          </button>
+          <button className="btn btn-outline-secondary" type="button" onClick={handleNewParcel} disabled={loading}>
+            Start New Parcel
+          </button>
         </div>
       </div>
     </div>

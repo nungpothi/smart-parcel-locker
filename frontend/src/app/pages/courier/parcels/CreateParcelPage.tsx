@@ -1,9 +1,5 @@
 import { FormEvent, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Card } from "../../../components/ui/Card";
-import { Select } from "../../../components/ui/Select";
-import { Input } from "../../../components/ui/Input";
-import { Button } from "../../../components/ui/Button";
 import { useAuthStore } from "../../../stores/auth.store";
 import { useParcelStore } from "../../../stores/parcel.store";
 import { useUiStore } from "../../../stores/ui.store";
@@ -71,67 +67,67 @@ const CreateParcelPage = () => {
 
   return (
     <div className="container py-4">
-      <h3 className="mb-3">Courier - Create Parcel</h3>
-      <div className="card shadow-sm">
-        <div className="card-body">
-          <form onSubmit={handleSubmit} className="row g-3">
-            <div className="col-12">
-              <label className="form-label">Locker</label>
-              <select
-                className="form-select"
-                value={lockerId}
-                onChange={(e) => setLockerId(e.target.value)}
-                disabled={loading}
-              >
-                <option value="">Select locker</option>
-                {lockers.map((locker) => (
-                  <option key={locker.locker_id} value={locker.locker_id}>
-                    {locker.locker_code} - {locker.location_name}
-                  </option>
-                ))}
-              </select>
-            </div>
+      <h3 className="mb-3 fw-semibold" style={{ color: "var(--color-text-main)" }}>
+        Courier - Create Parcel
+      </h3>
+      <div className="card p-4 p-md-5">
+        <form onSubmit={handleSubmit} className="row g-3">
+          <div className="col-12">
+            <label className="form-label">Locker</label>
+            <select
+              className="form-select"
+              value={lockerId}
+              onChange={(e) => setLockerId(e.target.value)}
+              disabled={loading}
+            >
+              <option value="">Select locker</option>
+              {lockers.map((locker) => (
+                <option key={locker.locker_id} value={locker.locker_id}>
+                  {locker.locker_code} - {locker.location_name}
+                </option>
+              ))}
+            </select>
+          </div>
 
-            <div className="col-12">
-              <label className="form-label">Size</label>
-              <select
-                className="form-select"
-                value={size}
-                onChange={(e) => setSize(e.target.value)}
-                disabled={loading}
-              >
-                <option value="">Select size</option>
-                <option value="S">Small</option>
-                <option value="M">Medium</option>
-                <option value="L">Large</option>
-              </select>
-            </div>
+          <div className="col-12">
+            <label className="form-label">Size</label>
+            <select
+              className="form-select"
+              value={size}
+              onChange={(e) => setSize(e.target.value)}
+              disabled={loading}
+            >
+              <option value="">Select size</option>
+              <option value="S">Small</option>
+              <option value="M">Medium</option>
+              <option value="L">Large</option>
+            </select>
+          </div>
 
-            <div className="col-12">
-              <label className="form-label">Recipient ID</label>
-              <input
-                className="form-control"
-                value={recipientId}
-                onChange={(e) => setRecipientId(e.target.value)}
-                placeholder="Recipient UUID"
-                disabled={loading}
-              />
-            </div>
+          <div className="col-12">
+            <label className="form-label">Recipient ID</label>
+            <input
+              className="form-control"
+              value={recipientId}
+              onChange={(e) => setRecipientId(e.target.value)}
+              placeholder="Recipient UUID"
+              disabled={loading}
+            />
+          </div>
 
-            <div className="col-12 d-flex justify-content-end">
-              <button className="btn btn-warning" type="submit" disabled={loading}>
-                {loading ? (
-                  <>
-                    <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true" />
-                    Creating...
-                  </>
-                ) : (
-                  "Create Parcel"
-                )}
-              </button>
-            </div>
-          </form>
-        </div>
+          <div className="col-12 d-flex justify-content-end">
+            <button className="btn btn-primary" type="submit" disabled={loading}>
+              {loading ? (
+                <>
+                  <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true" />
+                  Creating...
+                </>
+              ) : (
+                "Create Parcel"
+              )}
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   );

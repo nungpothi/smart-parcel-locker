@@ -3,6 +3,7 @@ import { BrowserRouter } from "react-router-dom";
 import { Router } from "./router";
 import { useAuthStore } from "./stores/auth.store";
 import "bootstrap/dist/css/bootstrap.min.css";
+import "./theme/variables.css";
 
 export const App = () => {
   const fetchMe = useAuthStore((state) => state.fetchMe);

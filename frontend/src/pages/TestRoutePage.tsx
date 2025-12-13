@@ -16,7 +16,9 @@ const Section = ({ title, links }: { title: string; links: { to: string; label: 
 const TestRoutePage = () => {
   return (
     <div className="container py-4">
-      <h3 className="mb-4">Test Route (Dev Only)</h3>
+      <h3 className="mb-4 fw-semibold" style={{ color: "var(--color-text-main)" }}>
+        Test Route (Dev Only)
+      </h3>
       <Section
         title="Auth"
         links={[

@@ -1,7 +1,5 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Card } from "../../../components/ui/Card";
-import { Button } from "../../../components/ui/Button";
 import { useParcelStore } from "../../../stores/parcel.store";
 import { useUiStore } from "../../../stores/ui.store";
 import { showError, showSuccess, showWarning } from "../../../utils/swal";
@@ -54,32 +52,32 @@ const ReserveParcelPage = () => {
 
   return (
     <div className="container py-4">
-      <h3 className="mb-3">Courier - Reserve Compartment</h3>
-      <div className="card shadow-sm">
-        <div className="card-body">
-          <p className="mb-2">
-            <strong>Parcel ID:</strong> {parcelId ?? "N/A"}
+      <h3 className="mb-3 fw-semibold" style={{ color: "var(--color-text-main)" }}>
+        Courier - Reserve Compartment
+      </h3>
+      <div className="card p-4 p-md-5">
+        <p className="mb-2">
+          <strong>Parcel ID:</strong> {parcelId ?? "N/A"}
+        </p>
+        <p className="mb-2">
+          <strong>Compartment ID:</strong> {compartmentId ?? "N/A"}
+        </p>
+        {expiresAt ? (
+          <p className="mb-3">
+            <strong>Expires At:</strong> {expiresAt}
           </p>
-          <p className="mb-2">
-            <strong>Compartment ID:</strong> {compartmentId ?? "N/A"}
-          </p>
-          {expiresAt ? (
-            <p className="mb-3">
-              <strong>Expires At:</strong> {expiresAt}
-            </p>
-          ) : null}
-          <div className="d-flex justify-content-end">
-            <button className="btn btn-warning" onClick={handleReserve} disabled={loading}>
-              {loading ? (
-                <>
-                  <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true" />
-                  Reserving...
-                </>
-              ) : (
-                "Reserve"
-              )}
-            </button>
-          </div>
+        ) : null}
+        <div className="d-flex justify-content-end">
+          <button className="btn btn-primary" onClick={handleReserve} disabled={loading}>
+            {loading ? (
+              <>
+                <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true" />
+                Reserving...
+              </>
+            ) : (
+              "Reserve"
+            )}
+          </button>
         </div>
       </div>
     </div>
