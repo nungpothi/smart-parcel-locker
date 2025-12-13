@@ -53,16 +53,35 @@ const ReserveParcelPage = () => {
   };
 
   return (
-    <div style={{ padding: "16px" }}>
-      <h1>Courier - Reserve Compartment</h1>
-      <Card>
-        <p>Parcel ID: {parcelId ?? "N/A"}</p>
-        <p>Compartment ID: {compartmentId ?? "N/A"}</p>
-        {expiresAt ? <p>Expires At: {expiresAt}</p> : null}
-        <Button onClick={handleReserve} disabled={loading}>
-          {loading ? "Reserving..." : "Reserve"}
-        </Button>
-      </Card>
+    <div className="container py-4">
+      <h3 className="mb-3">Courier - Reserve Compartment</h3>
+      <div className="card shadow-sm">
+        <div className="card-body">
+          <p className="mb-2">
+            <strong>Parcel ID:</strong> {parcelId ?? "N/A"}
+          </p>
+          <p className="mb-2">
+            <strong>Compartment ID:</strong> {compartmentId ?? "N/A"}
+          </p>
+          {expiresAt ? (
+            <p className="mb-3">
+              <strong>Expires At:</strong> {expiresAt}
+            </p>
+          ) : null}
+          <div className="d-flex justify-content-end">
+            <button className="btn btn-warning" onClick={handleReserve} disabled={loading}>
+              {loading ? (
+                <>
+                  <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true" />
+                  Reserving...
+                </>
+              ) : (
+                "Reserve"
+              )}
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

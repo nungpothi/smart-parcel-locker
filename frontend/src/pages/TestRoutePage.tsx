@@ -1,22 +1,22 @@
 import { Link } from "react-router-dom";
 
 const Section = ({ title, links }: { title: string; links: { to: string; label: string }[] }) => (
-  <section style={{ marginBottom: "16px" }}>
-    <h2>{title}</h2>
-    <ul>
+  <section className="mb-4">
+    <h5 className="mb-2">{title}</h5>
+    <div className="list-group">
       {links.map((link) => (
-        <li key={link.to}>
-          <Link to={link.to}>{link.label}</Link>
-        </li>
+        <Link key={link.to} to={link.to} className="list-group-item list-group-item-action">
+          {link.label}
+        </Link>
       ))}
-    </ul>
+    </div>
   </section>
 );
 
 const TestRoutePage = () => {
   return (
-    <div style={{ padding: "16px" }}>
-      <h1>Test Route (Dev Only)</h1>
+    <div className="container py-4">
+      <h3 className="mb-4">Test Route (Dev Only)</h3>
       <Section
         title="Auth"
         links={[

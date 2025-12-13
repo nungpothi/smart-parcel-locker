@@ -54,20 +54,33 @@ const ReadyParcelPage = () => {
   };
 
   return (
-    <div style={{ padding: "16px" }}>
-      <h1>Courier - Mark Pickup Ready</h1>
-      <Card>
-        <p>Parcel ID: {parcelId ?? "N/A"}</p>
-        <p>Status: {status ?? "N/A"}</p>
-        <div style={{ display: "flex", gap: "8px" }}>
-          <Button onClick={handleReady} disabled={loading}>
-            {loading ? "Updating..." : "Mark Ready"}
-          </Button>
-          <Button type="button" onClick={handleNewParcel} disabled={loading}>
-            Start New Parcel
-          </Button>
+    <div className="container py-4">
+      <h3 className="mb-3">Courier - Mark Pickup Ready</h3>
+      <div className="card shadow-sm">
+        <div className="card-body">
+          <p className="mb-2">
+            <strong>Parcel ID:</strong> {parcelId ?? "N/A"}
+          </p>
+          <p className="mb-3">
+            <strong>Status:</strong> {status ?? "N/A"}
+          </p>
+          <div className="d-flex gap-2 justify-content-end">
+            <button className="btn btn-warning" onClick={handleReady} disabled={loading}>
+              {loading ? (
+                <>
+                  <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true" />
+                  Updating...
+                </>
+              ) : (
+                "Mark Ready"
+              )}
+            </button>
+            <button className="btn btn-outline-secondary" type="button" onClick={handleNewParcel} disabled={loading}>
+              Start New Parcel
+            </button>
+          </div>
         </div>
-      </Card>
+      </div>
     </div>
   );
 };

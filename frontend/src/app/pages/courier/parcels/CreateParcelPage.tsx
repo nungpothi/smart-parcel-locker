@@ -70,47 +70,69 @@ const CreateParcelPage = () => {
   };
 
   return (
-    <div style={{ padding: "16px" }}>
-      <h1>Courier - Create Parcel</h1>
-      <Card>
-        <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-          <label>
-            Locker
-            <Select value={lockerId} onChange={(e) => setLockerId(e.target.value)} disabled={loading}>
-              <option value="">Select locker</option>
-              {lockers.map((locker) => (
-                <option key={locker.locker_id} value={locker.locker_id}>
-                  {locker.locker_code} - {locker.location_name}
-                </option>
-              ))}
-            </Select>
-          </label>
+    <div className="container py-4">
+      <h3 className="mb-3">Courier - Create Parcel</h3>
+      <div className="card shadow-sm">
+        <div className="card-body">
+          <form onSubmit={handleSubmit} className="row g-3">
+            <div className="col-12">
+              <label className="form-label">Locker</label>
+              <select
+                className="form-select"
+                value={lockerId}
+                onChange={(e) => setLockerId(e.target.value)}
+                disabled={loading}
+              >
+                <option value="">Select locker</option>
+                {lockers.map((locker) => (
+                  <option key={locker.locker_id} value={locker.locker_id}>
+                    {locker.locker_code} - {locker.location_name}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-          <label>
-            Size
-            <Select value={size} onChange={(e) => setSize(e.target.value)} disabled={loading}>
-              <option value="">Select size</option>
-              <option value="S">Small</option>
-              <option value="M">Medium</option>
-              <option value="L">Large</option>
-            </Select>
-          </label>
+            <div className="col-12">
+              <label className="form-label">Size</label>
+              <select
+                className="form-select"
+                value={size}
+                onChange={(e) => setSize(e.target.value)}
+                disabled={loading}
+              >
+                <option value="">Select size</option>
+                <option value="S">Small</option>
+                <option value="M">Medium</option>
+                <option value="L">Large</option>
+              </select>
+            </div>
 
-          <label>
-            Recipient ID
-            <Input
-              value={recipientId}
-              onChange={(e) => setRecipientId(e.target.value)}
-              placeholder="Recipient UUID"
-              disabled={loading}
-            />
-          </label>
+            <div className="col-12">
+              <label className="form-label">Recipient ID</label>
+              <input
+                className="form-control"
+                value={recipientId}
+                onChange={(e) => setRecipientId(e.target.value)}
+                placeholder="Recipient UUID"
+                disabled={loading}
+              />
+            </div>
 
-          <Button type="submit" disabled={loading}>
-            {loading ? "Creating..." : "Create"}
-          </Button>
-        </form>
-      </Card>
+            <div className="col-12 d-flex justify-content-end">
+              <button className="btn btn-warning" type="submit" disabled={loading}>
+                {loading ? (
+                  <>
+                    <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true" />
+                    Creating...
+                  </>
+                ) : (
+                  "Create Parcel"
+                )}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
     </div>
   );
 };

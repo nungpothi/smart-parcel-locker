@@ -50,15 +50,30 @@ const DepositParcelPage = () => {
   };
 
   return (
-    <div style={{ padding: "16px" }}>
-      <h1>Courier - Deposit Parcel</h1>
-      <Card>
-        <p>Parcel ID: {parcelId ?? "N/A"}</p>
-        <p>Compartment ID: {compartmentId ?? "N/A"}</p>
-        <Button onClick={handleDeposit} disabled={loading}>
-          {loading ? "Depositing..." : "Deposit"}
-        </Button>
-      </Card>
+    <div className="container py-4">
+      <h3 className="mb-3">Courier - Deposit Parcel</h3>
+      <div className="card shadow-sm">
+        <div className="card-body">
+          <p className="mb-2">
+            <strong>Parcel ID:</strong> {parcelId ?? "N/A"}
+          </p>
+          <p className="mb-3">
+            <strong>Compartment ID:</strong> {compartmentId ?? "N/A"}
+          </p>
+          <div className="d-flex justify-content-end">
+            <button className="btn btn-warning" onClick={handleDeposit} disabled={loading}>
+              {loading ? (
+                <>
+                  <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true" />
+                  Depositing...
+                </>
+              ) : (
+                "Deposit"
+              )}
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
