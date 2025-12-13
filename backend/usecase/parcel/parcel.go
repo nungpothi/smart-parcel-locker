@@ -2,7 +2,10 @@ package parcel
 
 import (
 	"context"
+	"crypto/rand"
 	"errors"
+	"fmt"
+	"math/big"
 	"smart-parcel-locker/backend/domain/compartment"
 	"smart-parcel-locker/backend/domain/locker"
 	"smart-parcel-locker/backend/domain/parcel"
@@ -13,6 +16,15 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
+
+// generateOTPCode returns a random 6-digit code as string.
+func generateOTPCode() string {
+	n, err := rand.Int(rand.Reader, big.NewInt(1000000))
+	if err != nil {
+		return "000000"
+	}
+	return fmt.Sprintf("%06d", n.Int64())
+}
 
 // UseCase handles parcel workflows.
 type UseCase struct {
@@ -51,8 +63,6 @@ type ReadyInput struct {
 type OTPRequestInput struct {
 	ParcelID    *uuid.UUID
 	RecipientID *uuid.UUID
-	OTPCode     string
-	ExpiresAt   time.Time
 }
 
 type OTPVerifyInput struct {
@@ -280,21 +290,24 @@ func (uc *UseCase) RequestOTP(ctx context.Context, input OTPRequestInput) (*parc
 		if p.Status != parcel.StatusPickupReady {
 			return parcel.ErrInvalidStatusTransition
 		}
-		if p.ExpiresAt != nil && time.Now().After(*p.ExpiresAt) {
+		now := time.Now()
+		if p.ExpiresAt != nil && now.After(*p.ExpiresAt) {
 			return parcel.ErrParcelExpired
 		}
-		hash, err := bcrypt.GenerateFromPassword([]byte(input.OTPCode), 12)
+		code := generateOTPCode()
+		hash, err := bcrypt.GenerateFromPassword([]byte(code), 12)
 		if err != nil {
 			return err
 		}
+		expiresAt := now.Add(10 * time.Minute)
 		otp := &parcel.OTP{
 			ID:        uuid.New(),
 			ParcelID:  p.ID,
 			OTPRef:    uuid.NewString(),
 			OTPHash:   string(hash),
 			Status:    parcel.OTPStatusActive,
-			ExpiresAt: input.ExpiresAt,
-			CreatedAt: time.Now(),
+			ExpiresAt: expiresAt,
+			CreatedAt: now,
 		}
 		created, err := parcelRepo.CreateOTP(ctx, otp)
 		if err != nil {

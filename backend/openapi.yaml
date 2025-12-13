@@ -252,14 +252,14 @@ paths:
             schema:
               $ref: '#/components/schemas/ParcelOTPRequest'
       responses:
-        '201':
+        '200':
           description: OTP generated
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/OTPCreateResponse'
         '400':
-          description: Bad request (invalid uuid, missing field, invalid status transition)
+          description: Bad request (invalid request)
           content:
             application/json:
               schema:
@@ -271,7 +271,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/APIErrorResponse'
         '409':
-          description: Conflict (invalid state for action)
+          description: Conflict (invalid status transition)
           content:
             application/json:
               schema:
@@ -716,7 +716,6 @@ components:
 
     ParcelOTPRequest:
       type: object
-      required: [otp_code, expires_at]
       description: At least one of parcel_id or recipient_id must be provided.
       properties:
         parcel_id:
@@ -725,11 +724,6 @@ components:
         recipient_id:
           type: string
           format: uuid
-        otp_code:
-          type: string
-        expires_at:
-          type: string
-          format: date-time
 
     OTPVerifyRequest:
       type: object

@@ -2,8 +2,6 @@ package parcel
 
 import (
 	"errors"
-	"smart-parcel-locker/backend/domain/compartment"
-	lockerdomain "smart-parcel-locker/backend/domain/locker"
 	"smart-parcel-locker/backend/domain/parcel"
 	"smart-parcel-locker/backend/pkg/errorx"
 	"smart-parcel-locker/backend/pkg/response"
@@ -44,8 +42,6 @@ type readyRequest struct {
 type otpRequest struct {
 	ParcelID    string `json:"parcel_id"`
 	RecipientID string `json:"recipient_id"`
-	OTPCode     string `json:"otp_code"`
-	ExpiresAt   string `json:"expires_at"`
 }
 
 type otpVerifyRequest struct {
@@ -233,24 +229,15 @@ func (h *Handler) RequestOTP(c *fiber.Ctx) error {
 	if parcelID == nil && recipientID == nil {
 		return invalidRequest(c, "parcel_id or recipient_id is required")
 	}
-	if req.OTPCode == "" {
-		return invalidInput(c, "otp_code is required")
-	}
-	expiresAtTime, err := time.Parse(time.RFC3339, req.ExpiresAt)
-	if err != nil {
-		return invalidInput(c, "invalid expires_at")
-	}
 
 	result, err := h.uc.RequestOTP(c.Context(), parcelusecase.OTPRequestInput{
 		ParcelID:    parcelID,
 		RecipientID: recipientID,
-		OTPCode:     req.OTPCode,
-		ExpiresAt:   expiresAtTime,
 	})
 	if err != nil {
 		return mapError(c, err)
 	}
-	return c.Status(fiber.StatusCreated).JSON(response.APIResponse{Success: true, Data: result})
+	return c.JSON(response.APIResponse{Success: true, Data: result})
 }
 
 func (h *Handler) VerifyOTP(c *fiber.Ctx) error {
