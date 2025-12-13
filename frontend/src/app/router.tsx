@@ -1,5 +1,4 @@
-import { createBrowserRouter } from "react-router-dom";
-import App from "./App";
+import { Navigate, Route, Routes } from "react-router-dom";
 import { AdminGuard } from "./guards/AdminGuard";
 import { CourierGuard } from "./guards/CourierGuard";
 import { RecipientGuard } from "./guards/RecipientGuard";
@@ -23,61 +22,54 @@ import { AdminLayout } from "./components/layout/AdminLayout";
 import { CourierLayout } from "./components/layout/CourierLayout";
 import { RecipientLayout } from "./components/layout/RecipientLayout";
 
-export const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <App />,
-    children: [
-      { index: true, element: <LoginPage /> },
-      { path: "auth/login", element: <LoginPage /> },
-      { path: "auth/register", element: <RegisterPage /> },
-      {
-        path: "admin",
-        element: (
-          <AdminGuard>
-            <AdminLayout />
-          </AdminGuard>
-        ),
-        children: [
-          { index: true, element: <DashboardPage /> },
-          { path: "dashboard", element: <DashboardPage /> },
-          { path: "locations", element: <LocationListPage /> },
-          { path: "locations/new", element: <LocationCreatePage /> },
-          { path: "lockers", element: <LockerListPage /> },
-          { path: "lockers/wizard", element: <LockerWizardPage /> },
-          { path: "compartments", element: <CompartmentListPage /> },
-          { path: "tools/expire-job", element: <ExpireJobPage /> }
-        ]
-      },
-      {
-        path: "courier",
-        element: (
-          <CourierGuard>
-            <CourierLayout />
-          </CourierGuard>
-        ),
-        children: [
-          { index: true, element: <CreateParcelPage /> },
-          { path: "parcels/create", element: <CreateParcelPage /> },
-          { path: "parcels/reserve", element: <ReserveParcelPage /> },
-          { path: "parcels/deposit", element: <DepositParcelPage /> },
-          { path: "parcels/ready", element: <ReadyParcelPage /> }
-        ]
-      },
-      {
-        path: "recipient",
-        element: (
-          <RecipientGuard>
-            <RecipientLayout />
-          </RecipientGuard>
-        ),
-        children: [
-          { index: true, element: <RequestOTPPage /> },
-          { path: "pickup/request-otp", element: <RequestOTPPage /> },
-          { path: "pickup/verify-otp", element: <VerifyOTPPage /> },
-          { path: "pickup/result", element: <PickupResultPage /> }
-        ]
+export const Router = () => (
+  <Routes>
+    <Route path="/" element={<Navigate to="/login" replace />} />
+    <Route path="/login" element={<LoginPage />} />
+    <Route path="/register" element={<RegisterPage />} />
+
+    <Route
+      path="/admin"
+      element={
+        <AdminGuard>
+          <AdminLayout />
+        </AdminGuard>
       }
-    ]
-  }
-]);
+    >
+      <Route index element={<DashboardPage />} />
+      <Route path="locations" element={<LocationListPage />} />
+      <Route path="locations/create" element={<LocationCreatePage />} />
+      <Route path="lockers" element={<LockerListPage />} />
+      <Route path="lockers/create" element={<LockerWizardPage />} />
+      <Route path="lockers/:lockerId/compartments" element={<CompartmentListPage />} />
+      <Route path="tools/expire" element={<ExpireJobPage />} />
+    </Route>
+
+    <Route
+      path="/courier"
+      element={
+        <CourierGuard>
+          <CourierLayout />
+        </CourierGuard>
+      }
+    >
+      <Route path="parcels/create" element={<CreateParcelPage />} />
+      <Route path="parcels/reserve" element={<ReserveParcelPage />} />
+      <Route path="parcels/deposit" element={<DepositParcelPage />} />
+      <Route path="parcels/ready" element={<ReadyParcelPage />} />
+    </Route>
+
+    <Route
+      path="/pickup"
+      element={
+        <RecipientGuard>
+          <RecipientLayout />
+        </RecipientGuard>
+      }
+    >
+      <Route path="request-otp" element={<RequestOTPPage />} />
+      <Route path="verify-otp" element={<VerifyOTPPage />} />
+      <Route path="result" element={<PickupResultPage />} />
+    </Route>
+  </Routes>
+);

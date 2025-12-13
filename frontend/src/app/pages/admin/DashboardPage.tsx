@@ -1,5 +1,6 @@
-export const DashboardPage = () => {
-  return <div>Admin Dashboard</div>;
+const DashboardPage = () => {
+  return <h1>Dashboard Page</h1>;
 };
 
 export default DashboardPage;
+export { DashboardPage };

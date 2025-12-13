@@ -1,5 +1,6 @@
-export const LockerListPage = () => {
-  return <div>Locker List</div>;
+const LockerListPage = () => {
+  return <h1>Locker List Page</h1>;
 };
 
 export default LockerListPage;
+export { LockerListPage };

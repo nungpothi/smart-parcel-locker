@@ -1,11 +1,23 @@
 import { ReactNode } from "react";
+import { Navigate, Outlet } from "react-router-dom";
+import { mockRole } from "../stores/auth.store";
 
 type GuardProps = {
   children: ReactNode;
 };
 
 export const RecipientGuard = ({ children }: GuardProps) => {
-  return <>{children}</>;
+  const role = mockRole;
+
+  if (role !== "RECIPIENT") {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (children) {
+    return <>{children}</>;
+  }
+
+  return <Outlet />;
 };
 
 export default RecipientGuard;

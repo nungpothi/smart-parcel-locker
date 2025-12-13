@@ -1,5 +1,6 @@
-export const ReserveParcelPage = () => {
-  return <div>Reserve Parcel</div>;
+const ReserveParcelPage = () => {
+  return <h1>Reserve Parcel Page</h1>;
 };
 
 export default ReserveParcelPage;
+export { ReserveParcelPage };

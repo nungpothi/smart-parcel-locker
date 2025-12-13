@@ -1,5 +1,3 @@
-import { create } from "zustand";
+export type MockRole = "ADMIN" | "COURIER" | "RECIPIENT" | "GUEST";
 
-type AuthState = Record<string, never>;
-
-export const useAuthStore = create<AuthState>(() => ({}));
+export const mockRole: MockRole = "ADMIN";

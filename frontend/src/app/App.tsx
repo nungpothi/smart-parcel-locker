@@ -1,10 +1,11 @@
-import { Outlet } from "react-router-dom";
+import { BrowserRouter } from "react-router-dom";
+import { Router } from "./router";
 
 export const App = () => {
   return (
-    <div className="app-shell">
-      <Outlet />
-    </div>
+    <BrowserRouter>
+      <Router />
+    </BrowserRouter>
   );
 };
 
