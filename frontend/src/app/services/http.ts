@@ -24,11 +24,23 @@ export const setBaseUrl = (url: string) => {
 };
 
 export const request = async <T>(method: string, path: string, body?: unknown): Promise<T> => {
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json"
+  };
+
+  try {
+    const { useAuthStore } = await import("../stores/auth.store");
+    const token = useAuthStore.getState().accessToken;
+    if (token) {
+      headers.Authorization = `Bearer ${token}`;
+    }
+  } catch (_error) {
+    // ignore auth store load issues
+  }
+
   const response = await fetch(buildUrl(path), {
     method,
-    headers: {
-      "Content-Type": "application/json"
-    },
+    headers,
     body: body ? JSON.stringify(body) : undefined
   });
 
@@ -40,7 +52,7 @@ export const request = async <T>(method: string, path: string, body?: unknown): 
   }
 
   const success = data?.success ?? response.ok;
-  const errorCode = data?.error_code;
+  const errorCode = response.status === 401 ? "UNAUTHORIZED" : data?.error_code;
   const message = data?.error || response.statusText || "Request failed";
 
   if (!response.ok || success === false) {

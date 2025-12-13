@@ -7,9 +7,12 @@ type GuardProps = {
 };
 
 export const RecipientGuard = ({ children }: GuardProps) => {
-  const role = useAuthStore((state) => state.role);
+  const { isAuthenticated, role } = useAuthStore((state) => ({
+    isAuthenticated: state.isAuthenticated,
+    role: state.role
+  }));
 
-  if (role !== "RECIPIENT") {
+  if (!isAuthenticated || role !== "RECIPIENT") {
     return <Navigate to="/login" replace />;
   }
 

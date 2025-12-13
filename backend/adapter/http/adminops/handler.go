@@ -7,7 +7,6 @@ import (
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 
-	"smart-parcel-locker/backend/domain/locker"
 	"smart-parcel-locker/backend/pkg/errorx"
 	"smart-parcel-locker/backend/pkg/response"
 	adminopsusecase "smart-parcel-locker/backend/usecase/adminops"

@@ -7,9 +7,12 @@ type GuardProps = {
 };
 
 export const AdminGuard = ({ children }: GuardProps) => {
-  const role = useAuthStore((state) => state.role);
+  const { isAuthenticated, role } = useAuthStore((state) => ({
+    isAuthenticated: state.isAuthenticated,
+    role: state.role
+  }));
 
-  if (role !== "ADMIN") {
+  if (!isAuthenticated || role !== "ADMIN") {
     return <Navigate to="/login" replace />;
   }
 

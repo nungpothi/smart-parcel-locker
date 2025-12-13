@@ -41,32 +41,25 @@ export const useAuthStore = create<AuthState & AuthActions>((set) => ({
     set({
       userId: res.user_id ?? null,
       role: res.role ?? null,
-      phone: res.phone ?? null,
       accessToken: res.access_token ?? null,
-      isAuthenticated: Boolean(res.access_token)
+      isAuthenticated: true
     });
   },
 
   register: async (phone, password, role) => {
-    const res = (await authApi.register({ phone, password, role })) as AuthResponse;
-    set({
-      userId: res.user_id ?? null,
-      role: res.role ?? null,
-      phone: res.phone ?? null,
-      accessToken: res.access_token ?? null,
-      isAuthenticated: Boolean(res.access_token)
-    });
+    await authApi.register({ phone, password, role });
+    set({ ...initialState });
   },
 
   fetchMe: async () => {
     const res = (await authApi.me()) as AuthResponse;
-    set({
+    set((state) => ({
       userId: res.user_id ?? null,
       role: res.role ?? null,
       phone: res.phone ?? null,
-      accessToken: res.access_token ?? null,
-      isAuthenticated: Boolean(res.user_id)
-    });
+      accessToken: state.accessToken,
+      isAuthenticated: true
+    }));
   },
 
   logout: async () => {
