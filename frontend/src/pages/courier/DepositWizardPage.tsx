@@ -1,35 +1,36 @@
 import { useEffect, useMemo } from "react";
-import { useCourierStore } from "../../../../stores/courier.store";
-import { useAuthStore } from "../../../stores/auth.store";
-import { showError, showSuccess, showWarning } from "../../../utils/swal";
-import { mapErrorToMessage } from "../../../utils/errorMapper";
+import { useCourierStore } from "../../stores/courier.store";
+import { useAuthStore } from "../../app/stores/auth.store";
+import { showError, showSuccess, showWarning } from "../../app/utils/swal";
+import { mapErrorToMessage } from "../../utils/errorMapper";
 
-const StepBadge = ({ index, label, active }: { index: number; label: string; active: boolean }) => (
-  <div className="d-flex flex-column align-items-center text-center" style={{ minWidth: 120 }}>
+const StepHeader = ({ step, title, active }: { step: number; title: string; active: boolean }) => (
+  <div className="d-flex flex-column align-items-center text-center" style={{ minWidth: 140 }}>
     <div
       className={`rounded-circle d-flex align-items-center justify-content-center fw-semibold mb-2 ${
         active ? "bg-warning text-dark" : "bg-light text-secondary"
       }`}
-      style={{ width: 42, height: 42, border: "2px solid #ffd54f" }}
+      style={{ width: 44, height: 44, border: "2px solid #ffd54f" }}
     >
-      {index}
+      {step}
     </div>
-    <span className={`small ${active ? "fw-semibold text-dark" : "text-muted"}`}>{label}</span>
+    <span className={`small ${active ? "fw-semibold text-dark" : "text-muted"}`}>{title}</span>
   </div>
 );
 
 const Stepper = ({ current }: { current: number }) => (
   <div className="d-flex align-items-center justify-content-between mb-4">
-    <StepBadge index={1} label="Select Locker" active={current === 1} />
+    <StepHeader step={1} title="Select Locker" active={current === 1} />
     <div className="flex-grow-1 mx-2" style={{ height: 2, background: "#ffe08a" }} />
-    <StepBadge index={2} label="Parcel Info" active={current === 2} />
+    <StepHeader step={2} title="Parcel Info" active={current === 2} />
     <div className="flex-grow-1 mx-2" style={{ height: 2, background: "#ffe08a" }} />
-    <StepBadge index={3} label="Confirm" active={current >= 3 && current < 4} />
+    <StepHeader step={3} title="Confirm Deposit" active={current >= 3 && current < 4} />
   </div>
 );
 
-const CreateParcelPage = () => {
-  const courierId = useAuthStore((state) => state.userId);
+const DepositWizardPage = () => {
+  const authCourierId = useAuthStore((state) => state.userId);
+
   const {
     step,
     lockers,
@@ -37,6 +38,8 @@ const CreateParcelPage = () => {
     size,
     useSelfRecipient,
     recipientId,
+    compartmentId,
+    status,
     summary,
     loadingLockers,
     submitting,
@@ -55,6 +58,8 @@ const CreateParcelPage = () => {
     size: state.size,
     useSelfRecipient: state.useSelfRecipient,
     recipientId: state.recipientId,
+    compartmentId: state.compartmentId,
+    status: state.status,
     summary: state.summary,
     loadingLockers: state.loadingLockers,
     submitting: state.submitting,
@@ -69,8 +74,8 @@ const CreateParcelPage = () => {
   }));
 
   const recipientValue = useMemo(
-    () => (useSelfRecipient ? courierId ?? "" : recipientId.trim()),
-    [courierId, recipientId, useSelfRecipient]
+    () => (useSelfRecipient ? authCourierId ?? "" : recipientId.trim()),
+    [authCourierId, recipientId, useSelfRecipient]
   );
 
   useEffect(() => {
@@ -80,10 +85,10 @@ const CreateParcelPage = () => {
   }, [loadLockers]);
 
   useEffect(() => {
-    if (!courierId && useSelfRecipient) {
+    if (!authCourierId && useSelfRecipient) {
       setUseSelfRecipient(false);
     }
-  }, [courierId, useSelfRecipient, setUseSelfRecipient]);
+  }, [authCourierId, useSelfRecipient, setUseSelfRecipient]);
 
   const handleNext = async () => {
     if (step === 1) {
@@ -100,7 +105,7 @@ const CreateParcelPage = () => {
         return;
       }
       if (!recipientValue) {
-        await showWarning("Recipient required", "Provide a recipient to continue");
+        await showWarning("Recipient required", "Pick a recipient option to continue");
         return;
       }
       setStep(3);
@@ -124,16 +129,16 @@ const CreateParcelPage = () => {
       return;
     }
     if (!recipientValue) {
-      await showWarning("Recipient required", "Provide a recipient to continue");
+      await showWarning("Recipient required", "Pick a recipient option to continue");
       setStep(2);
       return;
     }
-    if (!courierId) {
-      await showWarning("Not authenticated", "Courier ID missing");
+    if (!authCourierId) {
+      await showWarning("Not authenticated", "Sign in as courier to deposit");
       return;
     }
     try {
-      const result = await completeDeposit(courierId, recipientValue);
+      const result = await completeDeposit(authCourierId, recipientValue);
       await showSuccess("Deposit complete", `Parcel ${result.parcelId}`);
     } catch (error) {
       await showError("Deposit failed", mapErrorToMessage(error));
@@ -209,10 +214,10 @@ const CreateParcelPage = () => {
             id="recipientSelf"
             checked={useSelfRecipient}
             onChange={() => setUseSelfRecipient(true)}
-            disabled={!courierId || submitting}
+            disabled={!authCourierId || submitting}
           />
-        <label className="form-check-label" htmlFor="recipientSelf">
-            Use my courier account {courierId ? `(ID: ${courierId})` : "(Unavailable)"}
+          <label className="form-check-label" htmlFor="recipientSelf">
+            Use my courier account {authCourierId ? `(ID: ${authCourierId})` : "(Unavailable)"}
           </label>
         </div>
       </div>
@@ -261,7 +266,7 @@ const CreateParcelPage = () => {
       </div>
       <div className="d-flex justify-content-between">
         <span className="text-muted">Status</span>
-        <span className="fw-semibold text-dark">{summary?.status ?? "PENDING"}</span>
+        <span className="fw-semibold text-dark">{status || "PENDING"}</span>
       </div>
     </div>
   );
@@ -345,7 +350,7 @@ const CreateParcelPage = () => {
           </h3>
           <div className="d-flex align-items-center gap-2">
             <span className="badge bg-warning text-dark px-3 py-2">Pastel Yellow</span>
-            <span className="text-muted small">Route: /courier/parcels/create</span>
+            <span className="text-muted small">Route: /courier/deposit</span>
           </div>
         </div>
       </div>
@@ -425,5 +430,5 @@ const CreateParcelPage = () => {
   );
 };
 
-export default CreateParcelPage;
-export { CreateParcelPage };
+export default DepositWizardPage;
+export { DepositWizardPage };
