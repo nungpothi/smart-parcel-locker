@@ -13,35 +13,44 @@ import {
   AdminOverviewResponse
 } from "../types/api";
 import { request } from "./http";
+import { unwrapApiResponse } from "../../services/apiResponse";
 
 export const createLocation = async (req: LocationCreateRequest) => {
-  return request<LocationResponse>("POST", "/admin/locations", req);
+  const res = await request<LocationResponse>("POST", "/admin/locations", req);
+  return unwrapApiResponse<LocationResponse>(res);
 };
 
 export const listLocations = async () => {
-  return request<LocationListResponse>("GET", "/admin/locations");
+  const res = await request<LocationListResponse>("GET", "/admin/locations");
+  return unwrapApiResponse<LocationListResponse>(res);
 };
 
 export const createLocker = async (req: LockerCreateRequest) => {
-  return request<LockerResponse>("POST", "/admin/lockers", req);
+  const res = await request<LockerResponse>("POST", "/admin/lockers", req);
+  return unwrapApiResponse<LockerResponse>(res);
 };
 
 export const listLockers = async () => {
-  return request<LockerListResponse>("GET", "/admin/lockers");
+  const res = await request<LockerListResponse>("GET", "/admin/lockers");
+  return unwrapApiResponse<LockerListResponse>(res);
 };
 
 export const updateLockerStatus = async (lockerId: string, req: LockerStatusUpdateRequest) => {
-  return request<LockerStatusResponse>("PATCH", `/admin/lockers/${lockerId}/status`, req);
+  const res = await request<LockerStatusResponse>("PATCH", `/admin/lockers/${lockerId}/status`, req);
+  return unwrapApiResponse<LockerStatusResponse>(res);
 };
 
 export const createCompartments = async (lockerId: string, req: CompartmentBatchCreateRequest) => {
-  return request<CompartmentBatchCreateResponse>("POST", `/admin/lockers/${lockerId}/compartments`, req);
+  const res = await request<CompartmentBatchCreateResponse>("POST", `/admin/lockers/${lockerId}/compartments`, req);
+  return unwrapApiResponse<CompartmentBatchCreateResponse>(res);
 };
 
 export const listCompartments = async (lockerId: string) => {
-  return request<CompartmentListResponse>("GET", `/admin/lockers/${lockerId}/compartments`);
+  const res = await request<CompartmentListResponse>("GET", `/admin/lockers/${lockerId}/compartments`);
+  return unwrapApiResponse<CompartmentListResponse>(res);
 };
 
 export const getOverview = async () => {
-  return request<AdminOverviewResponse>("GET", "/admin/overview");
+  const res = await request<AdminOverviewResponse>("GET", "/admin/overview");
+  return unwrapApiResponse<AdminOverviewResponse>(res);
 };

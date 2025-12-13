@@ -1,4 +1,5 @@
 import { request } from "./http";
+import { unwrapApiResponse } from "../../services/apiResponse";
 
 type LoginPayload = {
   phone: string;
@@ -12,17 +13,21 @@ type RegisterPayload = {
 };
 
 export const login = async (payload: LoginPayload) => {
-  return request<any>("POST", "/auth/login", payload);
+  const res = await request<any>("POST", "/auth/login", payload);
+  return unwrapApiResponse<any>(res);
 };
 
 export const register = async (payload: RegisterPayload) => {
-  return request<any>("POST", "/auth/register", payload);
+  const res = await request<any>("POST", "/auth/register", payload);
+  return unwrapApiResponse<any>(res);
 };
 
 export const me = async () => {
-  return request<any>("GET", "/auth/me");
+  const res = await request<any>("GET", "/auth/me");
+  return unwrapApiResponse<any>(res);
 };
 
 export const logout = async () => {
-  return request<any>("POST", "/auth/logout");
+  const res = await request<any>("POST", "/auth/logout");
+  return unwrapApiResponse<any>(res);
 };

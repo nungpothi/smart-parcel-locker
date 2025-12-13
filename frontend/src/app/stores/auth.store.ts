@@ -39,7 +39,6 @@ export const useAuthStore = create<AuthState & AuthActions>((set) => ({
 
   login: async (phone, password) => {
     const res = (await authApi.login({ phone, password })) as AuthResponse;
-    console.log("Login response:", res);
     if (res.access_token) {
       localStorage.setItem("AUTH_ACCESS_TOKEN", res.access_token);
     }

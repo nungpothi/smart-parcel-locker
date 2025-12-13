@@ -54,11 +54,10 @@ export const request = async <T>(method: string, path: string, body?: unknown): 
     data = null;
   }
 
-  const success = data?.success ?? response.ok;
   const errorCode = response.status === 401 ? "UNAUTHORIZED" : data?.error_code;
   const message = data?.error || response.statusText || "Request failed";
 
-  if (!response.ok || success === false) {
+  if (!response.ok) {
     throw new APIError(response.status, message, errorCode);
   }
 
