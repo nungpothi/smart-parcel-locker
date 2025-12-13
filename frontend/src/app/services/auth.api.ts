@@ -18,3 +18,11 @@ export const login = async (payload: LoginPayload) => {
 export const register = async (payload: RegisterPayload) => {
   return request<any>("POST", "/auth/register", payload);
 };
+
+export const me = async () => {
+  return request<any>("GET", "/auth/me");
+};
+
+export const logout = async () => {
+  return request<any>("POST", "/auth/logout");
+};
