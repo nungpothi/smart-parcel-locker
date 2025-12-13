@@ -768,12 +768,12 @@ components:
         - type: object
           required: [data]
           properties:
-        data:
-          type: object
-          required: [expired_count]
-          properties:
-            expired_count:
-              type: integer
+            data:
+              type: object
+              required: [expired_count]
+              properties:
+                expired_count:
+                  type: integer
       example:
         success: true
         data:
