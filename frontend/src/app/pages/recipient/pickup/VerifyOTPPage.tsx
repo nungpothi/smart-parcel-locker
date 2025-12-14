@@ -1,44 +1,47 @@
 import { FormEvent, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useParcelStore } from "../../../stores/parcel.store";
-import { useUiStore } from "../../../stores/ui.store";
+import { useAuthStore } from "../../../stores/auth.store";
+import { useRecipientStore } from "../../../../stores/recipient.store";
 import { showError, showSuccess, showWarning } from "../../../utils/swal";
 import { mapErrorToMessage } from "../../../utils/errorMapper";
 
 const VerifyOTPPage = () => {
   const navigate = useNavigate();
-  const { parcelId, verifyOtp } = useParcelStore((state) => ({
-    parcelId: state.parcelId,
-    verifyOtp: state.verifyOtp
-  }));
-  const { loading, setLoading } = useUiStore((state) => ({
+  const recipientId = useAuthStore((state) => state.userId);
+  const { parcel, otpRef, loading, fetchParcelByRecipient, verifyOtp } = useRecipientStore((state) => ({
+    parcel: state.parcel,
+    otpRef: state.otpRef,
     loading: state.loading,
-    setLoading: state.setLoading
+    fetchParcelByRecipient: state.fetchParcelByRecipient,
+    verifyOtp: state.verifyOtp
   }));
   const [otpCode, setOtpCode] = useState("");
 
   useEffect(() => {
-    if (!parcelId) {
-      showWarning("No parcel in progress", "Please request OTP first").then(() => navigate("/pickup/request-otp"));
+    if (!otpRef) {
+      navigate("/pickup/request-otp");
+      return;
     }
-  }, [navigate, parcelId]);
+    if (!parcel && recipientId) {
+      fetchParcelByRecipient(recipientId).catch(async (error) => {
+        await showError("Load failed", mapErrorToMessage(error));
+      });
+    }
+  }, [otpRef, parcel, recipientId, fetchParcelByRecipient, navigate]);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (!parcelId) {
-      await showWarning("No parcel in progress", "Please request OTP first");
+    if (!otpRef) {
+      await showWarning("No OTP", "Request OTP first");
       navigate("/pickup/request-otp");
       return;
     }
     try {
-      setLoading(true);
-      await verifyOtp(parcelId, otpCode);
+      await verifyOtp(otpCode);
       await showSuccess("OTP verified", "Proceed to pickup");
       navigate("/pickup/result");
     } catch (error) {
       await showError("Verification failed", mapErrorToMessage(error));
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -59,7 +62,7 @@ const VerifyOTPPage = () => {
             />
           </div>
           <div className="d-flex justify-content-end">
-            <button className="btn btn-primary" type="submit" disabled={loading}>
+            <button className="btn btn-primary" type="submit" disabled={loading || !otpRef}>
               {loading ? (
                 <>
                   <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true" />
