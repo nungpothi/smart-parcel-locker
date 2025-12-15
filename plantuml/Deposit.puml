@@ -1,0 +1,22 @@
+@startuml
+title Deposit Parcel Flow (Phone-based, Both Phones Required)
+
+actor Courier
+participant "Kiosk / Web UI" as UI
+participant "API" as API
+database DB
+participant "SMS Gateway" as SMS
+
+Courier -> UI : Start Deposit
+UI -> Courier : Input receiver_phone (required)\nInput sender_phone (required)
+UI -> API : POST /parcels/deposit\n(receiver_phone, sender_phone)
+API -> DB : Validate both phone numbers
+API -> DB : Find available compartment
+API -> DB : Create parcel\n(receiver_phone,\nsender_phone,\nstatus=READY_FOR_PICKUP,\npickup_code)
+API -> SMS : Send pickup_code to receiver_phone
+API -> SMS : Send pickup_code to sender_phone
+API -> UI : Open compartment
+Courier -> UI : Put parcel & close door
+UI -> API : Confirm deposit
+API -> DB : Update parcel status=READY_FOR_PICKUP
+@enduml

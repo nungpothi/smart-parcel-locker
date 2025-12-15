@@ -1,0 +1,54 @@
+@startuml
+title Admin Flow (Search & Assist Pickup)
+
+actor Admin
+participant "Admin Web UI" as UI
+participant "API" as API
+database DB
+participant "SMS Gateway" as SMS
+
+Admin -> UI : Search parcel by phone
+UI -> API : GET /admin/parcels?phone=xxx
+API -> DB : Query parcels by phone
+API -> UI : Show parcel list
+
+Admin -> UI : Select parcel
+UI -> API : GET /admin/parcels/{id}
+API -> DB : Load parcel detail
+API -> UI : Show parcel detail
+@enduml
+---
+@startuml
+title Admin Flow (Re-send OTP)
+
+actor Admin
+participant "Admin Web UI" as UI
+participant "API" as API
+database DB
+participant "SMS Gateway" as SMS
+
+Admin -> UI : Re-send OTP
+UI -> API : POST /admin/pickup/resend-otp (parcel_id, phone)
+API -> DB : Validate parcel READY_FOR_PICKUP
+API -> DB : Invalidate old OTP
+API -> DB : Generate new OTP
+API -> SMS : Send OTP to phone
+API -> UI : Success
+@enduml
+---
+@startuml
+title Admin Flow (Force Pickup / Emergency)
+
+actor Admin
+participant "Admin Web UI" as UI
+participant "API" as API
+database DB
+
+Admin -> UI : Force pickup
+UI -> API : POST /admin/pickup/force
+API -> DB : Validate admin role
+API -> DB : Update parcel status=PICKED_UP
+API -> DB : Save force_reason + admin_id
+API -> UI : Open compartment
+@enduml
+---

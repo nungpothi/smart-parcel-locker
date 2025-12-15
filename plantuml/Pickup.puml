@@ -1,0 +1,32 @@
+@startuml
+title Pickup Flow (OTP -> Token Based)
+
+actor User
+participant "Kiosk / Web UI" as UI
+participant "API" as API
+database DB
+participant "SMS Gateway" as SMS
+
+User -> UI : Input phone
+UI -> API : POST /pickup/request-otp (phone)
+API -> DB : Find active parcels by phone
+API -> SMS : Send OTP
+
+User -> UI : Input phone + OTP
+UI -> API : POST /pickup/verify-otp (phone, otp)
+API -> DB : Verify OTP
+API -> DB : Invalidate OTP
+API -> DB : Generate pickup_token\n(bind phone + parcel_ids)
+API -> UI : Return pickup_token
+
+UI -> API : GET /pickup/parcels (pickup_token)
+API -> DB : Validate pickup_token
+API -> UI : Return parcel list
+
+User -> UI : Select parcel
+UI -> API : POST /pickup/confirm (parcel_id, pickup_token)
+API -> DB : Validate pickup_token\nand parcel ownership
+API -> DB : Update parcel status=PICKED_UP
+API -> UI : Open compartment
+
+@enduml
