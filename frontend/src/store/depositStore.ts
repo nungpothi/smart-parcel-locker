@@ -1,23 +1,23 @@
 import { create } from 'zustand'
 
-export type ParcelSize = 'small' | 'medium' | 'large' | ''
+export type DepositSize = 'S' | 'M' | 'L' | null
 
 type DepositState = {
-  primaryPhone: string
-  secondaryPhone: string
-  size: ParcelSize
-  setPrimaryPhone: (phone: string) => void
-  setSecondaryPhone: (phone: string) => void
-  setSize: (size: ParcelSize) => void
-  reset: () => void
+  receiverPhone: string
+  senderPhone: string
+  size: DepositSize
+  setReceiverPhone: (phone: string) => void
+  setSenderPhone: (phone: string) => void
+  setSize: (size: DepositSize) => void
+  resetDeposit: () => void
 }
 
 export const useDepositStore = create<DepositState>((set) => ({
-  primaryPhone: '',
-  secondaryPhone: '',
-  size: '',
-  setPrimaryPhone: (primaryPhone) => set({ primaryPhone }),
-  setSecondaryPhone: (secondaryPhone) => set({ secondaryPhone }),
+  receiverPhone: '',
+  senderPhone: '',
+  size: null,
+  setReceiverPhone: (receiverPhone) => set({ receiverPhone }),
+  setSenderPhone: (senderPhone) => set({ senderPhone }),
   setSize: (size) => set({ size }),
-  reset: () => set({ primaryPhone: '', secondaryPhone: '', size: '' }),
+  resetDeposit: () => set({ receiverPhone: '', senderPhone: '', size: null }),
 }))

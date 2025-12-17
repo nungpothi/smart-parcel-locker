@@ -19,7 +19,7 @@ const Button = ({
   return (
     <button
       className={clsx(
-        'inline-flex items-center justify-center rounded-full px-6 py-4 text-lg font-semibold transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2',
+        'inline-flex items-center justify-center rounded-full px-6 py-4 text-lg font-semibold transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 disabled:cursor-not-allowed disabled:opacity-60',
         variant === 'primary'
           ? 'bg-primary text-text shadow-soft hover:bg-primary-dark'
           : 'border-2 border-primary bg-white text-text hover:border-primary-dark',
