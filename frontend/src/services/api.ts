@@ -1,13 +1,14 @@
 import axios from 'axios'
 
 export const apiClient = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL,
+  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api/v1',
 })
 
 export type DepositPayload = {
-  primaryPhone: string
-  secondaryPhone?: string
-  size: 'small' | 'medium' | 'large'
+  locker_id: string
+  size: 'S' | 'M' | 'L'
+  receiver_phone: string
+  sender_phone: string
 }
 
 export type PickupOtpRequest = {
@@ -44,8 +45,13 @@ export type Compartment = {
   status: string
 }
 
-export const depositParcel = (payload: DepositPayload) => {
-  return apiClient.post('/deposit', payload)
+export type AvailableLocker = {
+  locker_id: string
+  locker_code: string
+  location_name: string
+}
+export const depositParcel = async (payload: DepositPayload) => {
+  return apiClient.post('/parcels/deposit', payload)
 }
 
 export const requestOtp = (payload: PickupOtpRequest) => {
@@ -62,6 +68,10 @@ export const fetchPickupParcels = (token: string) => {
 
 export const confirmPickup = (payload: ConfirmPickupPayload) => {
   return apiClient.post('/pickup/confirm', payload)
+}
+
+export const fetchAvailableLockers = async () => {
+  return apiClient.get('/lockers/available')
 }
 
 export const fetchLocations = () => {

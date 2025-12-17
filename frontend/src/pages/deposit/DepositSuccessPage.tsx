@@ -5,7 +5,7 @@ import { useDepositStore } from '@/store/depositStore'
 
 const DepositSuccessPage = () => {
   const navigate = useNavigate()
-  const { resetDeposit } = useDepositStore()
+  const { parcelCode, pickupCode, resetDeposit } = useDepositStore()
 
   const handleBack = () => {
     resetDeposit()
@@ -22,6 +22,17 @@ const DepositSuccessPage = () => {
           <h1 className="font-display text-3xl">ฝากพัสดุสำเร็จ</h1>
           <p className="text-base text-text/80">
             ระบบได้ส่ง SMS ไปยังเบอร์ผู้รับและผู้ส่งแล้ว
+          </p>
+        </div>
+
+        <div className="mt-6 rounded-2xl border border-primary/30 bg-white/80 p-4 text-left">
+          <p className="text-sm text-text/70">รหัสพัสดุ</p>
+          <p className="text-xl font-semibold text-text">
+            {parcelCode ?? '-'}
+          </p>
+          <p className="mt-4 text-sm text-text/70">รหัสรับพัสดุ</p>
+          <p className="text-xl font-semibold text-text">
+            {pickupCode ?? 'ไม่มี'}
           </p>
         </div>
 
