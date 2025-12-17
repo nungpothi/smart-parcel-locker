@@ -20,6 +20,10 @@ func NewGormRepository(db *gorm.DB) *GormRepository {
 	return &GormRepository{db: db}
 }
 
+func (r *GormRepository) WithDB(db *gorm.DB) otp.Repository {
+	return &GormRepository{db: db}
+}
+
 func (r *GormRepository) Create(ctx context.Context, entity *otp.OTP) (*otp.OTP, error) {
 	model := gormmodels.ParcelOTP{
 		ID:         entity.ID,
@@ -43,11 +47,10 @@ func (r *GormRepository) Create(ctx context.Context, entity *otp.OTP) (*otp.OTP,
 	return mapModelToDomain(model), nil
 }
 
-func (r *GormRepository) GetActiveByPhone(ctx context.Context, phone string) (*otp.OTP, error) {
+func (r *GormRepository) GetByRefAndPhone(ctx context.Context, otpRef string, phone string) (*otp.OTP, error) {
 	var model gormmodels.ParcelOTP
 	if err := r.db.WithContext(ctx).
-		Where("phone = ? AND status = ?", phone, string(otp.StatusActive)).
-		Order("created_at DESC").
+		Where("phone = ? AND otp_ref = ?", phone, otpRef).
 		First(&model).Error; err != nil {
 		return nil, err
 	}

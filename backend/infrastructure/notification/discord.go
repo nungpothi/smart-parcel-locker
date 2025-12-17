@@ -28,7 +28,7 @@ func NewDiscordNotifier() *DiscordNotifier {
 func (d *DiscordNotifier) SendOTP(ctx context.Context, phone string, otpCode string) error {
 	payload := map[string]string{
 		"content": fmt.Sprintf(
-			"OTP for pickup\nPhone: %s\nOTP: %s\nExpires in 5 minutes",
+			"Pickup OTP\nPhone: %s\nOTP: %s\nExpires in 5 minutes",
 			phone,
 			otpCode,
 		),

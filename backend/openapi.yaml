@@ -84,7 +84,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/APIErrorResponse'
 
-  /pickup/request-otp:
+  /pickup/otp/request:
     post:
       summary: Request pickup OTP
       tags: [Parcels]
@@ -93,16 +93,22 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PickupOTPRequest'
+              $ref: '#/components/schemas/PickupOtpRequest'
       responses:
         '200':
           description: OTP generated
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PickupOTPResponse'
+                $ref: '#/components/schemas/PickupOtpResponse'
         '400':
           description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+        '429':
+          description: Too many requests
           content:
             application/json:
               schema:
@@ -114,7 +120,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/APIErrorResponse'
 
-  /pickup/verify-otp:
+  /pickup/otp/verify:
     post:
       summary: Verify pickup OTP
       tags: [Parcels]
@@ -123,14 +129,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PickupOTPVerifyRequest'
+              $ref: '#/components/schemas/PickupOtpVerifyRequest'
       responses:
         '200':
           description: OTP verified
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PickupOTPVerifyResponse'
+                $ref: '#/components/schemas/PickupOtpVerifyResponse'
         '400':
           description: Invalid request or OTP
           content:
@@ -144,6 +150,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/APIErrorResponse'
         '409':
+          description: OTP already used
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+        '410':
           description: OTP expired
           content:
             application/json:
@@ -625,14 +637,14 @@ components:
           pickup_code: "PU-123456"
           status: READY_FOR_PICKUP
 
-    PickupOTPRequest:
+    PickupOtpRequest:
       type: object
       required: [phone]
       properties:
         phone:
           type: string
 
-    PickupOTPResponse:
+    PickupOtpResponse:
       allOf:
         - $ref: '#/components/schemas/APIBase'
         - type: object
@@ -653,16 +665,18 @@ components:
           otp_ref: "f9b5c3d6-21b5-4fd7-bf68-3e3f3c86b917"
           expires_at: "2025-01-01T10:35:00Z"
 
-    PickupOTPVerifyRequest:
+    PickupOtpVerifyRequest:
       type: object
-      required: [phone, otp]
+      required: [phone, otp_ref, otp_code]
       properties:
         phone:
           type: string
-        otp:
+        otp_ref:
+          type: string
+        otp_code:
           type: string
 
-    PickupOTPVerifyResponse:
+    PickupOtpVerifyResponse:
       allOf:
         - $ref: '#/components/schemas/APIBase'
         - type: object
@@ -670,15 +684,18 @@ components:
           properties:
             data:
               type: object
-              required: [status]
+              required: [pickup_token, expires_at]
               properties:
-                status:
+                pickup_token:
                   type: string
-                  enum: [VERIFIED]
+                expires_at:
+                  type: string
+                  format: date-time
       example:
         success: true
         data:
-          status: VERIFIED
+          pickup_token: "9c0c2c50-9f2c-4bc3-8d33-7df875e2c2ac"
+          expires_at: "2025-01-01T10:50:00Z"
 
     Admin:
       type: object

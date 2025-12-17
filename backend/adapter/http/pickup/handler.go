@@ -46,8 +46,9 @@ func (h *Handler) RequestOTP(c *fiber.Ctx) error {
 }
 
 type verifyOTPRequest struct {
-	Phone string `json:"phone"`
-	OTP   string `json:"otp"`
+	Phone  string `json:"phone"`
+	OtpRef string `json:"otp_ref"`
+	Otp    string `json:"otp_code"`
 }
 
 func (h *Handler) VerifyOTP(c *fiber.Ctx) error {
@@ -56,7 +57,7 @@ func (h *Handler) VerifyOTP(c *fiber.Ctx) error {
 		return writeError(c, fiber.StatusBadRequest, "INVALID_REQUEST", "invalid request body")
 	}
 
-	result, err := h.uc.VerifyOTP(c.Context(), req.Phone, req.OTP)
+	result, err := h.uc.VerifyOTP(c.Context(), req.Phone, req.OtpRef, req.Otp)
 	if err != nil {
 		return mapError(c, err)
 	}
@@ -64,7 +65,8 @@ func (h *Handler) VerifyOTP(c *fiber.Ctx) error {
 	return c.JSON(response.APIResponse{
 		Success: true,
 		Data: map[string]interface{}{
-			"status": result.Status,
+			"pickup_token": result.PickupToken,
+			"expires_at":   result.ExpiresAt,
 		},
 	})
 }
@@ -93,10 +95,14 @@ func statusFromCode(code string) int {
 	switch code {
 	case "INVALID_REQUEST", "INVALID_OTP":
 		return fiber.StatusBadRequest
-	case "OTP_EXPIRED":
+	case "OTP_ALREADY_USED":
 		return fiber.StatusConflict
+	case "OTP_EXPIRED":
+		return fiber.StatusGone
 	case "OTP_NOT_FOUND":
 		return fiber.StatusNotFound
+	case "TOO_MANY_REQUESTS":
+		return fiber.StatusTooManyRequests
 	default:
 		return fiber.StatusInternalServerError
 	}

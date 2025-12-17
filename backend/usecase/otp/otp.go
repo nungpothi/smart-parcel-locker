@@ -7,12 +7,14 @@ import (
 	"encoding/hex"
 	"log"
 	"math/big"
+	"sync"
 	"time"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 
 	"smart-parcel-locker/backend/domain/otp"
+	"smart-parcel-locker/backend/infrastructure/database"
 	"smart-parcel-locker/backend/pkg/errorx"
 )
 
@@ -23,11 +25,18 @@ type Notifier interface {
 	SendOTP(ctx context.Context, phone string, otpCode string) error
 }
 
+type otpRepository interface {
+	otp.Repository
+	WithDB(db *gorm.DB) otp.Repository
+}
+
 // UseCase handles OTP request/verify flow.
 type UseCase struct {
-	repo     otp.Repository
-	notifier Notifier
-	now      func() time.Time
+	repo        otpRepository
+	notifier    Notifier
+	now         func() time.Time
+	tx          *database.TransactionManager
+	rateLimiter *phoneRateLimiter
 }
 
 type RequestResult struct {
@@ -36,25 +45,39 @@ type RequestResult struct {
 }
 
 type VerifyResult struct {
-	Status otp.Status
+	Status      otp.Status
+	PickupToken string
+	ExpiresAt   time.Time
 }
 
 // NewUseCase constructs OTP use case.
-func NewUseCase(repo otp.Repository, notifier Notifier) *UseCase {
+func NewUseCase(repo otp.Repository, notifier Notifier, tx *database.TransactionManager) *UseCase {
 	if notifier == nil {
 		notifier = noopNotifier{}
 	}
+	if tx == nil {
+		tx = database.NewTransactionManager(nil)
+	}
 	return &UseCase{
-		repo:     repo,
-		notifier: notifier,
-		now:      time.Now,
+		repo: repo.(interface {
+			otp.Repository
+			WithDB(db *gorm.DB) otp.Repository
+		}),
+		notifier:    notifier,
+		now:         time.Now,
+		tx:          tx,
+		rateLimiter: newPhoneRateLimiter(30 * time.Second),
 	}
 }
 
 // RequestOTP generates and stores an OTP, then notifies the user.
 func (uc *UseCase) RequestOTP(ctx context.Context, phone string) (*RequestResult, error) {
-	if phone == "" || !isNumeric(phone) {
+	if !isValidPhone(phone) {
 		return nil, otp.ErrInvalidRequest
+	}
+
+	if !uc.rateLimiter.Allow(phone, uc.now()) {
+		return nil, errorx.Error{Code: "TOO_MANY_REQUESTS", Message: "too many requests"}
 	}
 
 	otpCode := generateNumericCode(6)
@@ -74,6 +97,8 @@ func (uc *UseCase) RequestOTP(ctx context.Context, phone string) (*RequestResult
 		return nil, err
 	}
 
+	log.Printf("otp requested for phone=%s ref=%s", phone, created.OtpRef)
+
 	if err := uc.notifier.SendOTP(ctx, phone, otpCode); err != nil {
 		log.Printf("otp webhook error for phone=%s: %v", phone, err)
 	} else {
@@ -87,43 +112,68 @@ func (uc *UseCase) RequestOTP(ctx context.Context, phone string) (*RequestResult
 }
 
 // VerifyOTP checks OTP code and marks it as verified.
-func (uc *UseCase) VerifyOTP(ctx context.Context, phone string, otpCode string) (*VerifyResult, error) {
-	if phone == "" || otpCode == "" || !isNumeric(phone) || !isNumeric(otpCode) {
+func (uc *UseCase) VerifyOTP(ctx context.Context, phone string, otpRef string, otpCode string) (*VerifyResult, error) {
+	if otpRef == "" || otpCode == "" || !isValidPhone(phone) || !isNumeric(otpCode) {
 		return nil, otp.ErrInvalidRequest
 	}
 	if len(otpCode) != 6 {
 		return nil, errorx.Error{Code: "INVALID_REQUEST", Message: "otp must be 6 digits"}
 	}
 
-	record, err := uc.repo.GetActiveByPhone(ctx, phone)
+	var result *VerifyResult
+	err := uc.tx.WithinTransaction(ctx, func(tx *gorm.DB) error {
+		var repo otp.Repository = uc.repo
+		if tx != nil {
+			repo = uc.repo.WithDB(tx)
+		}
+		record, err := repo.GetByRefAndPhone(ctx, otpRef, phone)
+		if err != nil {
+			if err == gorm.ErrRecordNotFound {
+				return otp.ErrNotFound
+			}
+			return err
+		}
+
+		now := uc.now()
+		switch record.Status {
+		case otp.StatusVerified:
+			return otp.ErrAlreadyUsed
+		case otp.StatusExpired:
+			return otp.ErrExpired
+		}
+
+		if now.After(record.ExpiresAt) {
+			record.Status = otp.StatusExpired
+			record.VerifiedAt = nil
+			if _, err := repo.Update(ctx, record); err != nil {
+				return err
+			}
+			return otp.ErrExpired
+		}
+
+		if hashOTP(otpCode) != record.OtpHash {
+			return otp.ErrInvalidOTP
+		}
+
+		record.Status = otp.StatusVerified
+		record.VerifiedAt = &now
+		if _, err := repo.Update(ctx, record); err != nil {
+			return err
+		}
+
+		result = &VerifyResult{
+			Status:      record.Status,
+			PickupToken: uuid.NewString(),
+			ExpiresAt:   now.Add(15 * time.Minute),
+		}
+		return nil
+	})
 	if err != nil {
-		if err == gorm.ErrRecordNotFound {
-			return nil, otp.ErrNotFound
-		}
+		log.Printf("otp verify failed for phone=%s ref=%s: %v", phone, otpRef, err)
 		return nil, err
 	}
-
-	now := uc.now()
-	if now.After(record.ExpiresAt) {
-		record.Status = otp.StatusExpired
-		record.VerifiedAt = nil
-		if _, err := uc.repo.Update(ctx, record); err != nil {
-			return nil, err
-		}
-		return nil, otp.ErrExpired
-	}
-
-	if hashOTP(otpCode) != record.OtpHash {
-		return nil, otp.ErrInvalidOTP
-	}
-
-	record.Status = otp.StatusVerified
-	record.VerifiedAt = &now
-	if _, err := uc.repo.Update(ctx, record); err != nil {
-		return nil, err
-	}
-
-	return &VerifyResult{Status: record.Status}, nil
+	log.Printf("otp verified for phone=%s ref=%s", phone, otpRef)
+	return result, nil
 }
 
 type noopNotifier struct{}
@@ -157,5 +207,36 @@ func isNumeric(value string) bool {
 			return false
 		}
 	}
+	return true
+}
+
+func isValidPhone(value string) bool {
+	if value == "" || len(value) < 9 || len(value) > 15 {
+		return false
+	}
+	return isNumeric(value)
+}
+
+type phoneRateLimiter struct {
+	window time.Duration
+	mu     sync.Mutex
+	last   map[string]time.Time
+}
+
+func newPhoneRateLimiter(window time.Duration) *phoneRateLimiter {
+	return &phoneRateLimiter{
+		window: window,
+		last:   make(map[string]time.Time),
+	}
+}
+
+func (rl *phoneRateLimiter) Allow(phone string, now time.Time) bool {
+	rl.mu.Lock()
+	defer rl.mu.Unlock()
+	lastTime, ok := rl.last[phone]
+	if ok && now.Sub(lastTime) < rl.window {
+		return false
+	}
+	rl.last[phone] = now
 	return true
 }
