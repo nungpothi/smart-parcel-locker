@@ -22,12 +22,14 @@ import (
 	"smart-parcel-locker/backend/infrastructure/notification"
 	otpinfra "smart-parcel-locker/backend/infrastructure/otp"
 	parcelinfra "smart-parcel-locker/backend/infrastructure/parcel"
+	pickupinfra "smart-parcel-locker/backend/infrastructure/pickup"
 	"smart-parcel-locker/backend/pkg/config"
 	adminusecase "smart-parcel-locker/backend/usecase/admin"
 	adminopsusecase "smart-parcel-locker/backend/usecase/adminops"
 	lockerqueryusecase "smart-parcel-locker/backend/usecase/lockerquery"
 	otpusecase "smart-parcel-locker/backend/usecase/otp"
 	parcelusecase "smart-parcel-locker/backend/usecase/parcel"
+	pickupusecase "smart-parcel-locker/backend/usecase/pickup"
 )
 
 func main() {
@@ -78,10 +80,12 @@ func wireModules(app *fiber.App, db *gorm.DB) {
 	lockerQueryUC := lockerqueryusecase.NewUseCase(lockerRepo, locationRepo)
 	lockerHandler := lockeradapter.NewHandler(lockerQueryUC)
 
+	tokenStore := pickupinfra.NewTokenStore()
 	otpRepo := otpinfra.NewGormRepository(db)
 	otpNotifier := notification.NewDiscordNotifier()
-	otpUC := otpusecase.NewUseCase(otpRepo, otpNotifier, txManager)
-	pickupHandler := pickupadapter.NewHandler(otpUC)
+	otpUC := otpusecase.NewUseCase(otpRepo, otpNotifier, tokenStore, txManager)
+	pickupUC := pickupusecase.NewUseCase(parcelRepo, tokenStore)
+	pickupHandler := pickupadapter.NewHandler(otpUC, pickupUC)
 
 	http.Register(app, parcelHandler, adminHandler, adminOpsHandler, lockerHandler, pickupHandler)
 }

@@ -14,6 +14,7 @@ import (
 	"gorm.io/gorm"
 
 	"smart-parcel-locker/backend/domain/otp"
+	pickupdomain "smart-parcel-locker/backend/domain/pickup"
 	"smart-parcel-locker/backend/infrastructure/database"
 	"smart-parcel-locker/backend/pkg/errorx"
 )
@@ -34,6 +35,7 @@ type otpRepository interface {
 type UseCase struct {
 	repo        otpRepository
 	notifier    Notifier
+	tokenStore  pickupdomain.TokenStore
 	now         func() time.Time
 	tx          *database.TransactionManager
 	rateLimiter *phoneRateLimiter
@@ -51,9 +53,17 @@ type VerifyResult struct {
 }
 
 // NewUseCase constructs OTP use case.
-func NewUseCase(repo otp.Repository, notifier Notifier, tx *database.TransactionManager) *UseCase {
+func NewUseCase(
+	repo otp.Repository,
+	notifier Notifier,
+	tokenStore pickupdomain.TokenStore,
+	tx *database.TransactionManager,
+) *UseCase {
 	if notifier == nil {
 		notifier = noopNotifier{}
+	}
+	if tokenStore == nil {
+		tokenStore = noopTokenStore{}
 	}
 	if tx == nil {
 		tx = database.NewTransactionManager(nil)
@@ -64,6 +74,7 @@ func NewUseCase(repo otp.Repository, notifier Notifier, tx *database.Transaction
 			WithDB(db *gorm.DB) otp.Repository
 		}),
 		notifier:    notifier,
+		tokenStore:  tokenStore,
 		now:         time.Now,
 		tx:          tx,
 		rateLimiter: newPhoneRateLimiter(30 * time.Second),
@@ -166,6 +177,7 @@ func (uc *UseCase) VerifyOTP(ctx context.Context, phone string, otpRef string, o
 			PickupToken: uuid.NewString(),
 			ExpiresAt:   now.Add(15 * time.Minute),
 		}
+		uc.tokenStore.Store(result.PickupToken, phone, result.ExpiresAt)
 		return nil
 	})
 	if err != nil {
@@ -180,6 +192,13 @@ type noopNotifier struct{}
 
 func (noopNotifier) SendOTP(ctx context.Context, phone string, otpCode string) error {
 	return nil
+}
+
+type noopTokenStore struct{}
+
+func (noopTokenStore) Store(token string, phone string, expiresAt time.Time) {}
+func (noopTokenStore) Get(token string) (pickupdomain.TokenInfo, bool) {
+	return pickupdomain.TokenInfo{}, false
 }
 
 func generateNumericCode(digits int) string {

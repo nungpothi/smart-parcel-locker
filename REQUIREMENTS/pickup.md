@@ -40,9 +40,28 @@
 - `pickup_token`
 - `expires_at`
 
+## List Parcels for Pickup
+**Endpoint:** `GET /pickup/parcels`
+
+**Header**
+- `X-Pickup-Token` (required)
+
+**Behavior**
+- Validate pickup token and expiry (15 minutes from verify).
+- Resolve phone from token.
+- List parcels where:
+  - `status = READY_FOR_PICKUP`
+  - `receiver_phone = phone` OR `sender_phone = phone`
+- Sorted by `created_at` ascending.
+
+**Response**
+- array of `ParcelPickupView` (no phone numbers, no pickup code)
+
 ## Error Codes
 - `INVALID_REQUEST` (400)
 - `OTP_NOT_FOUND` (404)
 - `OTP_ALREADY_USED` (409)
 - `OTP_EXPIRED` (410)
 - `TOO_MANY_REQUESTS` (429, optional rate limit)
+- `INVALID_TOKEN` (401)
+- `TOKEN_EXPIRED` (410)

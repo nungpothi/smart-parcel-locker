@@ -168,6 +168,42 @@ paths:
               schema:
                 $ref: '#/components/schemas/APIErrorResponse'
 
+  /pickup/parcels:
+    get:
+      summary: List parcels eligible for pickup
+      tags: [Parcels]
+      parameters:
+        - in: header
+          name: X-Pickup-Token
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Parcel list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PickupParcelListResponse'
+        '401':
+          description: Invalid token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+        '410':
+          description: Token expired
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+
   /lockers/available:
     get:
       summary: List available lockers
@@ -696,6 +732,50 @@ components:
         data:
           pickup_token: "9c0c2c50-9f2c-4bc3-8d33-7df875e2c2ac"
           expires_at: "2025-01-01T10:50:00Z"
+
+    ParcelPickupView:
+      type: object
+      required: [parcel_id, parcel_code, locker_id, size]
+      properties:
+        parcel_id:
+          type: string
+          format: uuid
+        parcel_code:
+          type: string
+        locker_id:
+          type: string
+          format: uuid
+        compartment_id:
+          type: string
+          format: uuid
+          nullable: true
+        size:
+          type: string
+          enum: [S, M, L]
+        expires_at:
+          type: string
+          format: date-time
+          nullable: true
+
+    PickupParcelListResponse:
+      allOf:
+        - $ref: '#/components/schemas/APIBase'
+        - type: object
+          required: [data]
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/ParcelPickupView'
+      example:
+        success: true
+        data:
+          - parcel_id: "d290f1ee-6c54-4b01-90e6-d701748f0851"
+            parcel_code: "PR-1234567890"
+            locker_id: "3c4f5a7d-1111-4b4c-a222-9f3e8d6c1111"
+            compartment_id: "c1f5c1a4-1234-4f0f-9a4b-1234567890ab"
+            size: M
+            expires_at: "2025-01-02T10:30:00Z"
 
     Admin:
       type: object

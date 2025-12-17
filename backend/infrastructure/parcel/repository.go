@@ -93,6 +93,22 @@ func (r *GormRepository) CountByStatus(ctx context.Context, statuses []parcel.St
 	return count, nil
 }
 
+func (r *GormRepository) ListReadyForPickupByPhone(ctx context.Context, phone string) ([]*parcel.Parcel, error) {
+	var models []gormmodels.Parcel
+	if err := r.db.WithContext(ctx).
+		Where("status = ?", string(parcel.StatusReadyForPickup)).
+		Where("receiver_phone = ? OR sender_phone = ?", phone, phone).
+		Order("created_at ASC").
+		Find(&models).Error; err != nil {
+		return nil, err
+	}
+	results := make([]*parcel.Parcel, 0, len(models))
+	for _, model := range models {
+		results = append(results, mapParcelModelToDomain(model))
+	}
+	return results, nil
+}
+
 func mapParcelModelToDomain(model gormmodels.Parcel) *parcel.Parcel {
 	return &parcel.Parcel{
 		ID:            model.ID,
