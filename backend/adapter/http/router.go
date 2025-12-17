@@ -7,6 +7,7 @@ import (
 	adminopsadapter "smart-parcel-locker/backend/adapter/http/adminops"
 	lockeradapter "smart-parcel-locker/backend/adapter/http/locker"
 	parceladapter "smart-parcel-locker/backend/adapter/http/parcel"
+	pickupadapter "smart-parcel-locker/backend/adapter/http/pickup"
 )
 
 // Register attaches all HTTP routes to the Fiber app.
@@ -16,6 +17,7 @@ func Register(
 	adminHandler *adminadapter.Handler,
 	adminOpsHandler *adminopsadapter.Handler,
 	lockerHandler *lockeradapter.Handler,
+	pickupHandler *pickupadapter.Handler,
 ) {
 	api := app.Group("/api/v1")
 
@@ -24,6 +26,9 @@ func Register(
 
 	lockerGroup := api.Group("/lockers")
 	lockeradapter.RegisterRoutes(lockerGroup, lockerHandler)
+
+	pickupGroup := api.Group("/pickup")
+	pickupadapter.RegisterRoutes(pickupGroup, pickupHandler)
 
 	adminGroup := api.Group("/admins")
 	adminadapter.RegisterRoutes(adminGroup, adminHandler)
