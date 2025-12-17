@@ -37,7 +37,7 @@ func (c *Compartment) Reserve(parcelID uuid.UUID) error {
 
 // Occupy marks the compartment as occupied after deposit.
 func (c *Compartment) Occupy(parcelID uuid.UUID) error {
-	if c.Status != StatusReserved {
+	if c.Status != StatusReserved && c.Status != StatusAvailable {
 		return ErrInvalidCompartmentStatus
 	}
 	c.Status = StatusOccupied

@@ -22,6 +22,46 @@ func NewHandler(uc *parcelusecase.UseCase) *Handler {
 	return &Handler{uc: uc}
 }
 
+type depositRequest struct {
+	LockerID      string `json:"locker_id"`
+	Size          string `json:"size"`
+	ReceiverPhone string `json:"receiver_phone"`
+	SenderPhone   string `json:"sender_phone"`
+}
+
+func (h *Handler) Deposit(c *fiber.Ctx) error {
+	var req depositRequest
+	if err := c.BodyParser(&req); err != nil {
+		return writeError(c, fiber.StatusBadRequest, "INVALID_REQUEST", "invalid request body")
+	}
+	if req.LockerID == "" || req.Size == "" || req.ReceiverPhone == "" || req.SenderPhone == "" {
+		return writeError(c, fiber.StatusBadRequest, "INVALID_REQUEST", "missing required fields")
+	}
+	lockerID, err := uuid.Parse(req.LockerID)
+	if err != nil {
+		return writeError(c, fiber.StatusBadRequest, "INVALID_REQUEST", "invalid locker_id")
+	}
+
+	result, err := h.uc.Deposit(c.Context(), parcelusecase.DepositInput{
+		LockerID:      lockerID,
+		Size:          req.Size,
+		ReceiverPhone: req.ReceiverPhone,
+		SenderPhone:   req.SenderPhone,
+	})
+	if err != nil {
+		return mapError(c, err)
+	}
+	return c.Status(fiber.StatusCreated).JSON(response.APIResponse{
+		Success: true,
+		Data: map[string]interface{}{
+			"parcel_id":   result.ParcelID,
+			"parcel_code": result.ParcelCode,
+			"pickup_code": result.PickupCode,
+			"status":      result.Status,
+		},
+	})
+}
+
 func (h *Handler) GetByID(c *fiber.Ctx) error {
 	parcelID, err := uuid.Parse(c.Params("parcel_id"))
 	if err != nil {
@@ -76,10 +116,12 @@ func extractError(err error) (string, string) {
 
 func statusFromCode(code string) int {
 	switch code {
-	case "INVALID_UUID":
+	case "INVALID_UUID", "INVALID_REQUEST":
 		return fiber.StatusBadRequest
-	case parcel.ErrParcelNotFound.Code:
+	case "NOT_FOUND", parcel.ErrParcelNotFound.Code:
 		return fiber.StatusNotFound
+	case "NO_AVAILABLE_COMPARTMENT", "LOCKER_INACTIVE", "INVALID_STATUS_TRANSITION":
+		return fiber.StatusConflict
 	default:
 		return fiber.StatusInternalServerError
 	}

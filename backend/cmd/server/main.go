@@ -56,7 +56,8 @@ func wireModules(app *fiber.App, db *gorm.DB) {
 	// Locker & parcel modules
 	lockerRepo := lockerinfra.NewGormRepository(db)
 	parcelRepo := parcelinfra.NewGormRepository(db)
-	parcelUC := parcelusecase.NewUseCase(parcelRepo)
+	compRepo := compartmentinfra.NewGormRepository(db)
+	parcelUC := parcelusecase.NewUseCase(parcelRepo, lockerRepo, compRepo, txManager)
 	parcelHandler := parceladapter.NewHandler(parcelUC)
 
 	// Admin module
@@ -66,7 +67,6 @@ func wireModules(app *fiber.App, db *gorm.DB) {
 
 	// Admin operations module
 	locationRepo := locationinfra.NewGormRepository(db)
-	compRepo := compartmentinfra.NewGormRepository(db)
 	adminOpsUC := adminopsusecase.NewUseCase(locationRepo, lockerRepo, compRepo, parcelRepo, txManager)
 	adminOpsHandler := adminopsadapter.NewHandler(adminOpsUC)
 

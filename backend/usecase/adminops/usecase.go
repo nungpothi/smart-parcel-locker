@@ -278,7 +278,11 @@ func (uc *UseCase) Overview(ctx context.Context) (*Overview, error) {
 	if err != nil {
 		return nil, err
 	}
-	parcelsActive, err := uc.parcelRepo.CountByStatus(ctx, []parcel.Status{})
+	activeStatuses := []parcel.Status{
+		parcel.StatusDepositing,
+		parcel.StatusReadyForPickup,
+	}
+	parcelsActive, err := uc.parcelRepo.CountByStatus(ctx, activeStatuses)
 	if err != nil {
 		return nil, err
 	}

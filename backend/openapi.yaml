@@ -5,6 +5,48 @@ info:
 servers:
   - url: http://localhost:8080/api/v1
 paths:
+  /parcels/deposit:
+    post:
+      summary: Deposit parcel (phone-based)
+      tags: [Parcels]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ParcelDepositRequest'
+      responses:
+        '201':
+          description: Parcel deposited
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ParcelDepositResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+        '404':
+          description: Locker not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+        '409':
+          description: Conflict (locker inactive or no available compartment)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+
   /parcels/{parcel_id}:
     get:
       summary: Get parcel by id
@@ -467,6 +509,50 @@ components:
         error_code: INVALID_REQUEST
         error: invalid request
 
+    ParcelDepositRequest:
+      type: object
+      required: [locker_id, size, receiver_phone, sender_phone]
+      properties:
+        locker_id:
+          type: string
+          format: uuid
+        size:
+          type: string
+          enum: [S, M, L]
+        receiver_phone:
+          type: string
+        sender_phone:
+          type: string
+
+    ParcelDepositResponse:
+      allOf:
+        - $ref: '#/components/schemas/APIBase'
+        - type: object
+          required: [data]
+          properties:
+            data:
+              type: object
+              required: [parcel_id, parcel_code, status]
+              properties:
+                parcel_id:
+                  type: string
+                  format: uuid
+                parcel_code:
+                  type: string
+                pickup_code:
+                  type: string
+                  nullable: true
+                status:
+                  type: string
+                  enum: [READY_FOR_PICKUP]
+      example:
+        success: true
+        data:
+          parcel_id: "d290f1ee-6c54-4b01-90e6-d701748f0851"
+          parcel_code: "PR-1234567890"
+          pickup_code: "PU-123456"
+          status: READY_FOR_PICKUP
+
     Admin:
       type: object
       required: [id, username, password_hash, role]
@@ -523,7 +609,7 @@ components:
 
     ParcelStatus:
       type: string
-      enum: [PICKED_UP, CANCELLED, EXPIRED]
+      enum: [DEPOSITING, READY_FOR_PICKUP, PICKED_UP, CANCELLED, EXPIRED]
 
     ParcelDetail:
       type: object

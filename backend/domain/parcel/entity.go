@@ -9,9 +9,11 @@ import (
 type Status string
 
 const (
-	StatusPickedUp  Status = "PICKED_UP"
-	StatusCancelled Status = "CANCELLED"
-	StatusExpired   Status = "EXPIRED"
+	StatusDepositing     Status = "DEPOSITING"
+	StatusReadyForPickup Status = "READY_FOR_PICKUP"
+	StatusPickedUp       Status = "PICKED_UP"
+	StatusCancelled      Status = "CANCELLED"
+	StatusExpired        Status = "EXPIRED"
 )
 
 // Parcel represents a package stored in a locker compartment.

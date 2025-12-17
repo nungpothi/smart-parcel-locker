@@ -6,6 +6,7 @@ import (
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 
 	"smart-parcel-locker/backend/domain/compartment"
 	gormmodels "smart-parcel-locker/backend/infrastructure/persistence/gorm/models"
@@ -44,6 +45,49 @@ func (r *GormRepository) CreateBulk(ctx context.Context, compartments []compartm
 		return 0, err
 	}
 	return len(models), nil
+}
+
+func (r *GormRepository) FindAvailableByLockerAndSizeForUpdate(ctx context.Context, lockerID uuid.UUID, size string) (*compartment.Compartment, error) {
+	var model gormmodels.Compartment
+	if err := r.db.WithContext(ctx).
+		Clauses(clause.Locking{Strength: "UPDATE"}).
+		Where("locker_id = ? AND size = ? AND status = ?", lockerID, size, compartment.StatusAvailable).
+		Order("compartment_no asc").
+		Limit(1).
+		Take(&model).Error; err != nil {
+		return nil, err
+	}
+	return &compartment.Compartment{
+		ID:            model.ID,
+		LockerID:      model.LockerID,
+		CompartmentNo: model.CompartmentNo,
+		Size:          model.Size,
+		Status:        model.Status,
+		CreatedAt:     model.CreatedAt,
+		UpdatedAt:     model.UpdatedAt,
+	}, nil
+}
+
+func (r *GormRepository) Update(ctx context.Context, comp *compartment.Compartment) (*compartment.Compartment, error) {
+	if comp == nil {
+		return nil, nil
+	}
+	now := time.Now()
+	model := gormmodels.Compartment{
+		ID:            comp.ID,
+		LockerID:      comp.LockerID,
+		CompartmentNo: comp.CompartmentNo,
+		Status:        comp.Status,
+		Size:          comp.Size,
+		UpdatedAt:     &now,
+	}
+	if err := r.db.WithContext(ctx).
+		Model(&gormmodels.Compartment{}).
+		Where("id = ?", comp.ID).
+		Updates(model).Error; err != nil {
+		return nil, err
+	}
+	return comp, nil
 }
 
 func (r *GormRepository) ListByLocker(ctx context.Context, lockerID uuid.UUID) ([]compartment.Compartment, error) {
