@@ -5,7 +5,10 @@ import { usePickupStore } from '@/store/pickupStore'
 
 const PickupSuccessPage = () => {
   const navigate = useNavigate()
-  const { resetPickup } = usePickupStore()
+  const { parcels, selectedParcelId, resetPickup } = usePickupStore()
+  const selectedParcel = parcels.find(
+    (parcel) => parcel.parcel_id === selectedParcelId,
+  )
 
   const handleBack = () => {
     resetPickup()
@@ -21,6 +24,15 @@ const PickupSuccessPage = () => {
           </div>
           <h1 className="font-display text-3xl">รับพัสดุเรียบร้อย</h1>
         </div>
+
+        {selectedParcel && (
+          <div className="mt-6 rounded-2xl border border-primary/30 bg-white/80 p-4 text-left">
+            <p className="text-sm text-text/70">รหัสพัสดุ</p>
+            <p className="text-xl font-semibold text-text">
+              {selectedParcel.parcel_code}
+            </p>
+          </div>
+        )}
 
         <div className="mt-8">
           <Button fullWidth onClick={handleBack}>

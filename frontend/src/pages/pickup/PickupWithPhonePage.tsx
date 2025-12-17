@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import axios from 'axios'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
@@ -46,6 +47,10 @@ const PickupWithPhonePage = () => {
     },
   })
 
+  useEffect(() => {
+    setError(null)
+  }, [setError])
+
   const onSubmit = async (values: PickupPhoneForm) => {
     setSubmitting(true)
     setError(null)
@@ -59,7 +64,7 @@ const PickupWithPhonePage = () => {
       setPhone(values.phone)
       setOtpRef(payload.otp_ref)
       setOtpCode('')
-      setPickupToken(null)
+    setPickupToken(null, null)
       navigate('/pickup/otp')
     } catch (err) {
       const status = axios.isAxiosError(err) ? err.response?.status : undefined

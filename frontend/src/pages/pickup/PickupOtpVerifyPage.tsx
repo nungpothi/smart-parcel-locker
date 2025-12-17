@@ -46,10 +46,11 @@ const PickupOtpVerifyPage = () => {
   })
 
   useEffect(() => {
+    setError(null)
     if (!phone) {
       navigate('/pickup/phone')
     }
-  }, [navigate, phone])
+  }, [navigate, phone, setError])
 
   const onSubmit = async (values: PickupOtpForm) => {
     if (!phone || !otpRef) {
@@ -65,7 +66,7 @@ const PickupOtpVerifyPage = () => {
         throw new Error('missing pickup_token')
       }
       setOtpCode(values.otp)
-      setPickupToken(payload.pickup_token)
+      setPickupToken(payload.pickup_token, payload.expires_at ?? null)
       navigate('/pickup/list')
     } catch (err) {
       const status = axios.isAxiosError(err) ? err.response?.status : undefined

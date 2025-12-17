@@ -11,10 +11,6 @@ export type DepositPayload = {
   sender_phone: string
 }
 
-export type ConfirmPickupPayload = {
-  token: string
-}
-
 export type Location = {
   location_id: string
   code: string
@@ -62,11 +58,23 @@ export const verifyPickupOtp = (
 }
 
 export const fetchPickupParcels = (token: string) => {
-  return apiClient.get(`/pickup/parcels/${token}`)
+  return apiClient.get('/pickup/parcels', {
+    headers: {
+      'X-Pickup-Token': token,
+    },
+  })
 }
 
-export const confirmPickup = (payload: ConfirmPickupPayload) => {
-  return apiClient.post('/pickup/confirm', payload)
+export const confirmPickup = (pickupToken: string, parcelId: string) => {
+  return apiClient.post(
+    '/pickup/confirm',
+    { parcel_id: parcelId },
+    {
+      headers: {
+        'X-Pickup-Token': pickupToken,
+      },
+    },
+  )
 }
 
 export const fetchAvailableLockers = async () => {
