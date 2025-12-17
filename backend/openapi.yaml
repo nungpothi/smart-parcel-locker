@@ -5,268 +5,6 @@ info:
 servers:
   - url: http://localhost:8080/api/v1
 paths:
-  /auth/login:
-    post:
-      summary: Login with phone and password
-      tags: [Auth]
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/LoginRequest'
-      responses:
-        '200':
-          description: Login successful
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/LoginResponse'
-        '400':
-          description: Invalid request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/APIErrorResponse'
-        '401':
-          description: Invalid credentials
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/APIErrorResponse'
-
-  /auth/register:
-    post:
-      summary: Register a new user
-      tags: [Auth]
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/RegisterRequest'
-      responses:
-        '201':
-          description: User registered
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RegisterResponse'
-        '400':
-          description: Invalid request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/APIErrorResponse'
-        '409':
-          description: Phone already exists
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/APIErrorResponse'
-
-  /auth/me:
-    get:
-      summary: Get current authenticated user
-      tags: [Auth]
-      security:
-        - BearerAuth: []
-      responses:
-        '200':
-          description: Current user
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/MeResponse'
-        '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/APIErrorResponse'
-
-  /auth/logout:
-    post:
-      summary: Logout current user
-      tags: [Auth]
-      security:
-        - BearerAuth: []
-      responses:
-        '200':
-          description: Logged out
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/APIBase'
-        '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/APIErrorResponse'
-
-  /parcels/create:
-    post:
-      summary: Create parcel (status CREATED)
-      tags: [Parcels]
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ParcelCreateRequest'
-      responses:
-        '201':
-          description: Parcel created
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ParcelCreateResponse'
-        '400':
-          description: Bad request (invalid uuid, missing field)
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/APIErrorResponse'
-        '409':
-          description: Conflict (invalid state for action)
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/APIErrorResponse'
-        '500':
-          description: Server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/APIErrorResponse'
-
-  /parcels/reserve:
-    post:
-      summary: Reserve compartment for parcel
-      tags: [Parcels]
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ParcelIDRequest'
-      responses:
-        '200':
-          description: Parcel reserved
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ParcelReserveResponse'
-        '400':
-          description: Bad request (invalid uuid, missing field, invalid status transition)
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/APIErrorResponse'
-        '404':
-          description: Not found (parcel or compartment)
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/APIErrorResponse'
-        '409':
-          description: Conflict (no available compartment, invalid state for action)
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/APIErrorResponse'
-        '500':
-          description: Server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/APIErrorResponse'
-
-  /parcels/deposit:
-    post:
-      summary: Store parcel into compartment
-      tags: [Parcels]
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ParcelIDRequest'
-      responses:
-        '200':
-          description: Parcel stored
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ParcelStatusResponse'
-        '400':
-          description: Bad request (invalid uuid, missing field, invalid status transition)
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/APIErrorResponse'
-        '404':
-          description: Not found (parcel or compartment)
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/APIErrorResponse'
-        '409':
-          description: Conflict (invalid state for action)
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/APIErrorResponse'
-        '500':
-          description: Server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/APIErrorResponse'
-
-  /parcels/ready:
-    post:
-      summary: Mark parcel as pickup ready
-      tags: [Parcels]
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ParcelIDRequest'
-      responses:
-        '200':
-          description: Parcel marked ready
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ParcelStatusResponse'
-        '400':
-          description: Bad request (invalid uuid, missing field, invalid status transition)
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/APIErrorResponse'
-        '404':
-          description: Parcel not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/APIErrorResponse'
-        '409':
-          description: Conflict (invalid state for action)
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/APIErrorResponse'
-        '500':
-          description: Server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/APIErrorResponse'
-
   /parcels/{parcel_id}:
     get:
       summary: Get parcel by id
@@ -304,205 +42,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/APIErrorResponse'
 
-  /parcels/by-recipient/{recipient_id}:
-    get:
-      summary: Get active parcel by recipient
-      tags: [Parcels]
-      parameters:
-        - in: path
-          name: recipient_id
-          required: true
-          schema:
-            type: string
-            format: uuid
-      responses:
-        '200':
-          description: Active parcel found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ParcelByRecipientResponse'
-        '400':
-          description: Bad request (invalid uuid)
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/APIErrorResponse'
-        '404':
-          description: Parcel not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/APIErrorResponse'
-        '500':
-          description: Server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/APIErrorResponse'
-
-  /parcels/otp/request:
-    post:
-      summary: Generate OTP for parcel
-      tags: [OTP]
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ParcelOTPRequest'
-      responses:
-        '200':
-          description: OTP generated
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/OTPCreateResponse'
-        '400':
-          description: Bad request (invalid request)
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/APIErrorResponse'
-        '404':
-          description: Parcel not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/APIErrorResponse'
-        '409':
-          description: Conflict (invalid status transition)
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/APIErrorResponse'
-        '410':
-          description: Parcel expired
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/APIErrorResponse'
-        '500':
-          description: Server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/APIErrorResponse'
-
-  /parcels/otp/verify:
-    post:
-      summary: Verify OTP
-      tags: [OTP]
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/OTPVerifyRequest'
-      responses:
-        '200':
-          description: OTP verified
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/OTPVerifyResponse'
-        '400':
-          description: Bad request (invalid uuid, missing field, invalid status transition, otp already used)
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/APIErrorResponse'
-        '404':
-          description: OTP not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/APIErrorResponse'
-        '409':
-          description: Conflict (invalid state for action, otp already used)
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/APIErrorResponse'
-        '410':
-          description: OTP expired
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/APIErrorResponse'
-        '500':
-          description: Server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/APIErrorResponse'
-
-  /parcels/pickup:
-    post:
-      summary: Pickup parcel
-      tags: [Parcels]
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/PickupRequest'
-      responses:
-        '200':
-          description: Parcel picked up
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ParcelPickupResponse'
-        '400':
-          description: Bad request (invalid uuid, missing field, invalid status transition, otp already used)
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/APIErrorResponse'
-        '404':
-          description: Not found (parcel or otp)
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/APIErrorResponse'
-        '409':
-          description: Conflict (invalid state for action, otp already used)
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/APIErrorResponse'
-        '410':
-          description: Parcel expired
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/APIErrorResponse'
-        '500':
-          description: Server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/APIErrorResponse'
-
-  /parcels/expire/run:
-    post:
-      summary: Run expire job manually
-      tags: [Parcels]
-      responses:
-        '200':
-          description: Expire job executed
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ExpireRunResponse'
-        '500':
-          description: Server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/APIErrorResponse'
-
   /lockers/available:
     get:
       summary: List available lockers
@@ -514,6 +53,149 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/LockerAvailableResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+
+  /admins:
+    post:
+      summary: Create an admin user
+      tags: [Admin]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminCreateRequest'
+      responses:
+        '201':
+          description: Admin created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+
+  /admins/{id}:
+    get:
+      summary: Get admin by id
+      tags: [Admin]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Admin retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+        '404':
+          description: Admin not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+    put:
+      summary: Update admin
+      tags: [Admin]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminUpdateRequest'
+      responses:
+        '200':
+          description: Admin updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+        '404':
+          description: Admin not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+    delete:
+      summary: Delete admin
+      tags: [Admin]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Admin deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIBase'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+        '404':
+          description: Admin not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
         '500':
           description: Server error
           content:
@@ -765,11 +447,6 @@ paths:
                 $ref: '#/components/schemas/APIErrorResponse'
 
 components:
-  securitySchemes:
-    BearerAuth:
-      type: http
-      scheme: bearer
-
   schemas:
     APIBase:
       type: object
@@ -790,243 +467,67 @@ components:
         error_code: INVALID_REQUEST
         error: invalid request
 
-    LoginRequest:
+    Admin:
       type: object
-      required: [phone, password]
+      required: [id, username, password_hash, role]
       properties:
-        phone:
+        id:
           type: string
-        password:
+          format: uuid
+        username:
           type: string
-
-    LoginResponse:
-      allOf:
-        - $ref: '#/components/schemas/APIBase'
-        - type: object
-          required: [data]
-          properties:
-            data:
-              type: object
-              required: [user_id, role, access_token]
-              properties:
-                user_id:
-                  type: string
-                  format: uuid
-                role:
-                  type: string
-                  enum: [ADMIN, COURIER, RECIPIENT]
-                access_token:
-                  type: string
-      example:
-        success: true
-        data:
-          user_id: "91b6b3c4-1234-4567-8901-abcdefabcdef"
-          role: COURIER
-          access_token: "token-123"
-
-    RegisterRequest:
-      type: object
-      required: [phone, password, role]
-      properties:
-        phone:
-          type: string
-        password:
+        password_hash:
           type: string
         role:
           type: string
-          enum: [ADMIN, COURIER, RECIPIENT]
+          enum: [ADMIN]
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
 
-    RegisterResponse:
+    AdminCreateRequest:
+      type: object
+      required: [username, password_hash, role]
+      properties:
+        username:
+          type: string
+        password_hash:
+          type: string
+        role:
+          type: string
+          enum: [ADMIN]
+
+    AdminUpdateRequest:
+      type: object
+      required: [username, password_hash, role]
+      properties:
+        username:
+          type: string
+        password_hash:
+          type: string
+        role:
+          type: string
+          enum: [ADMIN]
+
+    AdminResponse:
       allOf:
         - $ref: '#/components/schemas/APIBase'
         - type: object
           required: [data]
           properties:
             data:
-              type: object
-              required: [user_id, role]
-              properties:
-                user_id:
-                  type: string
-                  format: uuid
-                role:
-                  type: string
-                  enum: [ADMIN, COURIER, RECIPIENT]
-      example:
-        success: true
-        data:
-          user_id: "91b6b3c4-1234-4567-8901-abcdefabcdef"
-          role: RECIPIENT
-
-    MeResponse:
-      allOf:
-        - $ref: '#/components/schemas/APIBase'
-        - type: object
-          required: [data]
-          properties:
-            data:
-              type: object
-              required: [user_id, role, phone]
-              properties:
-                user_id:
-                  type: string
-                  format: uuid
-                role:
-                  type: string
-                  enum: [ADMIN, COURIER, RECIPIENT]
-                phone:
-                  type: string
+              $ref: '#/components/schemas/Admin'
 
     ParcelStatus:
       type: string
-      enum: [CREATED, RESERVED, STORED, PICKUP_READY, PICKED_UP, CANCELLED, EXPIRED]
-
-    ParcelCreateRequest:
-      type: object
-      required: [locker_id, size, courier_id, recipient_id]
-      properties:
-        locker_id:
-          type: string
-          format: uuid
-        size:
-          type: string
-          enum: [S, M, L]
-        courier_id:
-          type: string
-          format: uuid
-        recipient_id:
-          type: string
-          format: uuid
-
-    ParcelIDRequest:
-      type: object
-      required: [parcel_id]
-      properties:
-        parcel_id:
-          type: string
-          format: uuid
-
-    ParcelOTPRequest:
-      type: object
-      description: At least one of parcel_id or recipient_id must be provided.
-      properties:
-        parcel_id:
-          type: string
-          format: uuid
-        recipient_id:
-          type: string
-          format: uuid
-
-    OTPVerifyRequest:
-      type: object
-      required: [otp_ref, otp_code]
-      properties:
-        otp_ref:
-          type: string
-        otp_code:
-          type: string
-
-    PickupRequest:
-      type: object
-      required: [parcel_id, otp_ref]
-      properties:
-        parcel_id:
-          type: string
-          format: uuid
-        otp_ref:
-          type: string
-
-    ParcelCreateResponse:
-      allOf:
-        - $ref: '#/components/schemas/APIBase'
-        - type: object
-          required: [data]
-          properties:
-            data:
-              type: object
-              required: [parcel_id, status]
-              properties:
-                parcel_id:
-                  type: string
-                  format: uuid
-                status:
-                  $ref: '#/components/schemas/ParcelStatus'
-      example:
-        success: true
-        data:
-          parcel_id: "d290f1ee-6c54-4b01-90e6-d701748f0851"
-          status: CREATED
-
-    ParcelReserveResponse:
-      allOf:
-        - $ref: '#/components/schemas/APIBase'
-        - type: object
-          required: [data]
-          properties:
-            data:
-              type: object
-              required: [parcel_id, compartment_id, status]
-              properties:
-                parcel_id:
-                  type: string
-                  format: uuid
-                compartment_id:
-                  type: string
-                  format: uuid
-                status:
-                  $ref: '#/components/schemas/ParcelStatus'
-      example:
-        success: true
-        data:
-          parcel_id: "d290f1ee-6c54-4b01-90e6-d701748f0851"
-          compartment_id: "c1f5c1a4-1234-4f0f-9a4b-1234567890ab"
-          status: RESERVED
-
-    ParcelStatusResponse:
-      allOf:
-        - $ref: '#/components/schemas/APIBase'
-        - type: object
-          required: [data]
-          properties:
-            data:
-              type: object
-              required: [parcel_id, status]
-              properties:
-                parcel_id:
-                  type: string
-                  format: uuid
-                status:
-                  $ref: '#/components/schemas/ParcelStatus'
-      example:
-        success: true
-        data:
-          parcel_id: "d290f1ee-6c54-4b01-90e6-d701748f0851"
-          status: STORED
-
-    ParcelPickupResponse:
-      allOf:
-        - $ref: '#/components/schemas/APIBase'
-        - type: object
-          required: [data]
-          properties:
-            data:
-              type: object
-              required: [parcel_id, status]
-              properties:
-                parcel_id:
-                  type: string
-                  format: uuid
-                status:
-                  $ref: '#/components/schemas/ParcelStatus'
-      example:
-        success: true
-        data:
-          parcel_id: "d290f1ee-6c54-4b01-90e6-d701748f0851"
-          status: PICKED_UP
+      enum: [PICKED_UP, CANCELLED, EXPIRED]
 
     ParcelDetail:
       type: object
-      required: [parcel_id, parcel_code, status, locker_id, size, courier_id, recipient_id]
+      required: [parcel_id, parcel_code, status, locker_id, size]
       properties:
         parcel_id:
           type: string
@@ -1045,12 +546,12 @@ components:
         size:
           type: string
           enum: [S, M, L]
-        courier_id:
+        receiver_phone:
           type: string
-          format: uuid
-        recipient_id:
+        sender_phone:
           type: string
-          format: uuid
+        pickup_code:
+          type: string
         reserved_at:
           type: string
           format: date-time
@@ -1081,115 +582,17 @@ components:
         data:
           parcel_id: "d290f1ee-6c54-4b01-90e6-d701748f0851"
           parcel_code: "PARCEL-001"
-          status: PICKUP_READY
+          status: PICKED_UP
           locker_id: "3c4f5a7d-1111-4b4c-a222-9f3e8d6c1111"
           compartment_id: "c1f5c1a4-1234-4f0f-9a4b-1234567890ab"
           size: M
-          courier_id: "91b6b3c4-1234-4567-8901-abcdefabcdef"
-          recipient_id: "4e5a6b7c-1234-4567-8901-abcdefabcdef"
+          receiver_phone: "0890001111"
+          sender_phone: "0890002222"
+          pickup_code: "PU-1234"
           reserved_at: "2025-01-01T10:00:00Z"
           deposited_at: "2025-01-01T10:30:00Z"
-          picked_up_at: null
+          picked_up_at: "2025-01-01T11:00:00Z"
           expires_at: "2025-01-02T10:30:00Z"
-
-    ParcelRecipientView:
-      type: object
-      required: [parcel_id, parcel_code, status, locker_id, compartment_id, expires_at]
-      properties:
-        parcel_id:
-          type: string
-          format: uuid
-        parcel_code:
-          type: string
-        status:
-          $ref: '#/components/schemas/ParcelStatus'
-        locker_id:
-          type: string
-          format: uuid
-        compartment_id:
-          type: string
-          format: uuid
-          nullable: true
-        expires_at:
-          type: string
-          format: date-time
-
-    ParcelByRecipientResponse:
-      allOf:
-        - $ref: '#/components/schemas/APIBase'
-        - type: object
-          required: [data]
-          properties:
-            data:
-              $ref: '#/components/schemas/ParcelRecipientView'
-      example:
-        success: true
-        data:
-          parcel_id: "d290f1ee-6c54-4b01-90e6-d701748f0851"
-          parcel_code: "PARCEL-001"
-          status: PICKUP_READY
-          locker_id: "3c4f5a7d-1111-4b4c-a222-9f3e8d6c1111"
-          compartment_id: "c1f5c1a4-1234-4f0f-9a4b-1234567890ab"
-          expires_at: "2025-01-02T10:30:00Z"
-
-    OTPCreateResponse:
-      allOf:
-        - $ref: '#/components/schemas/APIBase'
-        - type: object
-          required: [data]
-          properties:
-            data:
-              type: object
-              required: [otp_ref, expires_at]
-              properties:
-                otp_ref:
-                  type: string
-                expires_at:
-                  type: string
-                  format: date-time
-      example:
-        success: true
-        data:
-          otp_ref: "otp-ref-123"
-          expires_at: "2025-01-01T12:00:00Z"
-
-    OTPVerifyResponse:
-      allOf:
-        - $ref: '#/components/schemas/APIBase'
-        - type: object
-          required: [data]
-          properties:
-            data:
-              type: object
-              required: [otp_ref, status]
-              properties:
-                otp_ref:
-                  type: string
-                status:
-                  type: string
-                  enum: [VERIFIED]
-      example:
-        success: true
-        data:
-          otp_ref: "otp-ref-123"
-          status: VERIFIED
-
-    ExpireRunResponse:
-      allOf:
-        - $ref: '#/components/schemas/APIBase'
-        - type: object
-          required: [data]
-          properties:
-            data:
-              type: object
-              required: [expired_count]
-              properties:
-                expired_count:
-                  type: integer
-      example:
-        success: true
-        data:
-          expired_count: 3
 
     Location:
       type: object
@@ -1446,12 +849,8 @@ components:
 
 tags:
   - name: Parcels
-    description: Parcel workflow endpoints
+    description: Parcel read endpoints
   - name: Lockers
     description: Public locker lookup endpoints
-  - name: OTP
-    description: OTP lifecycle endpoints
   - name: Admin
     description: Admin operations and monitoring
-  - name: Auth
-    description: Authentication endpoints

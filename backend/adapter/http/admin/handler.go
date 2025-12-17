@@ -7,6 +7,7 @@ import (
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 
+	"smart-parcel-locker/backend/domain/admin"
 	"smart-parcel-locker/backend/pkg/response"
 	adminusecase "smart-parcel-locker/backend/usecase/admin"
 )
@@ -34,6 +35,9 @@ func (h *Handler) Create(c *fiber.Ctx) error {
 	if req.Username == "" || req.PasswordHash == "" || req.Role == "" {
 		return adminInvalidRequest(c, "username, password_hash, and role are required")
 	}
+	if req.Role != "ADMIN" {
+		return adminInvalidRequest(c, "role must be ADMIN")
+	}
 	result, err := h.uc.Create(c.Context(), adminusecase.CreateInput{
 		Username:     req.Username,
 		PasswordHash: req.PasswordHash,
@@ -42,7 +46,7 @@ func (h *Handler) Create(c *fiber.Ctx) error {
 	if err != nil {
 		return adminError(c, fiber.StatusInternalServerError, "INTERNAL_ERROR", err.Error())
 	}
-	return c.Status(fiber.StatusCreated).JSON(response.APIResponse{Success: true, Data: result})
+	return c.Status(fiber.StatusCreated).JSON(response.APIResponse{Success: true, Data: adminToResponse(result)})
 }
 
 func (h *Handler) Get(c *fiber.Ctx) error {
@@ -57,7 +61,7 @@ func (h *Handler) Get(c *fiber.Ctx) error {
 		}
 		return adminError(c, fiber.StatusInternalServerError, "INTERNAL_ERROR", err.Error())
 	}
-	return c.JSON(response.APIResponse{Success: true, Data: result})
+	return c.JSON(response.APIResponse{Success: true, Data: adminToResponse(result)})
 }
 
 func (h *Handler) Update(c *fiber.Ctx) error {
@@ -72,6 +76,9 @@ func (h *Handler) Update(c *fiber.Ctx) error {
 	if req.Username == "" || req.PasswordHash == "" || req.Role == "" {
 		return adminInvalidRequest(c, "username, password_hash, and role are required")
 	}
+	if req.Role != "ADMIN" {
+		return adminInvalidRequest(c, "role must be ADMIN")
+	}
 	result, err := h.uc.Update(c.Context(), adminusecase.UpdateInput{
 		ID:           id,
 		Username:     req.Username,
@@ -84,7 +91,7 @@ func (h *Handler) Update(c *fiber.Ctx) error {
 		}
 		return adminError(c, fiber.StatusInternalServerError, "INTERNAL_ERROR", err.Error())
 	}
-	return c.JSON(response.APIResponse{Success: true, Data: result})
+	return c.JSON(response.APIResponse{Success: true, Data: adminToResponse(result)})
 }
 
 func (h *Handler) Delete(c *fiber.Ctx) error {
@@ -107,4 +114,18 @@ func adminError(c *fiber.Ctx, status int, code, msg string) error {
 
 func adminInvalidRequest(c *fiber.Ctx, msg string) error {
 	return adminError(c, fiber.StatusBadRequest, "INVALID_REQUEST", msg)
+}
+
+func adminToResponse(result *admin.Admin) map[string]interface{} {
+	if result == nil {
+		return nil
+	}
+	return map[string]interface{}{
+		"id":            result.ID,
+		"username":      result.Username,
+		"password_hash": result.PasswordHash,
+		"role":          result.Role,
+		"created_at":    result.CreatedAt,
+		"updated_at":    result.UpdatedAt,
+	}
 }

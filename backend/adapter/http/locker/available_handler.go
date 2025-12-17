@@ -17,7 +17,7 @@ func NewHandler(uc *lockerquery.UseCase) *Handler {
 	return &Handler{uc: uc}
 }
 
-// ListAvailable returns active lockers with location name for couriers.
+// ListAvailable returns active lockers with location name.
 func (h *Handler) ListAvailable(c *fiber.Ctx) error {
 	lockers, err := h.uc.ListAvailable(c.Context())
 	if err != nil {

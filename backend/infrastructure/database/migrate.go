@@ -21,10 +21,7 @@ func AutoMigrateSchema(db *gorm.DB) error {
 		&gormmodels.Location{},
 		&gormmodels.Locker{},
 		&gormmodels.Compartment{},
-		&gormmodels.User{},
 		&gormmodels.Parcel{},
-		&gormmodels.ParcelEvent{},
-		&gormmodels.ParcelOTP{},
 	); err != nil {
 		return fmt.Errorf("auto migrate: %w", err)
 	}
