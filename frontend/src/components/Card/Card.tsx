@@ -11,7 +11,7 @@ const Card = ({ title, children, className }: CardProps) => {
   return (
     <section
       className={clsx(
-        'rounded-3xl bg-card p-6 shadow-soft sm:p-8',
+        'rounded-panel border border-border/70 bg-surface p-6 shadow-panel sm:p-8',
         className,
       )}
     >

@@ -9,18 +9,22 @@ type InputProps = InputHTMLAttributes<HTMLInputElement> & {
 const Input = ({ label, error, className, ...props }: InputProps) => {
   return (
     <label className="block w-full text-left">
-      {label && <span className="text-sm font-semibold">{label}</span>}
+      {label && (
+        <span className="text-sm font-semibold text-text-muted">{label}</span>
+      )}
       <input
         className={clsx(
-          'mt-2 w-full rounded-2xl border-2 px-4 py-3 text-base focus:outline-none',
+          'mt-2 min-h-[52px] w-full rounded-control border px-4 py-3 text-lg text-text placeholder:text-text-subtle focus:outline-none focus:ring-2 focus:ring-ring/30',
           error
-            ? 'border-red-300 ring-2 ring-red-200'
-            : 'border-primary/40 focus:border-primary',
+            ? 'border-danger ring-2 ring-danger-soft'
+            : 'border-border focus:border-primary-strong',
           className,
         )}
         {...props}
       />
-      {error && <span className="mt-2 block text-sm text-red-600">{error}</span>}
+      {error && (
+        <span className="mt-2 block text-sm text-danger">{error}</span>
+      )}
     </label>
   )
 }

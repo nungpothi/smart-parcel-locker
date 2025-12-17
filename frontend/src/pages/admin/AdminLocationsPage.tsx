@@ -53,7 +53,7 @@ const AdminLocationsPage = () => {
   }
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-4xl flex-col gap-6 px-6 py-10">
+    <section className="flex flex-1 flex-col gap-6">
       <Card>
         <div className="text-center">
           <h1 className="font-display text-3xl">Locations</h1>
@@ -79,7 +79,7 @@ const AdminLocationsPage = () => {
             onChange={(event) => setAddress(event.target.value)}
           />
 
-          {error && <p className="text-sm text-red-600">{error}</p>}
+          {error && <p className="text-sm text-danger">{error}</p>}
 
           <Button fullWidth onClick={handleCreate} disabled={loading}>
             Create Location
@@ -90,18 +90,18 @@ const AdminLocationsPage = () => {
       <Card title="Existing Locations">
         <div className="space-y-3">
           {locations.length === 0 ? (
-            <p className="text-sm text-text/70">No locations yet.</p>
+            <p className="text-sm text-text-muted">No locations yet.</p>
           ) : (
             locations.map((location) => (
               <div
                 key={location.location_id}
-                className="flex flex-wrap items-center justify-between gap-2 rounded-2xl border border-primary/30 bg-white/80 p-4"
+                className="flex flex-wrap items-center justify-between gap-2 rounded-control border border-border bg-surface/80 p-4"
               >
                 <div>
                   <p className="text-base font-semibold">{location.code}</p>
-                  <p className="text-sm text-text/70">{location.name}</p>
+                  <p className="text-sm text-text-muted">{location.name}</p>
                 </div>
-                <span className="rounded-full bg-primary px-4 py-2 text-xs font-semibold">
+                <span className="rounded-pill bg-secondary px-4 py-2 text-xs font-semibold text-text">
                   {location.is_active ? 'Active' : 'Inactive'}
                 </span>
               </div>
@@ -118,7 +118,7 @@ const AdminLocationsPage = () => {
           Back to Home
         </Button>
       </div>
-    </main>
+    </section>
   )
 }
 

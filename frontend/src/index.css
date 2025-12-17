@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Poppins:wght@400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Sora:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,6 +6,25 @@
 
 :root {
   color-scheme: light;
+  --color-base: 246 244 255;
+  --color-surface: 255 255 255;
+  --color-surface-alt: 239 234 250;
+  --color-primary: 201 181 255;
+  --color-primary-strong: 170 142 255;
+  --color-secondary: 231 222 255;
+  --color-success: 188 233 210;
+  --color-danger: 239 170 197;
+  --color-danger-soft: 253 235 244;
+  --color-text: 40 30 66;
+  --color-text-muted: 88 74 118;
+  --color-text-subtle: 125 113 154;
+  --color-border: 227 218 246;
+  --color-ring: 201 181 255;
+  --radius-panel: 28px;
+  --radius-control: 20px;
+  --radius-pill: 999px;
+  --shadow-panel: 0 18px 45px rgba(76, 60, 118, 0.16);
+  --shadow-lift: 0 10px 20px rgba(96, 78, 150, 0.25);
 }
 
 * {
@@ -15,9 +34,17 @@
 body {
   margin: 0;
   min-height: 100vh;
-  background-color: #fdfbf3;
-  color: #6a4b1f;
-  font-family: 'Poppins', system-ui, sans-serif;
+  background: radial-gradient(
+    120% 120% at 50% 0%,
+    rgb(var(--color-primary) / 0.3),
+    rgb(var(--color-base) / 1)
+  );
+  color: rgb(var(--color-text));
+  font-family: 'Sora', system-ui, sans-serif;
+}
+
+#root {
+  min-height: 100vh;
 }
 
 a {

@@ -125,13 +125,15 @@ const PickupOtpVerifyPage = () => {
   }
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-3xl flex-col justify-center gap-6 px-6 py-10">
+    <section className="flex flex-1 flex-col justify-center gap-6">
       <Card>
         <div className="text-center">
           <h1 className="font-display text-3xl">ยืนยันรหัส OTP</h1>
         </div>
 
-        <p className="mt-4 text-center text-sm text-text/70">OTP ถูกส่งไปแล้ว</p>
+        <p className="mt-4 text-center text-sm text-text-subtle">
+          OTP ถูกส่งไปแล้ว
+        </p>
 
         <form className="mt-8 space-y-5" onSubmit={handleSubmit(onSubmit)}>
           <Input
@@ -142,7 +144,7 @@ const PickupOtpVerifyPage = () => {
             error={errors.otp?.message}
           />
           {errorMessage && (
-            <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            <div className="rounded-control border border-danger bg-danger-soft px-4 py-3 text-sm text-danger">
               {errorMessage}
             </div>
           )}
@@ -154,7 +156,7 @@ const PickupOtpVerifyPage = () => {
         <div className="mt-6 text-center">
           <button
             type="button"
-            className="text-sm font-semibold text-accent"
+            className="text-sm font-semibold text-primary-strong"
             onClick={handleResend}
             disabled={isSubmitting}
           >
@@ -168,7 +170,7 @@ const PickupOtpVerifyPage = () => {
           </Button>
         </div>
       </Card>
-    </main>
+    </section>
   )
 }
 

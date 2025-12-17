@@ -71,7 +71,7 @@ const DepositSizePage = () => {
   }
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-3xl flex-col justify-center gap-6 px-6 py-10">
+    <section className="flex flex-1 flex-col justify-center gap-6">
       <header className="text-center">
         <h1 className="font-display text-4xl">เลือกขนาดช่อง</h1>
       </header>
@@ -85,10 +85,10 @@ const DepositSizePage = () => {
               onClick={() => setSize(option)}
               disabled={isSubmitting}
               className={clsx(
-                'flex h-28 items-center justify-center rounded-3xl border-2 text-2xl font-semibold transition',
+                'flex h-28 items-center justify-center rounded-panel border-2 text-2xl font-semibold transition',
                 size === option
-                  ? 'border-accent bg-primary text-text shadow-soft'
-                  : 'border-primary/50 bg-white text-text/70',
+                  ? 'border-primary-strong bg-primary text-text shadow-lift'
+                  : 'border-border bg-surface text-text-muted',
                 isSubmitting && 'cursor-not-allowed opacity-60',
               )}
             >
@@ -98,7 +98,7 @@ const DepositSizePage = () => {
         </div>
 
         {errorMessage && (
-          <div className="mt-6 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          <div className="mt-6 rounded-control border border-danger bg-danger-soft px-4 py-3 text-sm text-danger">
             {errorMessage}
           </div>
         )}
@@ -113,7 +113,7 @@ const DepositSizePage = () => {
           </Button>
         </div>
       </Card>
-    </main>
+    </section>
   )
 }
 

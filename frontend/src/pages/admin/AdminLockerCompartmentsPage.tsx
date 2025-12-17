@@ -86,7 +86,7 @@ const AdminLockerCompartmentsPage = () => {
   }
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-4xl flex-col gap-6 px-6 py-10">
+    <section className="flex flex-1 flex-col gap-6">
       <Card>
         <div className="text-center">
           <h1 className="font-display text-3xl">Generate Compartments</h1>
@@ -96,7 +96,7 @@ const AdminLockerCompartmentsPage = () => {
           {rows.map((row, index) => (
             <div
               key={`row-${index}`}
-              className="flex flex-col gap-3 rounded-2xl border border-primary/30 bg-white/80 p-4 sm:flex-row sm:items-end"
+              className="flex flex-col gap-3 rounded-control border border-border bg-surface/80 p-4 sm:flex-row sm:items-end"
             >
               <div className="flex-1">
                 <Input
@@ -110,9 +110,11 @@ const AdminLockerCompartmentsPage = () => {
                 />
               </div>
               <label className="block w-full sm:w-40">
-                <span className="text-sm font-semibold">Size</span>
+                <span className="text-sm font-semibold text-text-muted">
+                  Size
+                </span>
                 <select
-                  className="mt-2 w-full rounded-2xl border-2 border-primary/40 bg-white px-4 py-3 text-base focus:border-primary focus:outline-none"
+                  className="mt-2 min-h-[52px] w-full rounded-control border border-border bg-surface px-4 py-3 text-lg text-text focus:border-primary-strong focus:outline-none focus:ring-2 focus:ring-ring/30"
                   value={row.size}
                   onChange={(event) => updateRow(index, 'size', event.target.value)}
                 >
@@ -135,7 +137,7 @@ const AdminLockerCompartmentsPage = () => {
             Add Row
           </Button>
 
-          {error && <p className="text-sm text-red-600">{error}</p>}
+          {error && <p className="text-sm text-danger">{error}</p>}
 
           <Button fullWidth onClick={handleGenerate} disabled={loading}>
             Generate
@@ -146,18 +148,18 @@ const AdminLockerCompartmentsPage = () => {
       <Card title="Existing Compartments">
         <div className="space-y-3">
           {compartments.length === 0 ? (
-            <p className="text-sm text-text/70">No compartments yet.</p>
+            <p className="text-sm text-text-muted">No compartments yet.</p>
           ) : (
             compartments.map((compartment) => (
               <div
                 key={compartment.compartment_id}
-                className="flex flex-wrap items-center justify-between gap-2 rounded-2xl border border-primary/30 bg-white/80 p-4"
+                className="flex flex-wrap items-center justify-between gap-2 rounded-control border border-border bg-surface/80 p-4"
               >
                 <div>
                   <p className="text-base font-semibold">#{compartment.compartment_no}</p>
-                  <p className="text-sm text-text/70">Size {compartment.size}</p>
+                  <p className="text-sm text-text-muted">Size {compartment.size}</p>
                 </div>
-                <span className="rounded-full bg-primary px-4 py-2 text-xs font-semibold">
+                <span className="rounded-pill bg-secondary px-4 py-2 text-xs font-semibold text-text">
                   {compartment.status}
                 </span>
               </div>
@@ -174,7 +176,7 @@ const AdminLockerCompartmentsPage = () => {
           Back to Admin Home
         </Button>
       </div>
-    </main>
+    </section>
   )
 }
 

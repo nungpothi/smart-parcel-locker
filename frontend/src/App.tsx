@@ -1,4 +1,6 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
+import AdminLayout from '@/layouts/AdminLayout'
+import PublicLayout from '@/layouts/PublicLayout'
 import AdminHomePage from '@/pages/admin/AdminHomePage'
 import AdminLockerCompartmentsPage from '@/pages/admin/AdminLockerCompartmentsPage'
 import AdminLockersPage from '@/pages/admin/AdminLockersPage'
@@ -17,8 +19,8 @@ import WelcomePage from '@/pages/welcome/WelcomePage'
 
 const App = () => {
   return (
-    <div className="min-h-screen bg-background text-text">
-      <Routes>
+    <Routes>
+      <Route element={<PublicLayout />}>
         <Route path="/" element={<WelcomePage />} />
         <Route path="/deposit" element={<DepositPhonePage />} />
         <Route path="/deposit/size" element={<DepositSizePage />} />
@@ -30,6 +32,8 @@ const App = () => {
         <Route path="/pickup/otp" element={<PickupOtpVerifyPage />} />
         <Route path="/pickup/list" element={<PickupParcelListPage />} />
         <Route path="/pickup/success" element={<PickupSuccessPage />} />
+      </Route>
+      <Route element={<AdminLayout />}>
         <Route path="/admin" element={<AdminHomePage />} />
         <Route path="/admin/locations" element={<AdminLocationsPage />} />
         <Route path="/admin/lockers" element={<AdminLockersPage />} />
@@ -37,9 +41,9 @@ const App = () => {
           path="/admin/lockers/:lockerId/compartments"
           element={<AdminLockerCompartmentsPage />}
         />
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    </div>
+      </Route>
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
   )
 }
 

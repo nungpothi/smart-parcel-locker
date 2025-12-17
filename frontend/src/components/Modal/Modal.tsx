@@ -12,9 +12,9 @@ type ModalProps = {
 }
 
 const modalClasses = {
-  popup: 'rounded-3xl border-2 border-primary/40 text-left',
+  popup: 'rounded-panel border border-border bg-surface text-left text-text shadow-panel',
   confirmButton:
-    'rounded-full bg-primary px-6 py-3 text-base font-semibold text-text shadow-soft',
+    'rounded-pill bg-primary px-6 py-3 text-base font-semibold text-text shadow-lift',
 }
 
 const Modal = ({

@@ -6,7 +6,7 @@ const AdminHomePage = () => {
   const navigate = useNavigate()
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-3xl flex-col justify-center gap-6 px-6 py-10">
+    <section className="flex flex-1 flex-col gap-6">
       <Card>
         <div className="text-center">
           <h1 className="font-display text-4xl">Admin Setup</h1>
@@ -18,13 +18,12 @@ const AdminHomePage = () => {
           <Button fullWidth onClick={() => navigate('/admin/lockers')}>
             Lockers
           </Button>
-          <Button variant="secondary" fullWidth onClick={() => navigate('/')}
-          >
+          <Button variant="secondary" fullWidth onClick={() => navigate('/')}>
             Back to Home
           </Button>
         </div>
       </Card>
-    </main>
+    </section>
   )
 }
 

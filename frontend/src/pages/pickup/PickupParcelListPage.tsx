@@ -113,7 +113,7 @@ const PickupParcelListPage = () => {
   }
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-4xl flex-col justify-center gap-6 px-6 py-10">
+    <section className="flex flex-1 flex-col gap-6">
       <Card>
         <div className="text-center">
           <h1 className="font-display text-3xl">เลือกพัสดุ</h1>
@@ -121,15 +121,17 @@ const PickupParcelListPage = () => {
 
         <div className="mt-8 space-y-4">
           {isLoadingParcels && (
-            <p className="text-center text-base text-text/70">กำลังโหลด...</p>
+            <p className="text-center text-base text-text-muted">
+              กำลังโหลด...
+            </p>
           )}
           {errorMessage && (
-            <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            <div className="rounded-control border border-danger bg-danger-soft px-4 py-3 text-sm text-danger">
               {errorMessage}
             </div>
           )}
           {!isLoadingParcels && parcels.length === 0 && !errorMessage ? (
-            <p className="text-center text-base text-text/70">
+            <p className="text-center text-base text-text-muted">
               ไม่พบพัสดุสำหรับรับ
             </p>
           ) : (
@@ -139,21 +141,21 @@ const PickupParcelListPage = () => {
                 type="button"
                 onClick={() => selectParcel(parcel.parcel_id)}
                 className={clsx(
-                  'flex w-full flex-col gap-2 rounded-2xl border-2 p-4 text-left transition sm:flex-row sm:items-center sm:justify-between',
+                  'flex w-full flex-col gap-2 rounded-control border-2 p-4 text-left transition sm:flex-row sm:items-center sm:justify-between',
                   selectedParcelId === parcel.parcel_id
-                    ? 'border-accent bg-primary/70'
-                    : 'border-primary/40 bg-white',
+                    ? 'border-primary-strong bg-primary/60'
+                    : 'border-border bg-surface',
                 )}
               >
                 <div>
                   <p className="text-lg font-semibold">{parcel.parcel_code}</p>
                   {parcel.expires_at && (
-                    <p className="text-sm text-text/70">
+                    <p className="text-sm text-text-subtle">
                       หมดอายุ {dayjs(parcel.expires_at).format('DD/MM/YYYY HH:mm')}
                     </p>
                   )}
                 </div>
-                <span className="rounded-full bg-white px-4 py-2 text-sm font-semibold">
+                <span className="rounded-pill bg-secondary px-4 py-2 text-sm font-semibold text-text">
                   ขนาด {parcel.size}
                 </span>
               </button>
@@ -197,7 +199,7 @@ const PickupParcelListPage = () => {
           </Button>
         </div>
       </Card>
-    </main>
+    </section>
   )
 }
 

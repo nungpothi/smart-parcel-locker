@@ -85,7 +85,7 @@ const PickupWithPhonePage = () => {
   }
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-3xl flex-col justify-center gap-6 px-6 py-10">
+    <section className="flex flex-1 flex-col justify-center gap-6">
       <Card>
         <div className="text-center">
           <h1 className="font-display text-3xl">รับพัสดุด้วยเบอร์โทร</h1>
@@ -100,7 +100,7 @@ const PickupWithPhonePage = () => {
             error={errors.phone?.message}
           />
           {errorMessage && (
-            <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            <div className="rounded-control border border-danger bg-danger-soft px-4 py-3 text-sm text-danger">
               {errorMessage}
             </div>
           )}
@@ -115,7 +115,7 @@ const PickupWithPhonePage = () => {
           </Button>
         </div>
       </Card>
-    </main>
+    </section>
   )
 }
 

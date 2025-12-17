@@ -88,7 +88,7 @@ const DepositPhonePage = () => {
   }
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-3xl flex-col justify-center gap-6 px-6 py-10">
+    <section className="flex flex-1 flex-col justify-center gap-6">
       <header className="text-center">
         <h1 className="font-display text-4xl">ฝากพัสดุ</h1>
       </header>
@@ -96,9 +96,11 @@ const DepositPhonePage = () => {
       <Card>
         <form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
           <label className="block text-left">
-            <span className="text-sm font-semibold">เลือกตู้</span>
+            <span className="text-sm font-semibold text-text-muted">
+              เลือกตู้
+            </span>
             <select
-              className="mt-2 w-full rounded-2xl border-2 border-primary/40 bg-white px-4 py-3 text-base focus:border-primary focus:outline-none"
+              className="mt-2 min-h-[52px] w-full rounded-control border border-border bg-surface px-4 py-3 text-lg text-text focus:border-primary-strong focus:outline-none focus:ring-2 focus:ring-ring/30"
               {...register('lockerId')}
             >
               <option value="">เลือกตู้</option>
@@ -111,16 +113,16 @@ const DepositPhonePage = () => {
           </label>
 
           {loading && (
-            <p className="text-sm text-text/70">กำลังโหลดรายการตู้...</p>
+            <p className="text-sm text-text-muted">กำลังโหลดรายการตู้...</p>
           )}
           {!loading && lockers.length === 0 && (
-            <p className="text-sm text-text/70">
+            <p className="text-sm text-text-muted">
               ไม่มีตู้ให้ใช้งาน กรุณาตั้งค่าผ่าน Admin ก่อน
             </p>
           )}
-          {fetchError && <p className="text-sm text-red-600">{fetchError}</p>}
+          {fetchError && <p className="text-sm text-danger">{fetchError}</p>}
           {errors.lockerId?.message && (
-            <p className="text-sm text-red-600">{errors.lockerId.message}</p>
+            <p className="text-sm text-danger">{errors.lockerId.message}</p>
           )}
 
           <Input
@@ -147,7 +149,7 @@ const DepositPhonePage = () => {
           </Button>
         </form>
       </Card>
-    </main>
+    </section>
   )
 }
 
