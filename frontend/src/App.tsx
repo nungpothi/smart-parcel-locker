@@ -1,7 +1,8 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
-import AdminLoginPage from '@/pages/admin/AdminLoginPage'
-import AdminParcelDetailPage from '@/pages/admin/AdminParcelDetailPage'
-import AdminParcelsPage from '@/pages/admin/AdminParcelsPage'
+import AdminHomePage from '@/pages/admin/AdminHomePage'
+import AdminLockerCompartmentsPage from '@/pages/admin/AdminLockerCompartmentsPage'
+import AdminLockersPage from '@/pages/admin/AdminLockersPage'
+import AdminLocationsPage from '@/pages/admin/AdminLocationsPage'
 import DepositOpenPage from '@/pages/deposit/DepositOpenPage'
 import DepositPhonePage from '@/pages/deposit/DepositPhonePage'
 import DepositSizePage from '@/pages/deposit/DepositSizePage'
@@ -29,9 +30,13 @@ const App = () => {
         <Route path="/pickup/otp" element={<PickupOtpVerifyPage />} />
         <Route path="/pickup/list" element={<PickupParcelListPage />} />
         <Route path="/pickup/success" element={<PickupSuccessPage />} />
-        <Route path="/admin/login" element={<AdminLoginPage />} />
-        <Route path="/admin/parcels" element={<AdminParcelsPage />} />
-        <Route path="/admin/parcels/:id" element={<AdminParcelDetailPage />} />
+        <Route path="/admin" element={<AdminHomePage />} />
+        <Route path="/admin/locations" element={<AdminLocationsPage />} />
+        <Route path="/admin/lockers" element={<AdminLockersPage />} />
+        <Route
+          path="/admin/lockers/:lockerId/compartments"
+          element={<AdminLockerCompartmentsPage />}
+        />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </div>

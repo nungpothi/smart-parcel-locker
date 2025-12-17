@@ -29,6 +29,12 @@ const WelcomePage = () => {
             รับพัสดุ
           </Button>
         </div>
+
+        <div className="mt-8">
+          <Button variant="secondary" fullWidth onClick={() => navigate('/admin')}>
+            Admin Setup
+          </Button>
+        </div>
       </div>
     </main>
   )
