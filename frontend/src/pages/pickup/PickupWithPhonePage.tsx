@@ -1,3 +1,4 @@
+import axios from 'axios'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
@@ -5,6 +6,7 @@ import { z } from 'zod'
 import Button from '@/components/Button'
 import Card from '@/components/Card'
 import Input from '@/components/Input'
+import { requestPickupOtp } from '@/services/api'
 import { usePickupStore } from '@/store/pickupStore'
 
 const phoneSchema = z
@@ -20,7 +22,17 @@ type PickupPhoneForm = z.infer<typeof formSchema>
 
 const PickupWithPhonePage = () => {
   const navigate = useNavigate()
-  const { setPhone, setPickupCode } = usePickupStore()
+  const {
+    setPhone,
+    setPickupCode,
+    setOtpRef,
+    setOtpCode,
+    setPickupToken,
+    setSubmitting,
+    setError,
+    isSubmitting,
+    errorMessage,
+  } = usePickupStore()
 
   const {
     register,
@@ -34,10 +46,37 @@ const PickupWithPhonePage = () => {
     },
   })
 
-  const onSubmit = (values: PickupPhoneForm) => {
-    setPickupCode(null)
-    setPhone(values.phone)
-    navigate('/pickup/otp')
+  const onSubmit = async (values: PickupPhoneForm) => {
+    setSubmitting(true)
+    setError(null)
+    try {
+      const response = await requestPickupOtp(values.phone)
+      const payload = response.data?.data
+      if (!payload?.otp_ref) {
+        throw new Error('missing otp_ref')
+      }
+      setPickupCode(null)
+      setPhone(values.phone)
+      setOtpRef(payload.otp_ref)
+      setOtpCode('')
+      setPickupToken(null)
+      navigate('/pickup/otp')
+    } catch (err) {
+      const status = axios.isAxiosError(err) ? err.response?.status : undefined
+      switch (status) {
+        case 400:
+          setError('กรุณากรอกเบอร์โทรให้ถูกต้อง')
+          break
+        case 429:
+          setError('ขอ OTP บ่อยเกินไป กรุณารอสักครู่')
+          break
+        case 500:
+        default:
+          setError('ระบบขัดข้อง กรุณาลองใหม่')
+      }
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   return (
@@ -55,8 +94,13 @@ const PickupWithPhonePage = () => {
             {...register('phone')}
             error={errors.phone?.message}
           />
-          <Button type="submit" fullWidth disabled={!isValid}>
-            ขอ OTP
+          {errorMessage && (
+            <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+              {errorMessage}
+            </div>
+          )}
+          <Button type="submit" fullWidth disabled={!isValid || isSubmitting}>
+            {isSubmitting ? 'กำลังขอ OTP...' : 'ขอ OTP'}
           </Button>
         </form>
 

@@ -1,4 +1,5 @@
-import dayjs from 'dayjs'
+import { useEffect } from 'react'
+import axios from 'axios'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
@@ -6,7 +7,8 @@ import { z } from 'zod'
 import Button from '@/components/Button'
 import Card from '@/components/Card'
 import Input from '@/components/Input'
-import { type PickupParcel, usePickupStore } from '@/store/pickupStore'
+import { requestPickupOtp, verifyPickupOtp } from '@/services/api'
+import { usePickupStore } from '@/store/pickupStore'
 
 const formSchema = z.object({
   otp: z
@@ -17,23 +19,19 @@ const formSchema = z.object({
 
 type PickupOtpForm = z.infer<typeof formSchema>
 
-const sizeOptions: PickupParcel['size'][] = ['S', 'M', 'L']
-
-const createMockParcels = (): PickupParcel[] => {
-  const count = Math.floor(Math.random() * 3) + 1
-  const now = dayjs()
-
-  return Array.from({ length: count }, (_, index) => ({
-    id: `P-${Date.now()}-${index}`,
-    locker: `A-${index + 1}`,
-    size: sizeOptions[index % sizeOptions.length],
-    depositedAt: now.subtract(index + 1, 'hour').toISOString(),
-  }))
-}
-
 const PickupOtpVerifyPage = () => {
   const navigate = useNavigate()
-  const { setOtp, setPickupToken, setParcels, selectParcel } = usePickupStore()
+  const {
+    phone,
+    otpRef,
+    setOtpRef,
+    setOtpCode,
+    setPickupToken,
+    setSubmitting,
+    setError,
+    isSubmitting,
+    errorMessage,
+  } = usePickupStore()
 
   const {
     register,
@@ -47,12 +45,82 @@ const PickupOtpVerifyPage = () => {
     },
   })
 
-  const onSubmit = (values: PickupOtpForm) => {
-    setOtp(values.otp)
-    setPickupToken(`TK-${Date.now()}`)
-    setParcels(createMockParcels())
-    selectParcel(null)
-    navigate('/pickup/list')
+  useEffect(() => {
+    if (!phone) {
+      navigate('/pickup/phone')
+    }
+  }, [navigate, phone])
+
+  const onSubmit = async (values: PickupOtpForm) => {
+    if (!phone || !otpRef) {
+      setError('กรุณาขอ OTP ใหม่อีกครั้ง')
+      return
+    }
+    setSubmitting(true)
+    setError(null)
+    try {
+      const response = await verifyPickupOtp(phone, otpRef, values.otp)
+      const payload = response.data?.data
+      if (!payload?.pickup_token) {
+        throw new Error('missing pickup_token')
+      }
+      setOtpCode(values.otp)
+      setPickupToken(payload.pickup_token)
+      navigate('/pickup/list')
+    } catch (err) {
+      const status = axios.isAxiosError(err) ? err.response?.status : undefined
+      switch (status) {
+        case 400:
+          setError('OTP ไม่ถูกต้อง')
+          break
+        case 404:
+          setError('ไม่พบ OTP')
+          break
+        case 409:
+          setError('OTP ถูกใช้งานแล้ว')
+          break
+        case 410:
+          setError('OTP หมดอายุ กรุณาขอใหม่')
+          break
+        case 500:
+        default:
+          setError('ระบบขัดข้อง กรุณาลองใหม่')
+      }
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  const handleResend = async () => {
+    if (!phone) {
+      setError('กรุณากลับไปกรอกเบอร์โทรใหม่')
+      return
+    }
+    setSubmitting(true)
+    setError(null)
+    try {
+      const response = await requestPickupOtp(phone)
+      const payload = response.data?.data
+      if (!payload?.otp_ref) {
+        throw new Error('missing otp_ref')
+      }
+      setOtpRef(payload.otp_ref)
+    } catch (err) {
+      const status = axios.isAxiosError(err) ? err.response?.status : undefined
+      switch (status) {
+        case 400:
+          setError('กรุณากรอกเบอร์โทรให้ถูกต้อง')
+          break
+        case 429:
+          setError('ขอ OTP บ่อยเกินไป กรุณารอสักครู่')
+          break
+        case 500:
+        default:
+          setError('ระบบขัดข้อง กรุณาลองใหม่')
+      }
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   return (
@@ -62,6 +130,8 @@ const PickupOtpVerifyPage = () => {
           <h1 className="font-display text-3xl">ยืนยันรหัส OTP</h1>
         </div>
 
+        <p className="mt-4 text-center text-sm text-text/70">OTP ถูกส่งไปแล้ว</p>
+
         <form className="mt-8 space-y-5" onSubmit={handleSubmit(onSubmit)}>
           <Input
             label="OTP"
@@ -70,13 +140,23 @@ const PickupOtpVerifyPage = () => {
             {...register('otp')}
             error={errors.otp?.message}
           />
-          <Button type="submit" fullWidth disabled={!isValid}>
-            ยืนยัน OTP
+          {errorMessage && (
+            <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+              {errorMessage}
+            </div>
+          )}
+          <Button type="submit" fullWidth disabled={!isValid || isSubmitting}>
+            {isSubmitting ? 'กำลังยืนยัน...' : 'ยืนยัน OTP'}
           </Button>
         </form>
 
         <div className="mt-6 text-center">
-          <button type="button" className="text-sm font-semibold text-accent">
+          <button
+            type="button"
+            className="text-sm font-semibold text-accent"
+            onClick={handleResend}
+            disabled={isSubmitting}
+          >
             ขอ OTP ใหม่
           </button>
         </div>

@@ -11,15 +11,6 @@ export type DepositPayload = {
   sender_phone: string
 }
 
-export type PickupOtpRequest = {
-  phone: string
-}
-
-export type VerifyOtpPayload = {
-  phone: string
-  otp: string
-}
-
 export type ConfirmPickupPayload = {
   token: string
 }
@@ -54,12 +45,20 @@ export const depositParcel = async (payload: DepositPayload) => {
   return apiClient.post('/parcels/deposit', payload)
 }
 
-export const requestOtp = (payload: PickupOtpRequest) => {
-  return apiClient.post('/pickup/request-otp', payload)
+export const requestPickupOtp = (phone: string) => {
+  return apiClient.post('/pickup/otp/request', { phone })
 }
 
-export const verifyOtp = (payload: VerifyOtpPayload) => {
-  return apiClient.post('/pickup/verify-otp', payload)
+export const verifyPickupOtp = (
+  phone: string,
+  otpRef: string,
+  otpCode: string,
+) => {
+  return apiClient.post('/pickup/otp/verify', {
+    phone,
+    otp_ref: otpRef,
+    otp_code: otpCode,
+  })
 }
 
 export const fetchPickupParcels = (token: string) => {
