@@ -552,10 +552,6 @@ components:
           type: string
         pickup_code:
           type: string
-        reserved_at:
-          type: string
-          format: date-time
-          nullable: true
         deposited_at:
           type: string
           format: date-time
@@ -589,7 +585,6 @@ components:
           receiver_phone: "0890001111"
           sender_phone: "0890002222"
           pickup_code: "PU-1234"
-          reserved_at: "2025-01-01T10:00:00Z"
           deposited_at: "2025-01-01T10:30:00Z"
           picked_up_at: "2025-01-01T11:00:00Z"
           expires_at: "2025-01-02T10:30:00Z"

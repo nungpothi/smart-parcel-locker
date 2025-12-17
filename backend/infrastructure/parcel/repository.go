@@ -60,7 +60,6 @@ func mapParcelModelToDomain(model gormmodels.Parcel) *parcel.Parcel {
 		SenderPhone:   model.SenderPhone,
 		PickupCode:    model.PickupCode,
 		Status:        parcel.Status(model.Status),
-		ReservedAt:    model.ReservedAt,
 		DepositedAt:   model.DepositedAt,
 		PickedUpAt:    model.PickedUpAt,
 		ExpiresAt:     model.ExpiresAt,

@@ -43,7 +43,6 @@ func (h *Handler) GetByID(c *fiber.Ctx) error {
 			"receiver_phone": p.ReceiverPhone,
 			"sender_phone":   p.SenderPhone,
 			"pickup_code":    p.PickupCode,
-			"reserved_at":    p.ReservedAt,
 			"deposited_at":   p.DepositedAt,
 			"picked_up_at":   p.PickedUpAt,
 			"expires_at":     p.ExpiresAt,

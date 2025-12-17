@@ -23,9 +23,8 @@ type Parcel struct {
 	Size          string // S | M | L
 	ReceiverPhone string
 	SenderPhone   string
-	PickupCode    string
+	PickupCode    *string
 	Status        Status
-	ReservedAt    *time.Time
 	DepositedAt   *time.Time
 	PickedUpAt    *time.Time
 	ExpiresAt     *time.Time
