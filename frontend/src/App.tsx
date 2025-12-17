@@ -6,12 +6,12 @@ import DepositOpenPage from '@/pages/deposit/DepositOpenPage'
 import DepositPhonePage from '@/pages/deposit/DepositPhonePage'
 import DepositSizePage from '@/pages/deposit/DepositSizePage'
 import DepositSuccessPage from '@/pages/deposit/DepositSuccessPage'
-import PickupHome from '@/pages/pickup/PickupHome'
-import PickupOtpVerify from '@/pages/pickup/PickupOtpVerify'
-import PickupParcelList from '@/pages/pickup/PickupParcelList'
-import PickupSuccess from '@/pages/pickup/PickupSuccess'
-import PickupWithCode from '@/pages/pickup/PickupWithCode'
-import PickupWithPhone from '@/pages/pickup/PickupWithPhone'
+import PickupHomePage from '@/pages/pickup/PickupHomePage'
+import PickupOtpVerifyPage from '@/pages/pickup/PickupOtpVerifyPage'
+import PickupParcelListPage from '@/pages/pickup/PickupParcelListPage'
+import PickupSuccessPage from '@/pages/pickup/PickupSuccessPage'
+import PickupWithCodePage from '@/pages/pickup/PickupWithCodePage'
+import PickupWithPhonePage from '@/pages/pickup/PickupWithPhonePage'
 import WelcomePage from '@/pages/welcome/WelcomePage'
 
 const App = () => {
@@ -23,12 +23,12 @@ const App = () => {
         <Route path="/deposit/size" element={<DepositSizePage />} />
         <Route path="/deposit/open" element={<DepositOpenPage />} />
         <Route path="/deposit/success" element={<DepositSuccessPage />} />
-        <Route path="/pickup" element={<PickupHome />} />
-        <Route path="/pickup/code" element={<PickupWithCode />} />
-        <Route path="/pickup/phone" element={<PickupWithPhone />} />
-        <Route path="/pickup/otp" element={<PickupOtpVerify />} />
-        <Route path="/pickup/list" element={<PickupParcelList />} />
-        <Route path="/pickup/success" element={<PickupSuccess />} />
+        <Route path="/pickup" element={<PickupHomePage />} />
+        <Route path="/pickup/code" element={<PickupWithCodePage />} />
+        <Route path="/pickup/phone" element={<PickupWithPhonePage />} />
+        <Route path="/pickup/otp" element={<PickupOtpVerifyPage />} />
+        <Route path="/pickup/list" element={<PickupParcelListPage />} />
+        <Route path="/pickup/success" element={<PickupSuccessPage />} />
         <Route path="/admin/login" element={<AdminLoginPage />} />
         <Route path="/admin/parcels" element={<AdminParcelsPage />} />
         <Route path="/admin/parcels/:id" element={<AdminParcelDetailPage />} />
