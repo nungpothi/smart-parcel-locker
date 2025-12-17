@@ -6,6 +6,7 @@ import (
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 
 	"smart-parcel-locker/backend/domain/parcel"
 	gormmodels "smart-parcel-locker/backend/infrastructure/persistence/gorm/models"
@@ -57,6 +58,46 @@ func (r *GormRepository) GetByID(ctx context.Context, id uuid.UUID) (*parcel.Par
 		return nil, err
 	}
 	return mapParcelModelToDomain(model), nil
+}
+
+func (r *GormRepository) GetByIDForUpdate(ctx context.Context, id uuid.UUID) (*parcel.Parcel, error) {
+	var model gormmodels.Parcel
+	if err := r.db.WithContext(ctx).
+		Clauses(clause.Locking{Strength: "UPDATE"}).
+		First(&model, "id = ?", id).Error; err != nil {
+		return nil, err
+	}
+	return mapParcelModelToDomain(model), nil
+}
+
+func (r *GormRepository) Update(ctx context.Context, p *parcel.Parcel) (*parcel.Parcel, error) {
+	if p == nil {
+		return nil, nil
+	}
+	now := time.Now()
+	model := gormmodels.Parcel{
+		ID:            p.ID,
+		ParcelCode:    p.ParcelCode,
+		LockerID:      p.LockerID,
+		CompartmentID: p.CompartmentID,
+		Size:          p.Size,
+		ReceiverPhone: p.ReceiverPhone,
+		SenderPhone:   p.SenderPhone,
+		PickupCode:    p.PickupCode,
+		Status:        string(p.Status),
+		DepositedAt:   p.DepositedAt,
+		PickedUpAt:    p.PickedUpAt,
+		ExpiresAt:     p.ExpiresAt,
+		UpdatedAt:     &now,
+	}
+	if err := r.db.WithContext(ctx).
+		Model(&gormmodels.Parcel{}).
+		Where("id = ?", p.ID).
+		Updates(model).Error; err != nil {
+		return nil, err
+	}
+	p.UpdatedAt = &now
+	return p, nil
 }
 
 func (r *GormRepository) CreateEvent(ctx context.Context, event *parcel.Event) error {

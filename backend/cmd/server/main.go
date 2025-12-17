@@ -84,7 +84,7 @@ func wireModules(app *fiber.App, db *gorm.DB) {
 	otpRepo := otpinfra.NewGormRepository(db)
 	otpNotifier := notification.NewDiscordNotifier()
 	otpUC := otpusecase.NewUseCase(otpRepo, otpNotifier, tokenStore, txManager)
-	pickupUC := pickupusecase.NewUseCase(parcelRepo, tokenStore)
+	pickupUC := pickupusecase.NewUseCase(parcelRepo, compRepo, tokenStore, txManager)
 	pickupHandler := pickupadapter.NewHandler(otpUC, pickupUC)
 
 	http.Register(app, parcelHandler, adminHandler, adminOpsHandler, lockerHandler, pickupHandler)

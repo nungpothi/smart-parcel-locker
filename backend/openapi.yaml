@@ -204,6 +204,72 @@ paths:
               schema:
                 $ref: '#/components/schemas/APIErrorResponse'
 
+  /pickup/confirm:
+    post:
+      summary: Confirm parcel pickup
+      tags: [Parcels]
+      parameters:
+        - in: header
+          name: X-Pickup-Token
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PickupConfirmRequest'
+      responses:
+        '200':
+          description: Pickup confirmed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PickupConfirmResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+        '401':
+          description: Invalid token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+        '404':
+          description: Parcel not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+        '410':
+          description: Token expired
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+
   /lockers/available:
     get:
       summary: List available lockers
@@ -776,6 +842,40 @@ components:
             compartment_id: "c1f5c1a4-1234-4f0f-9a4b-1234567890ab"
             size: M
             expires_at: "2025-01-02T10:30:00Z"
+
+    PickupConfirmRequest:
+      type: object
+      required: [parcel_id]
+      properties:
+        parcel_id:
+          type: string
+          format: uuid
+
+    PickupConfirmResponse:
+      allOf:
+        - $ref: '#/components/schemas/APIBase'
+        - type: object
+          required: [data]
+          properties:
+            data:
+              type: object
+              required: [parcel_id, status, picked_up_at]
+              properties:
+                parcel_id:
+                  type: string
+                  format: uuid
+                status:
+                  type: string
+                  enum: [PICKED_UP]
+                picked_up_at:
+                  type: string
+                  format: date-time
+      example:
+        success: true
+        data:
+          parcel_id: "d290f1ee-6c54-4b01-90e6-d701748f0851"
+          status: PICKED_UP
+          picked_up_at: "2025-01-01T11:00:00Z"
 
     Admin:
       type: object

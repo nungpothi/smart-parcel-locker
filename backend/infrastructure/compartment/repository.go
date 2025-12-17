@@ -68,6 +68,24 @@ func (r *GormRepository) FindAvailableByLockerAndSizeForUpdate(ctx context.Conte
 	}, nil
 }
 
+func (r *GormRepository) GetByIDForUpdate(ctx context.Context, id uuid.UUID) (*compartment.Compartment, error) {
+	var model gormmodels.Compartment
+	if err := r.db.WithContext(ctx).
+		Clauses(clause.Locking{Strength: "UPDATE"}).
+		First(&model, "id = ?", id).Error; err != nil {
+		return nil, err
+	}
+	return &compartment.Compartment{
+		ID:            model.ID,
+		LockerID:      model.LockerID,
+		CompartmentNo: model.CompartmentNo,
+		Size:          model.Size,
+		Status:        model.Status,
+		CreatedAt:     model.CreatedAt,
+		UpdatedAt:     model.UpdatedAt,
+	}, nil
+}
+
 func (r *GormRepository) Update(ctx context.Context, comp *compartment.Compartment) (*compartment.Compartment, error) {
 	if comp == nil {
 		return nil, nil

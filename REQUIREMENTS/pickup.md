@@ -57,6 +57,29 @@
 **Response**
 - array of `ParcelPickupView` (no phone numbers, no pickup code)
 
+## Confirm Pickup
+**Endpoint:** `POST /pickup/confirm`
+
+**Header**
+- `X-Pickup-Token` (required)
+
+**Input**
+- `parcel_id` (uuid, required)
+
+**Behavior**
+- Validate token and expiry.
+- Load parcel and lock row for update.
+- Require status `READY_FOR_PICKUP`.
+- Require token phone matches receiver or sender.
+- Set parcel status to `PICKED_UP` and `picked_up_at = now`.
+- Release compartment to `AVAILABLE`.
+- Create parcel event `PICKED_UP`.
+
+**Response**
+- `parcel_id`
+- `status = PICKED_UP`
+- `picked_up_at`
+
 ## Error Codes
 - `INVALID_REQUEST` (400)
 - `OTP_NOT_FOUND` (404)
@@ -65,3 +88,6 @@
 - `TOO_MANY_REQUESTS` (429, optional rate limit)
 - `INVALID_TOKEN` (401)
 - `TOKEN_EXPIRED` (410)
+- `FORBIDDEN` (403)
+- `PARCEL_NOT_FOUND` (404)
+- `CONFLICT` (409)

@@ -4,9 +4,11 @@ import (
 	"errors"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 
 	"smart-parcel-locker/backend/domain/otp"
+	"smart-parcel-locker/backend/domain/parcel"
 	pickupdomain "smart-parcel-locker/backend/domain/pickup"
 	"smart-parcel-locker/backend/pkg/errorx"
 	"smart-parcel-locker/backend/pkg/response"
@@ -97,6 +99,37 @@ func (h *Handler) ListParcels(c *fiber.Ctx) error {
 	})
 }
 
+type confirmPickupRequest struct {
+	ParcelID string `json:"parcel_id"`
+}
+
+func (h *Handler) ConfirmPickup(c *fiber.Ctx) error {
+	token := c.Get("X-Pickup-Token")
+	var req confirmPickupRequest
+	if err := c.BodyParser(&req); err != nil {
+		return writeError(c, fiber.StatusBadRequest, "INVALID_REQUEST", "invalid request body")
+	}
+	if req.ParcelID == "" {
+		return writeError(c, fiber.StatusBadRequest, "INVALID_REQUEST", "parcel_id is required")
+	}
+	parcelID, err := uuid.Parse(req.ParcelID)
+	if err != nil {
+		return writeError(c, fiber.StatusBadRequest, "INVALID_REQUEST", "invalid parcel_id")
+	}
+	result, err := h.pickupUC.ConfirmPickup(c.Context(), token, parcelID)
+	if err != nil {
+		return mapError(c, err)
+	}
+	return c.JSON(response.APIResponse{
+		Success: true,
+		Data: map[string]interface{}{
+			"parcel_id":    result.ParcelID,
+			"status":       result.Status,
+			"picked_up_at": result.PickedUpAt,
+		},
+	})
+}
+
 func mapError(c *fiber.Ctx, err error) error {
 	if err == nil {
 		return nil
@@ -120,6 +153,9 @@ func extractError(err error) (string, string) {
 	if errors.Is(err, pickupdomain.ErrTokenExpired) {
 		return pickupdomain.ErrTokenExpired.Code, pickupdomain.ErrTokenExpired.Message
 	}
+	if errors.Is(err, parcel.ErrParcelNotFound) {
+		return parcel.ErrParcelNotFound.Code, parcel.ErrParcelNotFound.Message
+	}
 	return "INTERNAL_ERROR", err.Error()
 }
 
@@ -127,13 +163,19 @@ func statusFromCode(code string) int {
 	switch code {
 	case "INVALID_REQUEST", "INVALID_OTP":
 		return fiber.StatusBadRequest
+	case "FORBIDDEN":
+		return fiber.StatusForbidden
 	case "INVALID_TOKEN":
 		return fiber.StatusUnauthorized
 	case "OTP_ALREADY_USED":
 		return fiber.StatusConflict
+	case "CONFLICT", "INVALID_STATUS_TRANSITION":
+		return fiber.StatusConflict
 	case "OTP_EXPIRED":
 		return fiber.StatusGone
 	case "OTP_NOT_FOUND":
+		return fiber.StatusNotFound
+	case "PARCEL_NOT_FOUND":
 		return fiber.StatusNotFound
 	case "TOO_MANY_REQUESTS":
 		return fiber.StatusTooManyRequests

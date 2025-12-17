@@ -7,4 +7,5 @@ func RegisterRoutes(router fiber.Router, handler *Handler) {
 	router.Post("/otp/request", handler.RequestOTP)
 	router.Post("/otp/verify", handler.VerifyOTP)
 	router.Get("/parcels", handler.ListParcels)
+	router.Post("/confirm", handler.ConfirmPickup)
 }

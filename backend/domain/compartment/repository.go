@@ -10,6 +10,7 @@ import (
 type Repository interface {
 	CreateBulk(ctx context.Context, compartments []Compartment) (int, error)
 	FindAvailableByLockerAndSizeForUpdate(ctx context.Context, lockerID uuid.UUID, size string) (*Compartment, error)
+	GetByIDForUpdate(ctx context.Context, id uuid.UUID) (*Compartment, error)
 	Update(ctx context.Context, compartment *Compartment) (*Compartment, error)
 	ListByLocker(ctx context.Context, lockerID uuid.UUID) ([]Compartment, error)
 	CountAll(ctx context.Context) (int64, error)
