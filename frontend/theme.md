@@ -21,3 +21,11 @@ This app relies on Tailwind + CSS variables to generate all utility classes and 
 ## Verifying utilities
 - After running the build/dev server (Node 20+ required by Vite), you should see computed styles for custom utilities such as `bg-base`, `text-text`, `shadow-panel`, and the Button/Card classes. If a class renders without styles, ensure it is covered by the content globs and mapped in `tailwind.config.cjs`.
 - Dist verification: open `dist/assets/index-*.css` and search for the utilities you rely on (e.g., `bg-primary`, `text-lg`, `rounded-panel`, `shadow-panel`). If they are missing, verify that `@source` covers your files and rebuild under a supported Node version (>=20.19).
+
+## Spacing rules
+- Default page padding: `PageContainer` uses the `roomy` preset (`px-8 sm:px-12` and `py-12 sm:py-14`) so content never touches screen edges on tablet/kiosk layouts. Stick with `roomy` for public-facing flows unless a screen must go edge-to-edge.
+- Card padding: `Card` density `spacious` now provides generous internal padding (`p-10 sm:p-12`) to keep text and controls well off the borders. Use `spacious` for public/kiosk surfaces; `cozy` is reserved for denser admin tables/forms.
+- Section spacing: use the shared stack utilities defined in `index.css` instead of ad-hoc gaps. `stack-page` creates primary vertical rhythm between page sections (2.5rem, then 3rem on sm+), `stack-section` spaces text blocks (1rem → 1.25rem), and `stack-actions` separates stacked buttons (1.25rem → 1.5rem).
+- Button group spacing: when stacking primary actions, wrap them in a `stack-actions` container to ensure clear separation without relying on color.
+- Dividers: use the `section-divider` helper (1px border with 1.5rem top padding, 1.75rem on sm+) to separate supporting/admin controls from primary flows while preserving breathing room.
+- Apply these spacing helpers consistently across pages; avoid embedding raw spacing utilities in individual screens so padding/spacing stays uniform and kiosk-friendly.

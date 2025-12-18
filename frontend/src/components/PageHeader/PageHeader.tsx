@@ -24,6 +24,16 @@ const variantSubtitleClasses: Record<PageHeaderVariant, string> = {
   admin: 'text-base text-text-muted',
 }
 
+const variantRootGapClasses: Record<PageHeaderVariant, string> = {
+  public: 'gap-3 sm:gap-4',
+  admin: 'gap-2',
+}
+
+const variantTextBlockGapClasses: Record<PageHeaderVariant, string> = {
+  public: 'gap-3 sm:gap-4',
+  admin: 'gap-2',
+}
+
 const eyebrowClasses: Record<PageHeaderVariant, string> = {
   public: 'text-sm font-semibold uppercase tracking-[0.2em] text-text-subtle',
   admin: 'text-xs font-semibold uppercase tracking-[0.28em] text-text-subtle',
@@ -44,7 +54,8 @@ const PageHeader = ({
   return (
     <header
       className={clsx(
-        'flex w-full flex-col gap-2',
+        'flex w-full flex-col',
+        variantRootGapClasses[variant],
         alignment === 'center' ? 'items-center text-center' : 'items-start',
         className,
       )}
@@ -54,7 +65,8 @@ const PageHeader = ({
         <div className="flex w-full flex-wrap items-end justify-between gap-4">
           <div
             className={clsx(
-              'flex flex-col gap-2',
+              'flex flex-col',
+              variantTextBlockGapClasses[variant],
               alignment === 'center' && 'w-full items-center',
             )}
           >

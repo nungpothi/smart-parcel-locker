@@ -15,7 +15,7 @@ type CardProps<T extends ElementType = 'section'> = {
 }
 
 const densityStyles: Record<CardDensity, string> = {
-  spacious: 'p-8 sm:p-10',
+  spacious: 'p-10 sm:p-12',
   cozy: 'p-5 sm:p-6',
 }
 

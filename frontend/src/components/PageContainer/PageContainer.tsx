@@ -22,13 +22,13 @@ const widthClasses: Record<PageWidth, string> = {
 
 const paddingXClasses: Record<HorizontalPadding, string> = {
   standard: 'px-5 sm:px-8',
-  roomy: 'px-6 sm:px-10',
+  roomy: 'px-8 sm:px-12',
 }
 
 const paddingYClasses: Record<VerticalPadding, string> = {
   none: 'py-0',
   cozy: 'py-6 sm:py-8',
-  roomy: 'py-10 sm:py-12',
+  roomy: 'py-12 sm:py-14',
 }
 
 const PageContainer = <T extends ElementType = 'div'>({

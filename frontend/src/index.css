@@ -7,6 +7,47 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer components {
+  .stack-page {
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+    @media (min-width: 640px) {
+      gap: 3rem;
+    }
+  }
+
+  .stack-section {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    @media (min-width: 640px) {
+      gap: 1.25rem;
+    }
+  }
+
+  .stack-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    @media (min-width: 640px) {
+      gap: 1.5rem;
+    }
+  }
+
+  .section-divider {
+    border-top: 1px solid rgb(var(--color-border) / 0.6);
+    padding-top: 1.5rem;
+    @media (min-width: 640px) {
+      padding-top: 1.75rem;
+    }
+  }
+
+  .eyebrow-chip {
+    padding: 10px;
+  }
+}
+
 :root {
   color-scheme: light;
   --color-base: 246 244 255;

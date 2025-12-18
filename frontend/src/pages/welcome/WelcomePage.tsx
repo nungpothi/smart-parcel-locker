@@ -8,19 +8,19 @@ const WelcomePage = () => {
 
   return (
     <section className="flex flex-1 items-center justify-center">
-      <Card tone="muted" density="spacious" className="w-full">
-        <div className="mx-auto flex max-w-2xl flex-col items-center gap-10 text-center">
-          <div className="flex items-center gap-3">
-            <Button size="md" variant="primary">
+      <Card tone="muted" density="spacious" className="w-full max-w-3xl">
+        <div className="stack-page w-full items-center">
+          <div className="flex w-full items-center justify-end gap-3">
+            <Button size="md" variant="outline" className="min-w-[68px] px-4">
               TH
             </Button>
-            <Button size="md" variant="outline">
+            <Button size="md" variant="outline" className="min-w-[68px] px-4">
               EN
             </Button>
           </div>
 
-          <div className="flex flex-col items-center gap-4">
-            <span className="rounded-pill border border-border/70 bg-surface px-4 py-2 text-sm font-semibold text-text-muted">
+          <div className="stack-section items-center text-center">
+            <span className="eyebrow-chip rounded-pill border border-border/70 bg-surface text-base font-semibold text-text-muted">
               ตู้ฝาก–รับพัสดุอัตโนมัติ
             </span>
             <PageHeader
@@ -31,21 +31,27 @@ const WelcomePage = () => {
             />
           </div>
 
-          <div className="w-full space-y-4">
-            <Button size="xl" fullWidth onClick={() => navigate('/deposit')}>
+          <div className="stack-actions w-full">
+            <Button
+              size="xl"
+              fullWidth
+              className="py-5 text-2xl sm:text-3xl"
+              onClick={() => navigate('/deposit')}
+            >
               ฝากพัสดุ
             </Button>
             <Button
               size="xl"
               variant="secondary"
               fullWidth
+              className="py-5 text-2xl sm:text-3xl"
               onClick={() => navigate('/pickup')}
             >
               รับพัสดุ
             </Button>
           </div>
 
-          <div className="w-full">
+          <div className="section-divider w-full">
             <Button
               size="md"
               variant="outline"
