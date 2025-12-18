@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import Button from '@/components/Button'
 import Card from '@/components/Card'
 import Input from '@/components/Input'
+import PageHeader from '@/components/PageHeader'
 import { createLocation, fetchLocations, type Location } from '@/services/api'
 
 const AdminLocationsPage = () => {
@@ -54,12 +55,16 @@ const AdminLocationsPage = () => {
 
   return (
     <section className="flex flex-1 flex-col gap-6">
-      <Card>
-        <div className="text-center">
-          <h1 className="font-display text-3xl">Locations</h1>
-        </div>
+      <PageHeader
+        variant="admin"
+        title="Locations"
+        subtitle="สร้างและจัดการข้อมูลสถานที่"
+        align="left"
+      />
 
-        <div className="mt-8 space-y-4">
+      <Card density="cozy">
+
+        <div className="space-y-4">
           <Input
             label="Code"
             placeholder="LOC-001"
@@ -87,7 +92,7 @@ const AdminLocationsPage = () => {
         </div>
       </Card>
 
-      <Card title="Existing Locations">
+      <Card title="Existing Locations" density="cozy">
         <div className="space-y-3">
           {locations.length === 0 ? (
             <p className="text-sm text-text-muted">No locations yet.</p>

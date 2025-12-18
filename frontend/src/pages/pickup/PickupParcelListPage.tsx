@@ -5,6 +5,7 @@ import clsx from 'clsx'
 import { useNavigate } from 'react-router-dom'
 import Button from '@/components/Button'
 import Card from '@/components/Card'
+import PageHeader from '@/components/PageHeader'
 import { confirmPickup, fetchPickupParcels } from '@/services/api'
 import { usePickupStore } from '@/store/pickupStore'
 
@@ -114,12 +115,14 @@ const PickupParcelListPage = () => {
 
   return (
     <section className="flex flex-1 flex-col gap-6">
-      <Card>
-        <div className="text-center">
-          <h1 className="font-display text-3xl">เลือกพัสดุ</h1>
-        </div>
+      <PageHeader
+        title="เลือกพัสดุ"
+        subtitle="เลือกพัสดุที่ต้องการเปิดรับ"
+        variant="public"
+      />
 
-        <div className="mt-8 space-y-4">
+      <Card>
+        <div className="space-y-4">
           {isLoadingParcels && (
             <p className="text-center text-base text-text-muted">
               กำลังโหลด...
@@ -136,15 +139,16 @@ const PickupParcelListPage = () => {
             </p>
           ) : (
             parcels.map((parcel) => (
-              <button
+              <Button
                 key={parcel.parcel_id}
                 type="button"
                 onClick={() => selectParcel(parcel.parcel_id)}
+                variant={selectedParcelId === parcel.parcel_id ? 'primary' : 'outline'}
+                size="lg"
                 className={clsx(
-                  'flex w-full flex-col gap-2 rounded-control border-2 p-4 text-left transition sm:flex-row sm:items-center sm:justify-between',
-                  selectedParcelId === parcel.parcel_id
-                    ? 'border-primary-strong bg-primary/60'
-                    : 'border-border bg-surface',
+                  'w-full justify-between rounded-control p-4 text-left sm:flex-row sm:items-center',
+                  selectedParcelId !== parcel.parcel_id && 'text-text',
+                  'flex-col sm:flex-row sm:gap-3',
                 )}
               >
                 <div>
@@ -158,7 +162,7 @@ const PickupParcelListPage = () => {
                 <span className="rounded-pill bg-secondary px-4 py-2 text-sm font-semibold text-text">
                   ขนาด {parcel.size}
                 </span>
-              </button>
+              </Button>
             ))
           )}
         </div>

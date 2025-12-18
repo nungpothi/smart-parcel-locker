@@ -7,6 +7,7 @@ import { z } from 'zod'
 import Button from '@/components/Button'
 import Card from '@/components/Card'
 import Input from '@/components/Input'
+import PageHeader from '@/components/PageHeader'
 import { requestPickupOtp, verifyPickupOtp } from '@/services/api'
 import { usePickupStore } from '@/store/pickupStore'
 
@@ -126,16 +127,18 @@ const PickupOtpVerifyPage = () => {
 
   return (
     <section className="flex flex-1 flex-col justify-center gap-6">
-      <Card>
-        <div className="text-center">
-          <h1 className="font-display text-3xl">ยืนยันรหัส OTP</h1>
-        </div>
+      <PageHeader
+        title="ยืนยันรหัส OTP"
+        subtitle="กรอก OTP ที่ได้รับทางโทรศัพท์"
+        variant="public"
+      />
 
-        <p className="mt-4 text-center text-sm text-text-subtle">
+      <Card>
+        <p className="text-center text-sm text-text-subtle">
           OTP ถูกส่งไปแล้ว
         </p>
 
-        <form className="mt-8 space-y-5" onSubmit={handleSubmit(onSubmit)}>
+        <form className="mt-6 space-y-5" onSubmit={handleSubmit(onSubmit)}>
           <Input
             label="OTP"
             placeholder="กรอก OTP 6 หลัก"
@@ -153,15 +156,17 @@ const PickupOtpVerifyPage = () => {
           </Button>
         </form>
 
-        <div className="mt-6 text-center">
-          <button
+        <div className="mt-6 flex flex-col items-center">
+          <Button
             type="button"
-            className="text-sm font-semibold text-primary-strong"
+            variant="outline"
+            size="md"
+            className="w-full sm:w-auto"
             onClick={handleResend}
             disabled={isSubmitting}
           >
             ขอ OTP ใหม่
-          </button>
+          </Button>
         </div>
 
         <div className="mt-6">

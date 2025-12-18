@@ -3,6 +3,7 @@ import clsx from 'clsx'
 import { useNavigate } from 'react-router-dom'
 import Button from '@/components/Button'
 import Card from '@/components/Card'
+import PageHeader from '@/components/PageHeader'
 import { depositParcel } from '@/services/api'
 import { type DepositSize, useDepositStore } from '@/store/depositStore'
 
@@ -72,28 +73,29 @@ const DepositSizePage = () => {
 
   return (
     <section className="flex flex-1 flex-col justify-center gap-6">
-      <header className="text-center">
-        <h1 className="font-display text-4xl">เลือกขนาดช่อง</h1>
-      </header>
+      <PageHeader
+        title="เลือกขนาดช่อง"
+        subtitle="เลือกขนาดช่องที่ต้องการให้เหมาะสมกับพัสดุ"
+        variant="public"
+      />
 
       <Card>
         <div className="grid gap-4 sm:grid-cols-3">
           {sizeOptions.map((option) => (
-            <button
+            <Button
               key={option}
+              variant={size === option ? 'primary' : 'outline'}
+              size="xl"
               type="button"
               onClick={() => setSize(option)}
               disabled={isSubmitting}
               className={clsx(
-                'flex h-28 items-center justify-center rounded-panel border-2 text-2xl font-semibold transition',
-                size === option
-                  ? 'border-primary-strong bg-primary text-text shadow-lift'
-                  : 'border-border bg-surface text-text-muted',
-                isSubmitting && 'cursor-not-allowed opacity-60',
+                'h-28 w-full rounded-panel text-2xl',
+                size !== option && 'text-text-muted',
               )}
             >
               {option}
-            </button>
+            </Button>
           ))}
         </div>
 

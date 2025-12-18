@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import Button from '@/components/Button'
 import Card from '@/components/Card'
 import Input from '@/components/Input'
+import PageHeader from '@/components/PageHeader'
 import {
   createLocker,
   fetchLockers,
@@ -68,12 +69,15 @@ const AdminLockersPage = () => {
 
   return (
     <section className="flex flex-1 flex-col gap-6">
-      <Card>
-        <div className="text-center">
-          <h1 className="font-display text-3xl">Lockers</h1>
-        </div>
+      <PageHeader
+        variant="admin"
+        title="Lockers"
+        subtitle="กำหนดตู้พัสดุและเชื่อมกับสถานที่"
+        align="left"
+      />
 
-        <div className="mt-8 space-y-4">
+      <Card density="cozy">
+        <div className="space-y-4">
           <label className="block text-left">
             <span className="text-sm font-semibold text-text-muted">
               Location
@@ -113,7 +117,7 @@ const AdminLockersPage = () => {
         </div>
       </Card>
 
-      <Card title="Existing Lockers">
+      <Card title="Existing Lockers" density="cozy">
         <div className="space-y-3">
           {lockers.length === 0 ? (
             <p className="text-sm text-text-muted">No lockers yet.</p>
@@ -137,6 +141,7 @@ const AdminLockersPage = () => {
                     </span>
                     <Button
                       variant="secondary"
+                      size="md"
                       onClick={() =>
                         navigate(`/admin/lockers/${locker.locker_id}/compartments`)
                       }

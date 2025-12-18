@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom'
 import Button from '@/components/Button'
 import Card from '@/components/Card'
+import PageHeader from '@/components/PageHeader'
 import { useDepositStore } from '@/store/depositStore'
 
 const DepositOpenPage = () => {
@@ -9,14 +10,19 @@ const DepositOpenPage = () => {
 
   return (
     <section className="flex flex-1 flex-col justify-center gap-6">
+      <PageHeader
+        title="ช่องกำลังเปิด"
+        subtitle="กรุณาใส่พัสดุและปิดช่องให้เรียบร้อย"
+        variant="public"
+      />
+
       <Card>
         <div className="flex flex-col items-center gap-4 text-center">
           <div className="flex h-24 w-24 items-center justify-center rounded-pill bg-primary text-3xl">
             🔓
           </div>
-          <h1 className="font-display text-3xl">ช่องกำลังเปิด</h1>
           <p className="text-base text-text-muted">
-            กรุณาใส่พัสดุและปิดช่อง
+            นำพัสดุวางในช่องให้เรียบร้อยแล้วปิดประตู
           </p>
         </div>
 

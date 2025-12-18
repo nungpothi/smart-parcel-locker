@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import Button from '@/components/Button'
 import Card from '@/components/Card'
 import Input from '@/components/Input'
+import PageHeader from '@/components/PageHeader'
 import {
   createCompartments,
   fetchCompartments,
@@ -87,12 +88,15 @@ const AdminLockerCompartmentsPage = () => {
 
   return (
     <section className="flex flex-1 flex-col gap-6">
-      <Card>
-        <div className="text-center">
-          <h1 className="font-display text-3xl">Generate Compartments</h1>
-        </div>
+      <PageHeader
+        variant="admin"
+        title="Generate Compartments"
+        subtitle="กำหนดหมายเลขช่องและขนาดสำหรับตู้"
+        align="left"
+      />
 
-        <div className="mt-8 space-y-4">
+      <Card density="cozy">
+        <div className="space-y-4">
           {rows.map((row, index) => (
             <div
               key={`row-${index}`}
@@ -125,6 +129,7 @@ const AdminLockerCompartmentsPage = () => {
               </label>
               <Button
                 variant="secondary"
+                size="md"
                 onClick={() => removeRow(index)}
                 disabled={rows.length === 1}
               >
@@ -145,7 +150,7 @@ const AdminLockerCompartmentsPage = () => {
         </div>
       </Card>
 
-      <Card title="Existing Compartments">
+      <Card title="Existing Compartments" density="cozy">
         <div className="space-y-3">
           {compartments.length === 0 ? (
             <p className="text-sm text-text-muted">No compartments yet.</p>

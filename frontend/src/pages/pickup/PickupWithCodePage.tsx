@@ -5,6 +5,7 @@ import { z } from 'zod'
 import Button from '@/components/Button'
 import Card from '@/components/Card'
 import Input from '@/components/Input'
+import PageHeader from '@/components/PageHeader'
 import { usePickupStore } from '@/store/pickupStore'
 
 const phoneSchema = z
@@ -45,12 +46,14 @@ const PickupWithCodePage = () => {
 
   return (
     <section className="flex flex-1 flex-col justify-center gap-6">
-      <Card>
-        <div className="text-center">
-          <h1 className="font-display text-3xl">รับพัสดุด้วยรหัส</h1>
-        </div>
+      <PageHeader
+        title="รับพัสดุด้วยรหัส"
+        subtitle="ยืนยันเบอร์โทรและรหัสรับพัสดุ"
+        variant="public"
+      />
 
-        <form className="mt-8 space-y-5" onSubmit={handleSubmit(onSubmit)}>
+      <Card>
+        <form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
           <Input
             label="เบอร์โทร"
             placeholder="กรอกเบอร์โทร"

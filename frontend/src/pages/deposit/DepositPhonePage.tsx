@@ -6,6 +6,7 @@ import { z } from 'zod'
 import Button from '@/components/Button'
 import Card from '@/components/Card'
 import Input from '@/components/Input'
+import PageHeader from '@/components/PageHeader'
 import { fetchAvailableLockers, type AvailableLocker } from '@/services/api'
 import { useDepositStore } from '@/store/depositStore'
 
@@ -89,9 +90,11 @@ const DepositPhonePage = () => {
 
   return (
     <section className="flex flex-1 flex-col justify-center gap-6">
-      <header className="text-center">
-        <h1 className="font-display text-4xl">ฝากพัสดุ</h1>
-      </header>
+      <PageHeader
+        title="ฝากพัสดุ"
+        subtitle="เลือกตู้และกรอกข้อมูลติดต่อ"
+        variant="public"
+      />
 
       <Card>
         <form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>

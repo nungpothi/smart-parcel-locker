@@ -1,19 +1,28 @@
 import { Outlet } from 'react-router-dom'
+import PageContainer from '@/components/PageContainer'
+import PageHeader from '@/components/PageHeader'
 
 const AdminLayout = () => {
   return (
     <div className="min-h-screen bg-base font-body text-text">
-      <div className="mx-auto flex min-h-screen w-full max-w-6xl flex-col px-6 py-8 sm:px-10">
-        <header className="mb-6 flex flex-col gap-2 border-b border-border/70 pb-6">
-          <p className="text-xs font-semibold uppercase tracking-[0.28em] text-text-subtle">
-            Admin Console
-          </p>
-          <p className="font-display text-2xl text-text">Setup Workspace</p>
-        </header>
+      <PageContainer
+        as="div"
+        width="wide"
+        paddingX="roomy"
+        paddingY="cozy"
+        className="flex min-h-screen flex-col"
+      >
+        <PageHeader
+          variant="admin"
+          eyebrow="Admin Console"
+          title="Setup Workspace"
+          className="mb-6 border-b border-border/70 pb-6"
+          align="left"
+        />
         <main className="flex flex-1 flex-col gap-6">
           <Outlet />
         </main>
-      </div>
+      </PageContainer>
     </div>
   )
 }

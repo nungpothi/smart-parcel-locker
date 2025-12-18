@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom'
 import Button from '@/components/Button'
 import Card from '@/components/Card'
+import PageHeader from '@/components/PageHeader'
 import { usePickupStore } from '@/store/pickupStore'
 
 const PickupSuccessPage = () => {
@@ -17,12 +18,20 @@ const PickupSuccessPage = () => {
 
   return (
     <section className="flex flex-1 flex-col justify-center gap-6">
+      <PageHeader
+        title="รับพัสดุเรียบร้อย"
+        subtitle="ช่องได้ถูกเปิดแล้ว กรุณารับพัสดุออกจากตู้"
+        variant="public"
+      />
+
       <Card>
         <div className="flex flex-col items-center gap-4 text-center">
           <div className="flex h-24 w-24 items-center justify-center rounded-pill bg-primary text-3xl">
             ✅
           </div>
-          <h1 className="font-display text-3xl">รับพัสดุเรียบร้อย</h1>
+          <p className="text-base text-text-muted">
+            ขอบคุณที่ใช้บริการ Smart Parcel Locker
+          </p>
         </div>
 
         {selectedParcel && (

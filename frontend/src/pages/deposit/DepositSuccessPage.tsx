@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom'
 import Button from '@/components/Button'
 import Card from '@/components/Card'
+import PageHeader from '@/components/PageHeader'
 import { useDepositStore } from '@/store/depositStore'
 
 const DepositSuccessPage = () => {
@@ -14,14 +15,19 @@ const DepositSuccessPage = () => {
 
   return (
     <section className="flex flex-1 flex-col justify-center gap-6">
+      <PageHeader
+        title="ฝากพัสดุสำเร็จ"
+        subtitle="ระบบได้ส่ง SMS ไปยังเบอร์ผู้รับและผู้ส่งแล้ว"
+        variant="public"
+      />
+
       <Card>
         <div className="flex flex-col items-center gap-4 text-center">
           <div className="flex h-24 w-24 items-center justify-center rounded-pill bg-primary text-3xl">
             ✅
           </div>
-          <h1 className="font-display text-3xl">ฝากพัสดุสำเร็จ</h1>
           <p className="text-base text-text-muted">
-            ระบบได้ส่ง SMS ไปยังเบอร์ผู้รับและผู้ส่งแล้ว
+            เก็บรหัสสำหรับผู้รับเพื่อติดตามพัสดุ
           </p>
         </div>
 
