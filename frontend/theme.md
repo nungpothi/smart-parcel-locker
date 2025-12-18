@@ -38,3 +38,10 @@ This app relies on Tailwind + CSS variables to generate all utility classes and 
 - Labels and support text: `field-label` (1rem, semibold) sits above controls; `field-support` reserves space for hints/errors (min-height 1.25rem) and uses `field-error` for danger coloring. This prevents layout jump when validation appears.
 - Actions: place primary form actions beneath fields inside the `form-shell` rhythm. For stacked actions, continue to use `stack-actions` or `form-actions` wrappers to maintain clear separation.
 - Use `Card` with `density="spacious"` for public forms so internal padding stays consistent; combine with `PageHeader` and `PageContainer` to avoid edge-to-edge content.
+
+## Selection layout rules (public)
+- Use `selection-grid` to lay out option tiles with comfortable gaps (1rem → 1.25rem on sm+) and auto-fit columns (min 180px) so options don’t crowd on wider screens.
+- Option tiles: apply `selection-tile` for card-like touch targets (min-height 150px, panel radius, generous padding, 1.75rem label) and `selection-tile--selected` for a clear selected state (strong border, soft ring, slight lift, alt surface). This avoids relying solely on color.
+- Support text: place validation or helper text under the grid using `field-support`/`field-error` to reserve space and prevent layout jumps.
+- Actions: separate the primary button from the options with `selection-actions` (adds top margin) and optionally `stack-actions` when stacking buttons, keeping the call to action visually distinct.
+- Always wrap selection screens in `Card` with `density="spacious"` inside `PageContainer`/`PageHeader` to avoid edge-to-edge content and to match kiosk spacing standards.

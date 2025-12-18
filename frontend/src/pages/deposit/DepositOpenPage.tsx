@@ -9,40 +9,59 @@ const DepositOpenPage = () => {
   const { parcelCode, pickupCode } = useDepositStore()
 
   return (
-    <section className="flex flex-1 flex-col justify-center gap-6">
-      <PageHeader
-        title="ช่องกำลังเปิด"
-        subtitle="กรุณาใส่พัสดุและปิดช่องให้เรียบร้อย"
-        variant="public"
-      />
+    <section className="flex flex-1 justify-center">
+      <div className="stack-page w-full">
+        <PageHeader
+          title="ช่องกำลังเปิด"
+          subtitle="กรุณาใส่พัสดุและปิดช่องให้เรียบร้อย"
+          variant="public"
+        />
 
-      <Card>
-        <div className="flex flex-col items-center gap-4 text-center">
-          <div className="flex h-24 w-24 items-center justify-center rounded-pill bg-primary text-3xl">
-            🔓
+        <Card tone="muted" density="spacious" className="w-full max-w-3xl">
+          <div className="stack-section items-center text-center">
+            <div className="flex h-28 w-28 items-center justify-center rounded-panel bg-surface text-4xl shadow-panel">
+              🔓
+            </div>
+            <div className="stack-section">
+              <p className="text-2xl font-semibold text-text">
+                ช่องล็อกเกอร์เปิดอยู่
+              </p>
+              <p className="text-lg text-text-muted">
+                กรุณาวางพัสดุลงในช่อง แล้วปิดประตูให้แน่นหนา
+              </p>
+            </div>
           </div>
-          <p className="text-base text-text-muted">
-            นำพัสดุวางในช่องให้เรียบร้อยแล้วปิดประตู
-          </p>
-        </div>
 
-        <div className="mt-6 rounded-control border border-border bg-surface/80 p-4 text-left">
-          <p className="text-sm text-text-subtle">รหัสพัสดุ</p>
-          <p className="text-xl font-semibold text-text">
-            {parcelCode ?? '-'}
-          </p>
-          <p className="mt-4 text-sm text-text-subtle">รหัสรับพัสดุ</p>
-          <p className="text-xl font-semibold text-text">
-            {pickupCode ?? 'ไม่มี'}
-          </p>
-        </div>
+          <div className="stack-section">
+            <div className="rounded-panel border border-border/70 bg-surface px-5 py-4">
+              <p className="text-sm font-semibold uppercase tracking-[0.12em] text-text-subtle">
+                รหัสพัสดุ
+              </p>
+              <p className="mt-2 text-2xl font-semibold text-text">
+                {parcelCode ?? '-'}
+              </p>
+              <div className="mt-4">
+                <p className="text-sm font-semibold uppercase tracking-[0.12em] text-text-subtle">
+                  รหัสรับพัสดุ
+                </p>
+                <p className="mt-2 text-2xl font-semibold text-text">
+                  {pickupCode ?? 'ไม่มี'}
+                </p>
+              </div>
+            </div>
 
-        <div className="mt-8">
-          <Button fullWidth onClick={() => navigate('/deposit/success')}>
-            ใส่พัสดุเรียบร้อยแล้ว
-          </Button>
-        </div>
-      </Card>
+            <div className="stack-actions selection-actions">
+              <Button
+                fullWidth
+                size="xl"
+                onClick={() => navigate('/deposit/success')}
+              >
+                ใส่พัสดุเรียบร้อยแล้ว
+              </Button>
+            </div>
+          </div>
+        </Card>
+      </div>
     </section>
   )
 }

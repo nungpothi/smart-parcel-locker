@@ -72,49 +72,57 @@ const DepositSizePage = () => {
   }
 
   return (
-    <section className="flex flex-1 flex-col justify-center gap-6">
-      <PageHeader
-        title="เลือกขนาดช่อง"
-        subtitle="เลือกขนาดช่องที่ต้องการให้เหมาะสมกับพัสดุ"
-        variant="public"
-      />
+    <section className="flex flex-1 justify-center">
+      <div className="stack-page w-full">
+        <PageHeader
+          title="เลือกขนาดช่อง"
+          subtitle="เลือกขนาดช่องที่ต้องการให้เหมาะสมกับพัสดุ"
+          variant="public"
+        />
 
-      <Card>
-        <div className="grid gap-4 sm:grid-cols-3">
-          {sizeOptions.map((option) => (
-            <Button
-              key={option}
-              variant={size === option ? 'primary' : 'outline'}
-              size="xl"
-              type="button"
-              onClick={() => setSize(option)}
-              disabled={isSubmitting}
+        <Card tone="muted" density="spacious" className="w-full max-w-3xl">
+          <div className="stack-section">
+            <div className="selection-grid">
+              {sizeOptions.map((option) => (
+                <button
+                  key={option}
+                  type="button"
+                  className={clsx(
+                    'selection-tile',
+                    size === option && 'selection-tile--selected',
+                  )}
+                  onClick={() => setSize(option)}
+                  disabled={isSubmitting}
+                  aria-pressed={size === option}
+                >
+                  {option}
+                </button>
+              ))}
+            </div>
+
+            <div
               className={clsx(
-                'h-28 w-full rounded-panel text-2xl',
-                size !== option && 'text-text-muted',
+                'field-support',
+                errorMessage && 'field-error',
               )}
+              aria-live="polite"
             >
-              {option}
-            </Button>
-          ))}
-        </div>
+              {errorMessage ?? ' '}
+            </div>
 
-        {errorMessage && (
-          <div className="mt-6 rounded-control border border-danger bg-danger-soft px-4 py-3 text-sm text-danger">
-            {errorMessage}
+            <div className="selection-actions stack-actions">
+              <Button
+                fullWidth
+                size="xl"
+                onClick={handleConfirm}
+                disabled={!canSubmit || isSubmitting}
+              >
+                {isSubmitting ? 'กำลังยืนยัน...' : 'ยืนยันขนาด'}
+              </Button>
+            </div>
           </div>
-        )}
-
-        <div className="mt-8">
-          <Button
-            fullWidth
-            onClick={handleConfirm}
-            disabled={!canSubmit || isSubmitting}
-          >
-            {isSubmitting ? 'กำลังยืนยัน...' : 'ยืนยันขนาด'}
-          </Button>
-        </div>
-      </Card>
+        </Card>
+      </div>
     </section>
   )
 }
