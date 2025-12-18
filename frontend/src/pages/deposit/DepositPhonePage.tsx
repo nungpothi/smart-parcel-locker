@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import clsx from 'clsx'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
@@ -89,69 +90,85 @@ const DepositPhonePage = () => {
   }
 
   return (
-    <section className="flex flex-1 flex-col justify-center gap-6">
-      <PageHeader
-        title="ฝากพัสดุ"
-        subtitle="เลือกตู้และกรอกข้อมูลติดต่อ"
-        variant="public"
-      />
+    <section className="flex flex-1 justify-center">
+      <div className="stack-page w-full">
+        <PageHeader
+          title="ฝากพัสดุ"
+          subtitle="เลือกตู้และกรอกข้อมูลติดต่อ"
+          variant="public"
+        />
 
-      <Card>
-        <form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
-          <label className="block text-left">
-            <span className="text-sm font-semibold text-text-muted">
-              เลือกตู้
-            </span>
-            <select
-              className="mt-2 min-h-[52px] w-full rounded-control border border-border bg-surface px-4 py-3 text-lg text-text focus:border-primary-strong focus:outline-none focus:ring-2 focus:ring-ring/30"
-              {...register('lockerId')}
-            >
-              <option value="">เลือกตู้</option>
-              {lockerOptions.map((locker) => (
-                <option key={locker.value} value={locker.value}>
-                  {locker.label}
-                </option>
-              ))}
-            </select>
-          </label>
+        <Card tone="muted" density="spacious" className="w-full max-w-3xl">
+          <form className="form-shell" onSubmit={handleSubmit(onSubmit)}>
+            <div className="field-stack">
+              <span className="field-label">เลือกตู้</span>
+              <select
+                className={clsx(
+                  'form-control',
+                  (errors.lockerId || fetchError) && 'form-control--error',
+                )}
+                {...register('lockerId')}
+              >
+                <option value="">เลือกตู้</option>
+                {lockerOptions.map((locker) => (
+                  <option key={locker.value} value={locker.value}>
+                    {locker.label}
+                  </option>
+                ))}
+              </select>
+              <div
+                className={clsx(
+                  'field-support',
+                  (errors.lockerId || fetchError) && 'field-error',
+                )}
+              >
+                {fetchError ||
+                  errors.lockerId?.message ||
+                  (loading
+                    ? 'กำลังโหลดรายการตู้...'
+                    : lockers.length === 0
+                      ? 'ไม่มีตู้ให้ใช้งาน กรุณาตั้งค่าผ่าน Admin ก่อน'
+                      : ' ')}
+              </div>
+            </div>
 
-          {loading && (
-            <p className="text-sm text-text-muted">กำลังโหลดรายการตู้...</p>
-          )}
-          {!loading && lockers.length === 0 && (
-            <p className="text-sm text-text-muted">
-              ไม่มีตู้ให้ใช้งาน กรุณาตั้งค่าผ่าน Admin ก่อน
-            </p>
-          )}
-          {fetchError && <p className="text-sm text-danger">{fetchError}</p>}
-          {errors.lockerId?.message && (
-            <p className="text-sm text-danger">{errors.lockerId.message}</p>
-          )}
+            <Input
+              label="เบอร์ผู้รับ"
+              placeholder="กรอกเบอร์ผู้รับ"
+              inputMode="numeric"
+              {...register('receiverPhone')}
+              error={errors.receiverPhone?.message}
+            />
+            <Input
+              label="เบอร์ผู้ส่ง"
+              placeholder="กรอกเบอร์ผู้ส่ง"
+              inputMode="numeric"
+              {...register('senderPhone')}
+              error={errors.senderPhone?.message}
+            />
 
-          <Input
-            label="เบอร์ผู้รับ"
-            placeholder="กรอกเบอร์ผู้รับ"
-            inputMode="numeric"
-            {...register('receiverPhone')}
-            error={errors.receiverPhone?.message}
-          />
-          <Input
-            label="เบอร์ผู้ส่ง"
-            placeholder="กรอกเบอร์ผู้ส่ง"
-            inputMode="numeric"
-            {...register('senderPhone')}
-            error={errors.senderPhone?.message}
-          />
-
-          <Button
-            type="submit"
-            fullWidth
-            disabled={!isValid || loading || lockers.length === 0}
-          >
-            ถัดไป
-          </Button>
-        </form>
-      </Card>
+            <div className="form-actions stack-actions">
+              <Button
+                type="submit"
+                size="xl"
+                fullWidth
+                disabled={!isValid || loading || lockers.length === 0}
+              >
+                ถัดไป
+              </Button>
+              <Button
+                type="button"
+                size="xl"
+                variant="outline"
+                fullWidth
+                onClick={() => navigate('/')}
+              >
+                ย้อนกลับ
+              </Button>
+            </div>
+          </form>
+        </Card>
+      </div>
     </section>
   )
 }

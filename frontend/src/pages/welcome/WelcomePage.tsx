@@ -9,7 +9,7 @@ const WelcomePage = () => {
   return (
     <section className="flex flex-1 items-center justify-center">
       <Card tone="muted" density="spacious" className="w-full max-w-3xl">
-        <div className="stack-page w-full items-center">
+        <div className="stack-page w-full items-center p-12 sm:p-16">
           <div className="flex w-full items-center justify-end gap-3">
             <Button size="md" variant="outline" className="min-w-[68px] px-4">
               TH

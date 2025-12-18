@@ -29,3 +29,12 @@ This app relies on Tailwind + CSS variables to generate all utility classes and 
 - Button group spacing: when stacking primary actions, wrap them in a `stack-actions` container to ensure clear separation without relying on color.
 - Dividers: use the `section-divider` helper (1px border with 1.5rem top padding, 1.75rem on sm+) to separate supporting/admin controls from primary flows while preserving breathing room.
 - Apply these spacing helpers consistently across pages; avoid embedding raw spacing utilities in individual screens so padding/spacing stays uniform and kiosk-friendly.
+
+## Form layout rules (public)
+- Form shell: wrap public-facing forms in `form-shell` to establish base vertical rhythm (1.75rem gaps) and avoid ad-hoc spacing.
+- Form shell padding: `form-shell` includes 0.75rem inner padding to keep controls slightly inset from the card edges while maintaining spacious card padding.
+- Field stacks: use `field-stack` for each labeled input/select group; it spaces label, control, and support text evenly (0.75rem gaps) and keeps content off card edges.
+- Control sizing: inputs/selects share the `form-control` style—full width, 60px min-height, 14px x 16px padding, rounded control radius, and 1.125rem text for kiosk readability. Add `form-control--error` when showing errors to align borders and focus rings.
+- Labels and support text: `field-label` (1rem, semibold) sits above controls; `field-support` reserves space for hints/errors (min-height 1.25rem) and uses `field-error` for danger coloring. This prevents layout jump when validation appears.
+- Actions: place primary form actions beneath fields inside the `form-shell` rhythm. For stacked actions, continue to use `stack-actions` or `form-actions` wrappers to maintain clear separation.
+- Use `Card` with `density="spacious"` for public forms so internal padding stays consistent; combine with `PageHeader` and `PageContainer` to avoid edge-to-edge content.
