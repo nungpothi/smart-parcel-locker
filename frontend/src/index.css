@@ -237,7 +237,7 @@
   --color-ring: 201 181 255;
   --radius-panel: 28px;
   --radius-control: 20px;
-  --radius-pill: 999px;
+  --radius-pill: 10px;
   --shadow-panel: 0 18px 45px rgba(76, 60, 118, 0.16);
   --shadow-lift: 0 10px 20px rgba(96, 78, 150, 0.25);
 }

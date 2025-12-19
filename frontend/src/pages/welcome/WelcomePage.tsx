@@ -9,7 +9,7 @@ const WelcomePage = () => {
   const { t } = useTranslation()
 
   return (
-    <section className="flex flex-1 items-center justify-center">
+    <section className="flex flex-1 items-center justify-center p-[10px]">
       <Card tone="muted" density="spacious" className="w-full max-w-3xl">
         <div className="stack-page w-full items-center p-12 sm:p-16">
           <div className="stack-section items-center text-center">

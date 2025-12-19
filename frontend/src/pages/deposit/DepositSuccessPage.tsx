@@ -16,7 +16,7 @@ const DepositSuccessPage = () => {
   }
 
   return (
-    <section className="flex flex-1 justify-center">
+    <section className="flex flex-1 justify-center p-[10px]">
       <div className="stack-page w-full">
         <PageHeader
           title={t('public.deposit.success.title')}
@@ -24,9 +24,9 @@ const DepositSuccessPage = () => {
           variant="public"
         />
 
-        <Card tone="muted" density="spacious" className="w-full max-w-3xl">
+        <Card tone="muted" density="spacious" className="w-full max-w-3xl p-[10px]">
           <div className="stack-section items-center text-center">
-            <div className="flex h-24 w-24 items-center justify-center rounded-pill bg-primary text-3xl">
+            <div className="flex h-24 w-24 items-center justify-center rounded-pill bg-primary text-3xl p-[10px]">
               OK
             </div>
             <p className="text-base text-text-muted">
@@ -34,7 +34,7 @@ const DepositSuccessPage = () => {
             </p>
           </div>
 
-          <div className="rounded-control mt-6 border border-border bg-surface/80 p-4 text-left">
+          <div className="rounded-control mt-6 border border-border bg-surface/80 p-4 text-left p-[10px]">
             <p className="text-sm text-text-subtle">{t('public.deposit.success.parcelCodeLabel')}</p>
             <p className="text-xl font-semibold text-text">{parcelCode ?? '-'}</p>
             <p className="mt-4 text-sm text-text-subtle">

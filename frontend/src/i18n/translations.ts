@@ -98,7 +98,7 @@ export const translations: Record<Language, TranslationTree> = {
         phonePlaceholder: 'กรอกเบอร์โทรศัพท์',
         sendCode: 'ส่งรหัส',
         sendingCode: 'กำลังส่งรหัส...',
-        startOver: 'เริ่มต้นใหม่',
+        startOver: 'ย้อนกลับ',
         rateLimit: 'ส่งคำขอถี่เกินไป กรุณารอสักครู่',
       },
       otp: {
@@ -110,7 +110,7 @@ export const translations: Record<Language, TranslationTree> = {
         verify: 'ยืนยันรหัส',
         verifying: 'กำลังยืนยัน...',
         resend: 'ส่งรหัสอีกครั้ง',
-        startOver: 'เริ่มต้นใหม่',
+        startOver: 'ย้อนกลับ',
         requestNew: 'กรุณาขอรหัสใหม่เพื่อดำเนินการต่อ',
         incorrect: 'รหัสไม่ถูกต้อง กรุณาตรวจสอบและลองใหม่',
         notFound: 'ไม่พบรหัส กรุณาขอใหม่',
@@ -161,7 +161,8 @@ export const translations: Record<Language, TranslationTree> = {
           error: 'กรุณาเลือกขนาดและกรอกข้อมูลให้ครบ',
           submit: 'ยืนยัน',
           submitting: 'กำลังดำเนินการ...',
-        },
+        },
+
         success: {
           title: 'ฝากพัสดุเรียบร้อย',
           subtitle: 'เราส่งรหัสรับให้ผู้รับเรียบร้อยแล้ว',
@@ -385,7 +386,8 @@ export const translations: Record<Language, TranslationTree> = {
           error: 'Please select a size and fill all details.',
           submit: 'Confirm',
           submitting: 'Submitting...',
-        },
+        },
+
         success: {
           title: 'Parcel deposited',
           subtitle: 'We sent the pickup code to the receiver.',

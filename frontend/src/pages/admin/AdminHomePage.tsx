@@ -9,7 +9,7 @@ const AdminHomePage = () => {
   const { t } = useTranslation()
 
   return (
-    <section className="flex flex-1 flex-col stack-admin-page">
+    <section className="flex flex-1 flex-col stack-admin-page p-[10px]">
       <PageHeader
         variant="admin"
         title={t('admin.home.title')}
@@ -17,7 +17,7 @@ const AdminHomePage = () => {
         align="left"
       />
 
-      <Card density="cozy">
+      <Card density="cozy" className=" p-[50px]">
         <div className="stack-admin-actions">
           <Button size="md" fullWidth onClick={() => navigate('/admin/locations')}>
             {t('admin.home.locations')}

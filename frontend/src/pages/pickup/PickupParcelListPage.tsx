@@ -102,7 +102,7 @@ const PickupParcelListPage = () => {
   const hasParcels = parcels.length > 0
 
   return (
-    <section className="flex flex-1 justify-center">
+    <section className="flex flex-1 justify-center p-[10px]">
       <div className="stack-page w-full">
         <PageHeader
           title={t('public.pickup.list.title')}
@@ -110,7 +110,7 @@ const PickupParcelListPage = () => {
           variant="public"
         />
 
-        <Card tone="muted" density="spacious" className="w-full max-w-4xl">
+        <Card tone="muted" density="spacious" className="w-full max-w-4xl p-[10px]">
           <div className="stack-section">
             <p className="text-center text-base text-text-muted">
               {t('public.pickup.list.helper')}
@@ -144,7 +144,7 @@ const PickupParcelListPage = () => {
                       type="button"
                       role="listitem"
                       className={clsx(
-                        'w-full rounded-panel border border-border/70 bg-surface px-6 py-5 text-left shadow-panel transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring',
+                        'w-full rounded-panel border border-border/70 bg-surface p-[10px] text-left shadow-panel transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring',
                         'flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between',
                         isSelected && 'border-primary-strong bg-surface-alt shadow-panel focus-visible:outline-ring',
                       )}
@@ -162,7 +162,7 @@ const PickupParcelListPage = () => {
                           </p>
                         )}
                       </div>
-                      <span className="rounded-pill bg-secondary px-4 py-2 text-sm font-semibold uppercase tracking-[0.12em] text-text">
+                      <span className="rounded-pill bg-secondary px-4 py-2 text-sm font-semibold uppercase tracking-[0.12em] text-text p-[10px]">
                         {t('public.pickup.list.sizeLabel', { size: parcel.size })}
                       </span>
                     </button>

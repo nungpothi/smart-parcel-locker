@@ -93,7 +93,7 @@ const PickupWithPhonePage = () => {
   }
 
   return (
-    <section className="flex flex-1 justify-center">
+    <section className="flex flex-1 justify-center p-[10px]">
       <div className="stack-page w-full">
         <PageHeader
           title={t('public.pickup.phone.title')}

@@ -97,7 +97,7 @@ This app relies on Tailwind + CSS variables to generate all utility classes and 
 ## List selection (public)
 - Structure list picks with `PageHeader` and a muted, spacious `Card` centered in `PageContainer`; cap width near 4xl for readability on kiosks.
 - Use `stack-section` inside the card to space helper text, list content, and feedback blocks; keep loading/empty states centered and calm.
-- Render parcels as full-width tappable rows: `rounded-panel border border-border/70 bg-surface px-6 py-5 shadow-panel`, flexing to stack on mobile and align side-by-side on sm+.
+- Render parcels as full-width tappable rows with exactly 10px internal padding: `rounded-panel border border-border/70 bg-surface p-[10px] shadow-panel`, flexing to stack on mobile and align side-by-side on sm+.
 - Make selection obvious without relying solely on color by swapping to `bg-surface-alt`, strengthening the border, and keeping focus/outline rings for keyboard users.
 - Keep primary list text at least `text-xl` with semibold weight; supporting meta (e.g., expiry) at `text-base text-text-subtle`; use a pill for secondary attributes like size.
 - Place a single primary CTA beneath the list in a `section-divider` + `stack-actions` block; keep refresh/back or other secondary actions in the same block but visually secondary to avoid crowding the list.

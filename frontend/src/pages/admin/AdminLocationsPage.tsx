@@ -56,7 +56,7 @@ const AdminLocationsPage = () => {
   }
 
   return (
-    <section className="flex flex-1 flex-col stack-admin-page">
+    <section className="flex flex-1 flex-col stack-admin-page p-[10px]">
       <PageHeader
         variant="admin"
         title={t('admin.locations.title')}

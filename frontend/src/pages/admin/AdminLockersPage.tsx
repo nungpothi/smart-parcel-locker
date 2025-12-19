@@ -70,7 +70,7 @@ const AdminLockersPage = () => {
   }
 
   return (
-    <section className="flex flex-1 flex-col stack-admin-page">
+    <section className="flex flex-1 flex-col stack-admin-page p-[10px]">
       <PageHeader
         variant="admin"
         title={t('admin.lockers.title')}
@@ -134,13 +134,12 @@ const AdminLockersPage = () => {
               </div>
             ) : (
               <div className="overflow-hidden rounded-[10px] border border-border bg-surface/80">
-                <table className="w-full border-collapse text-left text-sm text-text">
+                <table className="w-full border-collapse text-left text-sm text-text p-[10px]">
                   <thead className="bg-surface-alt text-xs font-semibold uppercase tracking-[0.08em] text-text-subtle">
-                    <tr>
+                    <tr className="p-[10px]">
                       <th className="px-4 py-3">
                         {t('admin.lockers.lockerCodeLabel')}
                       </th>
-                      <th className="px-4 py-3">{t('admin.lockers.nameLabel')}</th>
                       <th className="px-4 py-3">
                         {t('admin.lockers.locationLabel')}
                       </th>
@@ -157,11 +156,8 @@ const AdminLockersPage = () => {
                       const location = locationMap.get(locker.location_id)
                       return (
                         <tr key={locker.locker_id} className="bg-surface/80">
-                          <td className="px-4 py-3 text-base font-semibold">
+                          <td className="px-4 py-3 text-text-muted font-semibold">
                             {locker.locker_code}
-                          </td>
-                          <td className="px-4 py-3 text-sm text-text-muted">
-                            {locker.name || '—'}
                           </td>
                           <td className="px-4 py-3 text-sm text-text-muted">
                             {location
@@ -169,13 +165,14 @@ const AdminLockersPage = () => {
                               : locker.location_id}
                           </td>
                           <td className="px-4 py-3 text-right">
-                            <span className="rounded-pill bg-secondary px-4 py-2 text-xs font-semibold text-text">
+                            <span className="rounded-pill bg-secondary px-4 py-2 text-xs font-semibold text-text p-[10px]">
                               {locker.status}
                             </span>
                           </td>
-                          <td className="px-4 py-3 text-right">
+                          <td className="px-4 py-3 text-right  p-[10px]">
                             <Button
                               variant="secondary"
+                              className=" p-[10px]"
                               size="md"
                               onClick={() =>
                                 navigate(

@@ -89,7 +89,7 @@ const AdminLockerCompartmentsPage = () => {
   }
 
   return (
-    <section className="flex flex-1 flex-col stack-admin-page">
+    <section className="flex flex-1 flex-col stack-admin-page p-[10px]">
       <PageHeader
         variant="admin"
         title={t('admin.compartments.title')}
@@ -97,12 +97,12 @@ const AdminLockerCompartmentsPage = () => {
         align="left"
       />
 
-      <Card density="cozy">
+      <Card density="cozy" className=" p-[10px]">
         <div className="stack-admin-section">
           {rows.map((row, index) => (
             <div
               key={`row-${index}`}
-              className="flex flex-col gap-3 rounded-control border border-border bg-surface/80 p-4 sm:flex-row sm:items-end"
+              className="flex flex-col gap-3 rounded-control border border-border bg-surface/80 p-4 sm:flex-row sm:items-end p-[10px]"
             >
               <div className="flex-1">
                 <Input
@@ -130,6 +130,7 @@ const AdminLockerCompartmentsPage = () => {
                   <option value="L">{t('common.sizes.L')}</option>
                 </select>
               </label>
+              <hr/>
               <Button
                 variant="secondary"
                 size="md"
@@ -153,7 +154,7 @@ const AdminLockerCompartmentsPage = () => {
         </div>
       </Card>
 
-      <Card title={t('admin.compartments.existingTitle')} density="cozy">
+      <Card title={t('admin.compartments.existingTitle')} density="cozy" className=" p-[10px]">
         <div className="stack-admin-section">
           {compartments.length === 0 ? (
             <p className="text-sm text-text-muted">{t('admin.compartments.empty')}</p>
@@ -161,15 +162,15 @@ const AdminLockerCompartmentsPage = () => {
             compartments.map((compartment) => (
               <div
                 key={compartment.compartment_id}
-                className="flex flex-wrap items-center justify-between gap-2 rounded-control border border-border bg-surface/80 p-4"
+                className="flex flex-wrap items-center justify-between gap-2 rounded-control border border-border bg-surface/80 p-4 p-[10px]"
               >
-                <div>
-                  <p className="text-base font-semibold">#{compartment.compartment_no}</p>
+                <div className="space-y-1 p-[10px]">
+                  <p className="text-text-muted font-semibold">#{compartment.compartment_no}</p>
                   <p className="text-sm text-text-muted">
                     {t('public.pickup.list.sizeLabel', { size: compartment.size })}
                   </p>
                 </div>
-                <span className="rounded-pill bg-secondary px-4 py-2 text-xs font-semibold text-text">
+                <span className="rounded-pill bg-secondary px-4 py-2 text-xs font-semibold text-text p-[10px]">
                   {compartment.status}
                 </span>
               </div>

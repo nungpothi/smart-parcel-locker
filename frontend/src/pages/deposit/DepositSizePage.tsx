@@ -74,7 +74,7 @@ const DepositSizePage = () => {
   }
 
   return (
-    <section className="flex flex-1 justify-center">
+    <section className="flex flex-1 justify-center p-[10px]">
       <div className="stack-page w-full">
         <PageHeader
           title={t('public.deposit.size.title')}
@@ -82,7 +82,7 @@ const DepositSizePage = () => {
           variant="public"
         />
 
-        <Card tone="muted" density="spacious" className="w-full max-w-3xl">
+        <Card tone="muted" density="spacious" className="w-full max-w-3xl p-[10px]">
           <div className="stack-section">
             <div className="selection-grid">
               {sizeOptions.map((option) => (

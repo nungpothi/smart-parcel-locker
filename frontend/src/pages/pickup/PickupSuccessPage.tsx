@@ -19,7 +19,7 @@ const PickupSuccessPage = () => {
   }
 
   return (
-    <section className="flex flex-1 justify-center">
+    <section className="flex flex-1 justify-center p-[10px]">
       <div className="stack-page w-full">
         <PageHeader
           title={t('public.pickup.success.title')}
@@ -27,9 +27,9 @@ const PickupSuccessPage = () => {
           variant="public"
         />
 
-        <Card tone="muted" density="spacious" className="w-full max-w-3xl">
+        <Card tone="muted" density="spacious" className="w-full max-w-3xl p-[10px]">
           <div className="stack-section items-center text-center">
-            <div className="flex h-28 w-28 items-center justify-center rounded-panel bg-surface text-3xl font-semibold shadow-panel">
+            <div className="flex h-28 w-28 items-center justify-center rounded-panel bg-surface text-3xl font-semibold shadow-panel p-[10px]">
               OK
             </div>
             <div className="stack-section">
@@ -43,7 +43,7 @@ const PickupSuccessPage = () => {
           </div>
 
           {selectedParcel && (
-            <div className="rounded-panel border border-border/70 bg-surface px-5 py-4">
+            <div className="rounded-panel border border-border/70 bg-surface px-5 py-4  p-[10px]">
               <p className="text-sm font-semibold uppercase tracking-[0.12em] text-text-subtle">
                 {t('public.pickup.success.parcelCodeLabel')}
               </p>
