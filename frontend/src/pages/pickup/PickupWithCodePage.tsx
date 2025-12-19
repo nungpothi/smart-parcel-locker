@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
@@ -6,23 +7,32 @@ import Button from '@/components/Button'
 import Card from '@/components/Card'
 import Input from '@/components/Input'
 import PageHeader from '@/components/PageHeader'
+import { useTranslation } from '@/i18n'
 import { usePickupStore } from '@/store/pickupStore'
 
-const phoneSchema = z
-  .string()
-  .min(9, 'Phone number must be at least 9 digits')
-  .regex(/^[0-9]+$/, 'Phone number must contain only digits')
-
-const formSchema = z.object({
-  phone: phoneSchema,
-  pickupCode: z.string().min(4, 'Pickup code must be at least 4 characters'),
-})
-
-type PickupWithCodeForm = z.infer<typeof formSchema>
+type PickupWithCodeForm = {
+  phone: string
+  pickupCode: string
+}
 
 const PickupWithCodePage = () => {
   const navigate = useNavigate()
+  const { t } = useTranslation()
   const { setPhone, setPickupCode, resetPickup } = usePickupStore()
+
+  const formSchema = useMemo(
+    () =>
+      z.object({
+        phone: z
+          .string()
+          .min(9, t('common.errors.phoneRequired'))
+          .regex(/^[0-9]+$/, t('common.errors.phoneDigits')),
+        pickupCode: z
+          .string()
+          .min(4, t('common.errors.pickupCodeLength')),
+      }),
+    [t],
+  )
 
   const {
     register,
@@ -48,8 +58,8 @@ const PickupWithCodePage = () => {
     <section className="flex flex-1 justify-center">
       <div className="stack-page w-full">
         <PageHeader
-          title="Enter your pickup code"
-          subtitle="Use the code we sent you to unlock your parcel safely."
+          title={t('public.pickup.code.title')}
+          subtitle={t('public.pickup.code.subtitle')}
           variant="public"
         />
 
@@ -57,8 +67,8 @@ const PickupWithCodePage = () => {
           <form className="form-shell" onSubmit={handleSubmit(onSubmit)}>
             <div className="stack-section">
               <Input
-                label="Pickup code"
-                placeholder="000000"
+                label={t('public.pickup.code.pickupCodeLabel')}
+                placeholder={t('public.pickup.code.pickupCodePlaceholder')}
                 inputMode="numeric"
                 autoComplete="one-time-code"
                 className="text-center text-3xl font-semibold tracking-[0.24em] leading-tight"
@@ -66,8 +76,8 @@ const PickupWithCodePage = () => {
                 error={errors.pickupCode?.message}
               />
               <Input
-                label="Phone number"
-                placeholder="Enter phone number"
+                label={t('public.pickup.code.phoneLabel')}
+                placeholder={t('public.pickup.code.phonePlaceholder')}
                 inputMode="tel"
                 autoComplete="tel"
                 {...register('phone')}
@@ -77,7 +87,7 @@ const PickupWithCodePage = () => {
 
             <div className="stack-actions">
               <Button type="submit" size="xl" fullWidth disabled={!isValid}>
-                Continue
+                {t('public.pickup.code.submit')}
               </Button>
             </div>
           </form>
@@ -87,9 +97,9 @@ const PickupWithCodePage = () => {
               variant="secondary"
               size="lg"
               fullWidth
-              onClick={() => navigate('/pickup')}
+              onClick={() => navigate('/')}
             >
-              Start over
+              {t('public.pickup.code.startOver')}
             </Button>
           </div>
         </Card>

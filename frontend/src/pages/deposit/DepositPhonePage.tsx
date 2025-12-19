@@ -8,24 +8,19 @@ import Button from '@/components/Button'
 import Card from '@/components/Card'
 import Input from '@/components/Input'
 import PageHeader from '@/components/PageHeader'
+import { useTranslation } from '@/i18n'
 import { fetchAvailableLockers, type AvailableLocker } from '@/services/api'
 import { useDepositStore } from '@/store/depositStore'
 
-const phoneSchema = z
-  .string()
-  .min(9, 'กรุณากรอกอย่างน้อย 9 หลัก')
-  .regex(/^[0-9]+$/, 'กรุณากรอกเฉพาะตัวเลข')
-
-const formSchema = z.object({
-  lockerId: z.string().min(1, 'กรุณาเลือกตู้'),
-  receiverPhone: phoneSchema,
-  senderPhone: phoneSchema,
-})
-
-type DepositPhoneForm = z.infer<typeof formSchema>
+type DepositPhoneForm = {
+  lockerId: string
+  receiverPhone: string
+  senderPhone: string
+}
 
 const DepositPhonePage = () => {
   const navigate = useNavigate()
+  const { t } = useTranslation()
   const {
     receiverPhone,
     senderPhone,
@@ -43,7 +38,7 @@ const DepositPhonePage = () => {
     () =>
       lockers.map((locker) => ({
         value: locker.locker_id,
-        label: `${locker.locker_code} • ${locker.location_name}`,
+        label: `${locker.locker_code} - ${locker.location_name}`,
       })),
     [lockers],
   )
@@ -56,13 +51,29 @@ const DepositPhonePage = () => {
         const response = await fetchAvailableLockers()
         setLockers(response.data?.data ?? [])
       } catch (err) {
-        setFetchError('โหลดรายการตู้ไม่สำเร็จ')
+        setFetchError(t('common.errors.generic'))
       } finally {
         setLoading(false)
       }
     }
     void load()
-  }, [])
+  }, [t])
+
+  const formSchema = useMemo(
+    () =>
+      z.object({
+        lockerId: z.string().min(1, t('common.errors.selectLocker')),
+        receiverPhone: z
+          .string()
+          .min(9, t('common.errors.phoneRequired'))
+          .regex(/^[0-9]+$/, t('common.errors.phoneDigits')),
+        senderPhone: z
+          .string()
+          .min(9, t('common.errors.phoneRequired'))
+          .regex(/^[0-9]+$/, t('common.errors.phoneDigits')),
+      }),
+    [t],
+  )
 
   const {
     register,
@@ -93,15 +104,15 @@ const DepositPhonePage = () => {
     <section className="flex flex-1 justify-center">
       <div className="stack-page w-full">
         <PageHeader
-          title="ฝากพัสดุ"
-          subtitle="เลือกตู้และกรอกข้อมูลติดต่อ"
+          title={t('public.deposit.phone.title')}
+          subtitle={t('public.deposit.phone.subtitle')}
           variant="public"
         />
 
         <Card tone="muted" density="spacious" className="w-full max-w-3xl">
           <form className="form-shell" onSubmit={handleSubmit(onSubmit)}>
             <div className="field-stack">
-              <span className="field-label">เลือกตู้</span>
+              <span className="field-label">{t('public.deposit.phone.lockerLabel')}</span>
               <select
                 className={clsx(
                   'form-control',
@@ -109,7 +120,7 @@ const DepositPhonePage = () => {
                 )}
                 {...register('lockerId')}
               >
-                <option value="">เลือกตู้</option>
+                <option value="">{t('public.deposit.phone.lockerPlaceholder')}</option>
                 {lockerOptions.map((locker) => (
                   <option key={locker.value} value={locker.value}>
                     {locker.label}
@@ -125,23 +136,23 @@ const DepositPhonePage = () => {
                 {fetchError ||
                   errors.lockerId?.message ||
                   (loading
-                    ? 'กำลังโหลดรายการตู้...'
+                    ? t('public.deposit.phone.loadingLockers')
                     : lockers.length === 0
-                      ? 'ไม่มีตู้ให้ใช้งาน กรุณาตั้งค่าผ่าน Admin ก่อน'
+                      ? t('public.deposit.phone.lockerEmpty')
                       : ' ')}
               </div>
             </div>
 
             <Input
-              label="เบอร์ผู้รับ"
-              placeholder="กรอกเบอร์ผู้รับ"
+              label={t('public.deposit.phone.receiverLabel')}
+              placeholder={t('public.deposit.phone.receiverPlaceholder')}
               inputMode="numeric"
               {...register('receiverPhone')}
               error={errors.receiverPhone?.message}
             />
             <Input
-              label="เบอร์ผู้ส่ง"
-              placeholder="กรอกเบอร์ผู้ส่ง"
+              label={t('public.deposit.phone.senderLabel')}
+              placeholder={t('public.deposit.phone.senderPlaceholder')}
               inputMode="numeric"
               {...register('senderPhone')}
               error={errors.senderPhone?.message}
@@ -154,7 +165,7 @@ const DepositPhonePage = () => {
                 fullWidth
                 disabled={!isValid || loading || lockers.length === 0}
               >
-                ถัดไป
+                {t('public.deposit.phone.submit')}
               </Button>
               <Button
                 type="button"
@@ -163,7 +174,7 @@ const DepositPhonePage = () => {
                 fullWidth
                 onClick={() => navigate('/')}
               >
-                ย้อนกลับ
+                {t('public.deposit.phone.cancel')}
               </Button>
             </div>
           </form>

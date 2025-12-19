@@ -1,11 +1,13 @@
-import { useNavigate } from 'react'
+import { useNavigate } from 'react-router-dom'
 import Button from '@/components/Button'
 import Card from '@/components/Card'
 import PageHeader from '@/components/PageHeader'
+import { useTranslation } from '@/i18n'
 import { usePickupStore } from '@/store/pickupStore'
 
 const PickupSuccessPage = () => {
   const navigate = useNavigate()
+  const { t } = useTranslation()
   const { parcels, selectedParcelId, resetPickup } = usePickupStore()
   const selectedParcel = parcels.find(
     (parcel) => parcel.parcel_id === selectedParcelId,
@@ -20,8 +22,8 @@ const PickupSuccessPage = () => {
     <section className="flex flex-1 justify-center">
       <div className="stack-page w-full">
         <PageHeader
-          title="Pickup confirmed"
-          subtitle="Your parcel is ready. No further steps are needed."
+          title={t('public.pickup.success.title')}
+          subtitle={t('public.pickup.success.subtitle')}
           variant="public"
         />
 
@@ -31,9 +33,11 @@ const PickupSuccessPage = () => {
               OK
             </div>
             <div className="stack-section">
-              <p className="text-3xl font-semibold text-text">Pickup complete</p>
+              <p className="text-3xl font-semibold text-text">
+                {t('public.pickup.success.headline')}
+              </p>
               <p className="text-lg text-text-muted">
-                You can close the locker and remove your parcel.
+                {t('public.pickup.success.body')}
               </p>
             </div>
           </div>
@@ -41,7 +45,7 @@ const PickupSuccessPage = () => {
           {selectedParcel && (
             <div className="rounded-panel border border-border/70 bg-surface px-5 py-4">
               <p className="text-sm font-semibold uppercase tracking-[0.12em] text-text-subtle">
-                Parcel code
+                {t('public.pickup.success.parcelCodeLabel')}
               </p>
               <p className="mt-2 text-2xl font-semibold text-text">
                 {selectedParcel.parcel_code}
@@ -51,7 +55,7 @@ const PickupSuccessPage = () => {
 
           <div className="section-divider stack-actions">
             <Button fullWidth size="xl" onClick={handleBack}>
-              Finish
+              {t('public.pickup.success.finish')}
             </Button>
           </div>
         </Card>

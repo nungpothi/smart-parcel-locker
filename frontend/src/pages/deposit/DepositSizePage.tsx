@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import Button from '@/components/Button'
 import Card from '@/components/Card'
 import PageHeader from '@/components/PageHeader'
+import { useTranslation } from '@/i18n'
 import { depositParcel } from '@/services/api'
 import { type DepositSize, useDepositStore } from '@/store/depositStore'
 
@@ -11,6 +12,7 @@ const sizeOptions: DepositSize[] = ['S', 'M', 'L']
 
 const DepositSizePage = () => {
   const navigate = useNavigate()
+  const { t } = useTranslation()
   const {
     size,
     lockerId,
@@ -27,7 +29,7 @@ const DepositSizePage = () => {
 
   const handleConfirm = async () => {
     if (!size || !lockerId || !receiverPhone || !senderPhone) {
-      setError('กรุณากรอกข้อมูลให้ครบก่อนยืนยัน')
+      setError(t('public.deposit.size.error'))
       return
     }
     setSubmitting(true)
@@ -54,17 +56,17 @@ const DepositSizePage = () => {
       const status = axios.isAxiosError(err) ? err.response?.status : undefined
       switch (status) {
         case 400:
-          setError('ข้อมูลไม่ถูกต้อง กรุณาตรวจสอบอีกครั้ง')
+          setError(t('common.errors.missingData'))
           break
         case 404:
-          setError('ไม่พบตู้ กรุณาเลือกใหม่')
+          setError(t('public.pickup.otp.notFound'))
           break
         case 409:
-          setError('ตู้ไม่พร้อมใช้งาน หรือไม่มีช่องว่างในขนาดที่เลือก')
+          setError(t('public.pickup.otp.used'))
           break
         case 500:
         default:
-          setError('ระบบขัดข้อง กรุณาลองใหม่')
+          setError(t('common.errors.generic'))
       }
     } finally {
       setSubmitting(false)
@@ -75,8 +77,8 @@ const DepositSizePage = () => {
     <section className="flex flex-1 justify-center">
       <div className="stack-page w-full">
         <PageHeader
-          title="เลือกขนาดช่อง"
-          subtitle="เลือกขนาดช่องที่ต้องการให้เหมาะสมกับพัสดุ"
+          title={t('public.deposit.size.title')}
+          subtitle={t('public.deposit.size.subtitle')}
           variant="public"
         />
 
@@ -117,7 +119,9 @@ const DepositSizePage = () => {
                 onClick={handleConfirm}
                 disabled={!canSubmit || isSubmitting}
               >
-                {isSubmitting ? 'กำลังยืนยัน...' : 'ยืนยันขนาด'}
+                {isSubmitting
+                  ? t('public.deposit.size.submitting')
+                  : t('public.deposit.size.submit')}
               </Button>
             </div>
           </div>

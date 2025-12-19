@@ -4,10 +4,12 @@ import Button from '@/components/Button'
 import Card from '@/components/Card'
 import Input from '@/components/Input'
 import PageHeader from '@/components/PageHeader'
+import { useTranslation } from '@/i18n'
 import { createLocation, fetchLocations, type Location } from '@/services/api'
 
 const AdminLocationsPage = () => {
   const navigate = useNavigate()
+  const { t } = useTranslation()
   const [code, setCode] = useState('')
   const [name, setName] = useState('')
   const [address, setAddress] = useState('')
@@ -21,7 +23,7 @@ const AdminLocationsPage = () => {
       const response = await fetchLocations()
       setLocations(response.data.data ?? [])
     } catch (err) {
-      setError('Failed to load locations.')
+      setError(t('common.errors.generic'))
     }
   }
 
@@ -31,7 +33,7 @@ const AdminLocationsPage = () => {
 
   const handleCreate = async () => {
     if (!code || !name) {
-      setError('Code and name are required.')
+      setError(t('common.errors.missingData'))
       return
     }
     setLoading(true)
@@ -47,7 +49,7 @@ const AdminLocationsPage = () => {
       setAddress('')
       await loadLocations()
     } catch (err) {
-      setError('Failed to create location.')
+      setError(t('common.errors.generic'))
     } finally {
       setLoading(false)
     }
@@ -57,29 +59,28 @@ const AdminLocationsPage = () => {
     <section className="flex flex-1 flex-col gap-6">
       <PageHeader
         variant="admin"
-        title="Locations"
-        subtitle="สร้างและจัดการข้อมูลสถานที่"
+        title={t('admin.locations.title')}
+        subtitle={t('admin.locations.subtitle')}
         align="left"
       />
 
       <Card density="cozy">
-
         <div className="space-y-4">
           <Input
-            label="Code"
-            placeholder="LOC-001"
+            label={t('admin.locations.codeLabel')}
+            placeholder={t('admin.locations.codePlaceholder')}
             value={code}
             onChange={(event) => setCode(event.target.value)}
           />
           <Input
-            label="Name"
-            placeholder="Main Hub"
+            label={t('admin.locations.nameLabel')}
+            placeholder={t('admin.locations.namePlaceholder')}
             value={name}
             onChange={(event) => setName(event.target.value)}
           />
           <Input
-            label="Address (optional)"
-            placeholder="Address"
+            label={t('admin.locations.addressLabel')}
+            placeholder={t('admin.locations.addressPlaceholder')}
             value={address}
             onChange={(event) => setAddress(event.target.value)}
           />
@@ -87,15 +88,15 @@ const AdminLocationsPage = () => {
           {error && <p className="text-sm text-danger">{error}</p>}
 
           <Button fullWidth onClick={handleCreate} disabled={loading}>
-            Create Location
+            {t('admin.locations.create')}
           </Button>
         </div>
       </Card>
 
-      <Card title="Existing Locations" density="cozy">
+      <Card title={t('admin.locations.existingTitle')} density="cozy">
         <div className="space-y-3">
           {locations.length === 0 ? (
-            <p className="text-sm text-text-muted">No locations yet.</p>
+            <p className="text-sm text-text-muted">{t('admin.locations.empty')}</p>
           ) : (
             locations.map((location) => (
               <div
@@ -107,7 +108,9 @@ const AdminLocationsPage = () => {
                   <p className="text-sm text-text-muted">{location.name}</p>
                 </div>
                 <span className="rounded-pill bg-secondary px-4 py-2 text-xs font-semibold text-text">
-                  {location.is_active ? 'Active' : 'Inactive'}
+                  {location.is_active
+                    ? t('admin.locations.active')
+                    : t('admin.locations.inactive')}
                 </span>
               </div>
             ))
@@ -117,10 +120,10 @@ const AdminLocationsPage = () => {
 
       <div className="space-y-3">
         <Button variant="secondary" fullWidth onClick={() => navigate('/admin')}>
-          Back to Admin Home
+          {t('common.actions.backToAdminHome')}
         </Button>
         <Button variant="secondary" fullWidth onClick={() => navigate('/')}>
-          Back to Home
+          {t('common.actions.backToHome')}
         </Button>
       </div>
     </section>

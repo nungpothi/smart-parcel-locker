@@ -4,6 +4,7 @@ import Button from '@/components/Button'
 import Card from '@/components/Card'
 import Input from '@/components/Input'
 import PageHeader from '@/components/PageHeader'
+import { useTranslation } from '@/i18n'
 import {
   createLocker,
   fetchLockers,
@@ -14,6 +15,7 @@ import {
 
 const AdminLockersPage = () => {
   const navigate = useNavigate()
+  const { t } = useTranslation()
   const [locations, setLocations] = useState<Location[]>([])
   const [lockers, setLockers] = useState<Locker[]>([])
   const [locationId, setLocationId] = useState('')
@@ -36,7 +38,7 @@ const AdminLockersPage = () => {
       setLocations(locationsResponse.data.data ?? [])
       setLockers(lockersResponse.data.data ?? [])
     } catch (err) {
-      setError('Failed to load lockers or locations.')
+      setError(t('common.errors.generic'))
     }
   }
 
@@ -46,7 +48,7 @@ const AdminLockersPage = () => {
 
   const handleCreate = async () => {
     if (!locationId || !lockerCode) {
-      setError('Location and locker code are required.')
+      setError(t('common.errors.missingData'))
       return
     }
     setLoading(true)
@@ -61,7 +63,7 @@ const AdminLockersPage = () => {
       setName('')
       await loadData()
     } catch (err) {
-      setError('Failed to create locker.')
+      setError(t('common.errors.generic'))
     } finally {
       setLoading(false)
     }
@@ -71,8 +73,8 @@ const AdminLockersPage = () => {
     <section className="flex flex-1 flex-col gap-6">
       <PageHeader
         variant="admin"
-        title="Lockers"
-        subtitle="กำหนดตู้พัสดุและเชื่อมกับสถานที่"
+        title={t('admin.lockers.title')}
+        subtitle={t('admin.lockers.subtitle')}
         align="left"
       />
 
@@ -80,14 +82,14 @@ const AdminLockersPage = () => {
         <div className="space-y-4">
           <label className="block text-left">
             <span className="text-sm font-semibold text-text-muted">
-              Location
+              {t('admin.lockers.locationLabel')}
             </span>
             <select
               className="mt-2 min-h-[52px] w-full rounded-control border border-border bg-surface px-4 py-3 text-lg text-text focus:border-primary-strong focus:outline-none focus:ring-2 focus:ring-ring/30"
               value={locationId}
               onChange={(event) => setLocationId(event.target.value)}
             >
-              <option value="">Select location</option>
+              <option value="">{t('admin.lockers.locationPlaceholder')}</option>
               {locations.map((location) => (
                 <option key={location.location_id} value={location.location_id}>
                   {location.code} - {location.name}
@@ -97,14 +99,14 @@ const AdminLockersPage = () => {
           </label>
 
           <Input
-            label="Locker Code"
-            placeholder="LCK-001"
+            label={t('admin.lockers.lockerCodeLabel')}
+            placeholder={t('admin.lockers.lockerCodePlaceholder')}
             value={lockerCode}
             onChange={(event) => setLockerCode(event.target.value)}
           />
           <Input
-            label="Name (optional)"
-            placeholder="Lobby Locker"
+            label={t('admin.lockers.nameLabel')}
+            placeholder={t('admin.lockers.namePlaceholder')}
             value={name}
             onChange={(event) => setName(event.target.value)}
           />
@@ -112,15 +114,15 @@ const AdminLockersPage = () => {
           {error && <p className="text-sm text-danger">{error}</p>}
 
           <Button fullWidth onClick={handleCreate} disabled={loading}>
-            Create Locker
+            {t('admin.lockers.create')}
           </Button>
         </div>
       </Card>
 
-      <Card title="Existing Lockers" density="cozy">
+      <Card title={t('admin.lockers.existingTitle')} density="cozy">
         <div className="space-y-3">
           {lockers.length === 0 ? (
-            <p className="text-sm text-text-muted">No lockers yet.</p>
+            <p className="text-sm text-text-muted">{t('admin.lockers.empty')}</p>
           ) : (
             lockers.map((locker) => {
               const location = locationMap.get(locker.location_id)
@@ -146,7 +148,7 @@ const AdminLockersPage = () => {
                         navigate(`/admin/lockers/${locker.locker_id}/compartments`)
                       }
                     >
-                      Manage Compartments
+                      {t('admin.lockers.manageCompartments')}
                     </Button>
                   </div>
                 </div>
@@ -158,10 +160,10 @@ const AdminLockersPage = () => {
 
       <div className="space-y-3">
         <Button variant="secondary" fullWidth onClick={() => navigate('/admin')}>
-          Back to Admin Home
+          {t('common.actions.backToAdminHome')}
         </Button>
         <Button variant="secondary" fullWidth onClick={() => navigate('/')}>
-          Back to Home
+          {t('common.actions.backToHome')}
         </Button>
       </div>
     </section>

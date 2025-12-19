@@ -87,3 +87,10 @@ This app relies on Tailwind + CSS variables to generate all utility classes and 
 - Center the success message in a `stack-section` with a simple badge or glyph (no new icons required) and calm headline/body pairing (`text-3xl`/`text-lg`) to be readable at kiosk distance.
 - Keep any supporting parcel detail in a subtle bordered panel beneath the message; use uppercase label chips and semibold code text to confirm the right parcel without crowding the hero message.
 - Place a single primary end-of-flow CTA in a `section-divider` + `stack-actions` block to separate it from the message and maintain a low-density finish; avoid secondary actions.
+
+## Language switch & i18n
+- The language switcher lives inside both layouts: top-right in `PublicLayout` (touch-friendly pills) and beside the header in `AdminLayout` (compact pills). Do not add per-page switches.
+- Keep the switch visible but low emphasis; use outline/primary pills within a subtle pill container (border + soft shadow) and avoid crowding primary actions.
+- All user-facing text must use i18n keys from `src/i18n/translations.ts` via `useTranslation().t(...)`. Do not hardcode strings in components.
+- To add copy: create a semantic key under `common`, `public.*`, or `admin.*`, provide both `th` (default) and `en` strings, then consume with `t('path.to.key')`. Use `{placeholder}` tokens for interpolated values.
+- To add a new language: extend `SUPPORTED_LANGUAGES`, add translations for every existing key, and ensure `DEFAULT_LANGUAGE`/`FALLBACK_LANGUAGE` are set appropriately.

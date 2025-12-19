@@ -6,11 +6,13 @@ import { useNavigate } from 'react-router-dom'
 import Button from '@/components/Button'
 import Card from '@/components/Card'
 import PageHeader from '@/components/PageHeader'
+import { useTranslation } from '@/i18n'
 import { confirmPickup, fetchPickupParcels } from '@/services/api'
 import { usePickupStore } from '@/store/pickupStore'
 
 const PickupParcelListPage = () => {
   const navigate = useNavigate()
+  const { t } = useTranslation()
   const {
     pickupToken,
     parcels,
@@ -38,23 +40,19 @@ const PickupParcelListPage = () => {
       const status = axios.isAxiosError(err) ? err.response?.status : undefined
       switch (status) {
         case 401:
-          setError('Session expired. Please verify again.')
-          setPickupToken(null, null)
-          navigate('/pickup/otp')
-          break
         case 410:
-          setError('Session expired. Please verify again.')
+          setError(t('common.errors.sessionExpired'))
           setPickupToken(null, null)
           navigate('/pickup/otp')
           break
         case 500:
         default:
-          setError('Something went wrong. Please try again.')
+          setError(t('common.errors.generic'))
       }
     } finally {
       setLoadingParcels(false)
     }
-  }, [navigate, pickupToken, selectParcel, setError, setLoadingParcels, setParcels, setPickupToken])
+  }, [navigate, pickupToken, selectParcel, setError, setLoadingParcels, setParcels, setPickupToken, t])
 
   useEffect(() => {
     if (!pickupToken) {
@@ -75,30 +73,26 @@ const PickupParcelListPage = () => {
       const status = axios.isAxiosError(err) ? err.response?.status : undefined
       switch (status) {
         case 400:
-          setError('This parcel cannot be picked up right now.')
+          setError(t('common.errors.missingData'))
           break
         case 401:
-          setError('Session expired. Please verify again.')
+        case 410:
+          setError(t('common.errors.sessionExpired'))
           setPickupToken(null, null)
           navigate('/pickup/otp')
           break
         case 403:
-          setError('You are not allowed to pick up this parcel.')
+          setError(t('common.errors.generic'))
           break
         case 404:
-          setError('Parcel not found.')
+          setError(t('public.pickup.otp.notFound'))
           break
         case 409:
-          setError('This parcel is already being picked up.')
-          break
-        case 410:
-          setError('Session expired. Please verify again.')
-          setPickupToken(null, null)
-          navigate('/pickup/otp')
+          setError(t('public.pickup.otp.used'))
           break
         case 500:
         default:
-          setError('Something went wrong. Please try again.')
+          setError(t('common.errors.generic'))
       }
     } finally {
       setConfirming(false)
@@ -111,19 +105,21 @@ const PickupParcelListPage = () => {
     <section className="flex flex-1 justify-center">
       <div className="stack-page w-full">
         <PageHeader
-          title="Select your parcel"
-          subtitle="Choose the parcel you want to pick up now."
+          title={t('public.pickup.list.title')}
+          subtitle={t('public.pickup.list.subtitle')}
           variant="public"
         />
 
         <Card tone="muted" density="spacious" className="w-full max-w-4xl">
           <div className="stack-section">
             <p className="text-center text-base text-text-muted">
-              Tap the parcel that matches your pickup code.
+              {t('public.pickup.list.helper')}
             </p>
 
             {isLoadingParcels && (
-              <p className="text-center text-base text-text-muted">Loading parcels...</p>
+              <p className="text-center text-base text-text-muted">
+                {t('public.pickup.list.loading')}
+              </p>
             )}
 
             {errorMessage && (
@@ -134,7 +130,7 @@ const PickupParcelListPage = () => {
 
             {!isLoadingParcels && !errorMessage && !hasParcels && (
               <p className="text-center text-base text-text-muted">
-                No parcels available right now.
+                {t('public.pickup.list.empty')}
               </p>
             )}
 
@@ -160,12 +156,14 @@ const PickupParcelListPage = () => {
                         <p className="text-xl font-semibold text-text">{parcel.parcel_code}</p>
                         {parcel.expires_at && (
                           <p className="text-base text-text-subtle">
-                            Expires {dayjs(parcel.expires_at).format('DD/MM/YYYY HH:mm')}
+                            {t('public.pickup.list.expiresAt', {
+                              datetime: dayjs(parcel.expires_at).format('DD/MM/YYYY HH:mm'),
+                            })}
                           </p>
                         )}
                       </div>
                       <span className="rounded-pill bg-secondary px-4 py-2 text-sm font-semibold uppercase tracking-[0.12em] text-text">
-                        Size {parcel.size}
+                        {t('public.pickup.list.sizeLabel', { size: parcel.size })}
                       </span>
                     </button>
                   )
@@ -177,7 +175,7 @@ const PickupParcelListPage = () => {
           <div className="section-divider stack-actions">
             {!isLoadingParcels && !hasParcels && !errorMessage ? (
               <Button fullWidth size="xl" onClick={() => navigate('/')}>
-                Start over
+                {t('common.actions.startOver')}
               </Button>
             ) : (
               <Button
@@ -186,7 +184,9 @@ const PickupParcelListPage = () => {
                 onClick={handleConfirm}
                 disabled={!selectedParcelId || isConfirming || isLoadingParcels}
               >
-                {isConfirming ? 'Confirming...' : 'Continue'}
+                {isConfirming
+                  ? t('public.pickup.list.confirming')
+                  : t('public.pickup.list.confirm')}
               </Button>
             )}
 
@@ -198,7 +198,7 @@ const PickupParcelListPage = () => {
                 onClick={loadParcels}
                 disabled={isLoadingParcels}
               >
-                Refresh list
+                {t('public.pickup.list.refresh')}
               </Button>
             )}
 
@@ -209,7 +209,7 @@ const PickupParcelListPage = () => {
               onClick={() => navigate('/pickup/otp')}
               disabled={isConfirming}
             >
-              Back
+              {t('public.pickup.list.back')}
             </Button>
           </div>
         </Card>

@@ -2,16 +2,18 @@ import { useNavigate } from 'react-router-dom'
 import Button from '@/components/Button'
 import Card from '@/components/Card'
 import PageHeader from '@/components/PageHeader'
+import { useTranslation } from '@/i18n'
 
 const PickupHomePage = () => {
   const navigate = useNavigate()
+  const { t } = useTranslation()
 
   return (
     <section className="flex flex-1 justify-center">
       <div className="stack-page w-full">
         <PageHeader
-          title="Pick up your parcel"
-          subtitle="Choose how you want to verify yourself to open the locker."
+          title={t('public.pickup.home.title')}
+          subtitle={t('public.pickup.home.subtitle')}
           variant="public"
         />
 
@@ -24,10 +26,10 @@ const PickupHomePage = () => {
                 onClick={() => navigate('/pickup/code')}
               >
                 <span className="text-2xl font-semibold leading-snug">
-                  Enter pickup code
+                  {t('public.pickup.home.byCodeLabel')}
                 </span>
                 <span className="text-base font-medium text-text-muted">
-                  Use the 6-digit code we sent you
+                  {t('public.pickup.home.byCodeHelper')}
                 </span>
               </button>
               <button
@@ -36,10 +38,10 @@ const PickupHomePage = () => {
                 onClick={() => navigate('/pickup/phone')}
               >
                 <span className="text-2xl font-semibold leading-snug">
-                  Verify by phone number
+                  {t('public.pickup.home.byPhoneLabel')}
                 </span>
                 <span className="text-base font-medium text-text-muted">
-                  Receive a one-time code by SMS
+                  {t('public.pickup.home.byPhoneHelper')}
                 </span>
               </button>
             </div>
@@ -51,7 +53,7 @@ const PickupHomePage = () => {
                 fullWidth
                 onClick={() => navigate('/')}
               >
-                Start over
+                {t('public.pickup.home.startOver')}
               </Button>
             </div>
           </div>

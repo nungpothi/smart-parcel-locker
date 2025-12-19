@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 import axios from 'axios'
 import clsx from 'clsx'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -9,22 +9,17 @@ import Button from '@/components/Button'
 import Card from '@/components/Card'
 import Input from '@/components/Input'
 import PageHeader from '@/components/PageHeader'
+import { useTranslation } from '@/i18n'
 import { requestPickupOtp } from '@/services/api'
 import { usePickupStore } from '@/store/pickupStore'
 
-const phoneSchema = z
-  .string()
-  .min(9, 'Phone number must be at least 9 digits')
-  .regex(/^[0-9]+$/, 'Phone number must contain only digits')
-
-const formSchema = z.object({
-  phone: phoneSchema,
-})
-
-type PickupPhoneForm = z.infer<typeof formSchema>
+type PickupPhoneForm = {
+  phone: string
+}
 
 const PickupWithPhonePage = () => {
   const navigate = useNavigate()
+  const { t } = useTranslation()
   const {
     setPhone,
     setPickupCode,
@@ -36,6 +31,17 @@ const PickupWithPhonePage = () => {
     isSubmitting,
     errorMessage,
   } = usePickupStore()
+
+  const formSchema = useMemo(
+    () =>
+      z.object({
+        phone: z
+          .string()
+          .min(9, t('common.errors.phoneRequired'))
+          .regex(/^[0-9]+$/, t('common.errors.phoneDigits')),
+      }),
+    [t],
+  )
 
   const {
     register,
@@ -72,14 +78,14 @@ const PickupWithPhonePage = () => {
       const status = axios.isAxiosError(err) ? err.response?.status : undefined
       switch (status) {
         case 400:
-          setError('Invalid phone number. Please check and try again.')
+          setError(t('common.errors.phoneRequired'))
           break
         case 429:
-          setError('Too many requests. Please wait before requesting another code.')
+          setError(t('public.pickup.phone.rateLimit'))
           break
         case 500:
         default:
-          setError('Something went wrong. Please try again.')
+          setError(t('common.errors.generic'))
       }
     } finally {
       setSubmitting(false)
@@ -90,8 +96,8 @@ const PickupWithPhonePage = () => {
     <section className="flex flex-1 justify-center">
       <div className="stack-page w-full">
         <PageHeader
-          title="Verify with your phone number"
-          subtitle="Enter your phone number to receive a one-time code for pickup."
+          title={t('public.pickup.phone.title')}
+          subtitle={t('public.pickup.phone.subtitle')}
           variant="public"
         />
 
@@ -99,11 +105,11 @@ const PickupWithPhonePage = () => {
           <form className="form-shell" onSubmit={handleSubmit(onSubmit)}>
             <div className="stack-section">
               <p className="text-base text-text-muted">
-                We only use this number to send your pickup code.
+                {t('public.pickup.phone.helper')}
               </p>
               <Input
-                label="Phone number"
-                placeholder="Enter phone number"
+                label={t('public.pickup.phone.phoneLabel')}
+                placeholder={t('public.pickup.phone.phonePlaceholder')}
                 inputMode="tel"
                 autoComplete="tel"
                 className="text-center text-2xl font-semibold tracking-[0.12em]"
@@ -128,7 +134,9 @@ const PickupWithPhonePage = () => {
                 fullWidth
                 disabled={!isValid || isSubmitting}
               >
-                {isSubmitting ? 'Sending code...' : 'Send code'}
+                {isSubmitting
+                  ? t('public.pickup.phone.sendingCode')
+                  : t('public.pickup.phone.sendCode')}
               </Button>
             </div>
           </form>
@@ -140,7 +148,7 @@ const PickupWithPhonePage = () => {
               fullWidth
               onClick={() => navigate('/pickup')}
             >
-              Start over
+              {t('public.pickup.phone.startOver')}
             </Button>
           </div>
         </Card>

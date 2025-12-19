@@ -2,29 +2,31 @@ import { useNavigate } from 'react-router-dom'
 import Button from '@/components/Button'
 import Card from '@/components/Card'
 import PageHeader from '@/components/PageHeader'
+import { useTranslation } from '@/i18n'
 
 const AdminHomePage = () => {
   const navigate = useNavigate()
+  const { t } = useTranslation()
 
   return (
     <section className="flex flex-1 flex-col gap-6">
       <PageHeader
         variant="admin"
-        title="Admin Setup"
-        subtitle="ตั้งค่าสถานที่และตู้พัสดุ"
+        title={t('admin.home.title')}
+        subtitle={t('admin.home.subtitle')}
         align="left"
       />
 
       <Card density="cozy">
         <div className="space-y-4">
           <Button fullWidth onClick={() => navigate('/admin/locations')}>
-            Locations
+            {t('admin.home.locations')}
           </Button>
           <Button fullWidth onClick={() => navigate('/admin/lockers')}>
-            Lockers
+            {t('admin.home.lockers')}
           </Button>
           <Button variant="secondary" fullWidth onClick={() => navigate('/')}>
-            Back to Home
+            {t('common.actions.backToHome')}
           </Button>
         </div>
       </Card>

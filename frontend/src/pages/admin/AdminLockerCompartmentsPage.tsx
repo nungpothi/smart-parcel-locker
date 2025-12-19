@@ -4,6 +4,7 @@ import Button from '@/components/Button'
 import Card from '@/components/Card'
 import Input from '@/components/Input'
 import PageHeader from '@/components/PageHeader'
+import { useTranslation } from '@/i18n'
 import {
   createCompartments,
   fetchCompartments,
@@ -20,6 +21,7 @@ const emptyRow = (): Row => ({ compartmentNo: '', size: 'S' })
 const AdminLockerCompartmentsPage = () => {
   const navigate = useNavigate()
   const { lockerId } = useParams()
+  const { t } = useTranslation()
   const [rows, setRows] = useState<Row[]>([emptyRow()])
   const [compartments, setCompartments] = useState<Compartment[]>([])
   const [error, setError] = useState('')
@@ -32,7 +34,7 @@ const AdminLockerCompartmentsPage = () => {
       const response = await fetchCompartments(lockerId)
       setCompartments(response.data.data ?? [])
     } catch (err) {
-      setError('Failed to load compartments.')
+      setError(t('common.errors.generic'))
     }
   }
 
@@ -58,7 +60,7 @@ const AdminLockerCompartmentsPage = () => {
 
   const handleGenerate = async () => {
     if (!lockerId) {
-      setError('Locker not found.')
+      setError(t('common.errors.generic'))
       return
     }
     const payloadRows = rows
@@ -69,7 +71,7 @@ const AdminLockerCompartmentsPage = () => {
       .filter((row) => Number.isFinite(row.compartment_no) && row.compartment_no > 0)
 
     if (payloadRows.length === 0) {
-      setError('Enter at least one valid compartment number.')
+      setError(t('common.errors.missingData'))
       return
     }
 
@@ -80,7 +82,7 @@ const AdminLockerCompartmentsPage = () => {
       setRows([emptyRow()])
       await loadCompartments()
     } catch (err) {
-      setError('Failed to generate compartments.')
+      setError(t('common.errors.generic'))
     } finally {
       setLoading(false)
     }
@@ -90,8 +92,8 @@ const AdminLockerCompartmentsPage = () => {
     <section className="flex flex-1 flex-col gap-6">
       <PageHeader
         variant="admin"
-        title="Generate Compartments"
-        subtitle="กำหนดหมายเลขช่องและขนาดสำหรับตู้"
+        title={t('admin.compartments.title')}
+        subtitle={t('admin.compartments.subtitle')}
         align="left"
       />
 
@@ -104,8 +106,8 @@ const AdminLockerCompartmentsPage = () => {
             >
               <div className="flex-1">
                 <Input
-                  label="Compartment No"
-                  placeholder="1"
+                  label={t('admin.compartments.compartmentNoLabel')}
+                  placeholder={t('admin.compartments.compartmentNoPlaceholder')}
                   inputMode="numeric"
                   value={row.compartmentNo}
                   onChange={(event) =>
@@ -115,16 +117,16 @@ const AdminLockerCompartmentsPage = () => {
               </div>
               <label className="block w-full sm:w-40">
                 <span className="text-sm font-semibold text-text-muted">
-                  Size
+                  {t('admin.compartments.sizeLabel')}
                 </span>
                 <select
                   className="mt-2 min-h-[52px] w-full rounded-control border border-border bg-surface px-4 py-3 text-lg text-text focus:border-primary-strong focus:outline-none focus:ring-2 focus:ring-ring/30"
                   value={row.size}
                   onChange={(event) => updateRow(index, 'size', event.target.value)}
                 >
-                  <option value="S">S</option>
-                  <option value="M">M</option>
-                  <option value="L">L</option>
+                  <option value="S">{t('common.sizes.S')}</option>
+                  <option value="M">{t('common.sizes.M')}</option>
+                  <option value="L">{t('common.sizes.L')}</option>
                 </select>
               </label>
               <Button
@@ -133,27 +135,27 @@ const AdminLockerCompartmentsPage = () => {
                 onClick={() => removeRow(index)}
                 disabled={rows.length === 1}
               >
-                Remove
+                {t('admin.compartments.removeRow')}
               </Button>
             </div>
           ))}
 
           <Button variant="secondary" fullWidth onClick={addRow}>
-            Add Row
+            {t('admin.compartments.addRow')}
           </Button>
 
           {error && <p className="text-sm text-danger">{error}</p>}
 
           <Button fullWidth onClick={handleGenerate} disabled={loading}>
-            Generate
+            {t('admin.compartments.generate')}
           </Button>
         </div>
       </Card>
 
-      <Card title="Existing Compartments" density="cozy">
+      <Card title={t('admin.compartments.existingTitle')} density="cozy">
         <div className="space-y-3">
           {compartments.length === 0 ? (
-            <p className="text-sm text-text-muted">No compartments yet.</p>
+            <p className="text-sm text-text-muted">{t('admin.compartments.empty')}</p>
           ) : (
             compartments.map((compartment) => (
               <div
@@ -162,7 +164,9 @@ const AdminLockerCompartmentsPage = () => {
               >
                 <div>
                   <p className="text-base font-semibold">#{compartment.compartment_no}</p>
-                  <p className="text-sm text-text-muted">Size {compartment.size}</p>
+                  <p className="text-sm text-text-muted">
+                    {t('public.pickup.list.sizeLabel', { size: compartment.size })}
+                  </p>
                 </div>
                 <span className="rounded-pill bg-secondary px-4 py-2 text-xs font-semibold text-text">
                   {compartment.status}
@@ -175,10 +179,10 @@ const AdminLockerCompartmentsPage = () => {
 
       <div className="space-y-3">
         <Button variant="secondary" fullWidth onClick={() => navigate('/admin/lockers')}>
-          Back to Lockers
+          {t('admin.compartments.backLockers')}
         </Button>
         <Button variant="secondary" fullWidth onClick={() => navigate('/admin')}>
-          Back to Admin Home
+          {t('common.actions.backToAdminHome')}
         </Button>
       </div>
     </section>
