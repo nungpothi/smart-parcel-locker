@@ -7,33 +7,56 @@ const PickupHomePage = () => {
   const navigate = useNavigate()
 
   return (
-    <section className="flex flex-1 flex-col justify-center gap-6">
-      <PageHeader
-        title="รับพัสดุ"
-        subtitle="เลือกรูปแบบการรับพัสดุที่สะดวก"
-        variant="public"
-      />
+    <section className="flex flex-1 justify-center">
+      <div className="stack-page w-full">
+        <PageHeader
+          title="Pick up your parcel"
+          subtitle="Choose how you want to verify yourself to open the locker."
+          variant="public"
+        />
 
-      <Card>
-        <div className="space-y-4">
-          <Button fullWidth onClick={() => navigate('/pickup/code')}>
-            มีรหัสรับพัสดุ
-          </Button>
-          <Button
-            variant="secondary"
-            fullWidth
-            onClick={() => navigate('/pickup/phone')}
-          >
-            ไม่มีรหัส (ใช้เบอร์โทร)
-          </Button>
-        </div>
+        <Card tone="muted" density="spacious" className="w-full max-w-4xl">
+          <div className="stack-section">
+            <div className="selection-grid">
+              <button
+                type="button"
+                className="selection-tile"
+                onClick={() => navigate('/pickup/code')}
+              >
+                <span className="text-2xl font-semibold leading-snug">
+                  Enter pickup code
+                </span>
+                <span className="text-base font-medium text-text-muted">
+                  Use the 6-digit code we sent you
+                </span>
+              </button>
+              <button
+                type="button"
+                className="selection-tile"
+                onClick={() => navigate('/pickup/phone')}
+              >
+                <span className="text-2xl font-semibold leading-snug">
+                  Verify by phone number
+                </span>
+                <span className="text-base font-medium text-text-muted">
+                  Receive a one-time code by SMS
+                </span>
+              </button>
+            </div>
 
-        <div className="mt-6">
-          <Button variant="secondary" fullWidth onClick={() => navigate('/')}>
-            กลับหน้าแรก
-          </Button>
-        </div>
-      </Card>
+            <div className="selection-actions stack-actions">
+              <Button
+                variant="secondary"
+                size="lg"
+                fullWidth
+                onClick={() => navigate('/')}
+              >
+                Start over
+              </Button>
+            </div>
+          </div>
+        </Card>
+      </div>
     </section>
   )
 }

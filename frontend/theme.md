@@ -45,3 +45,9 @@ This app relies on Tailwind + CSS variables to generate all utility classes and 
 - Support text: place validation or helper text under the grid using `field-support`/`field-error` to reserve space and prevent layout jumps.
 - Actions: separate the primary button from the options with `selection-actions` (adds top margin) and optionally `stack-actions` when stacking buttons, keeping the call to action visually distinct.
 - Always wrap selection screens in `Card` with `density="spacious"` inside `PageContainer`/`PageHeader` to avoid edge-to-edge content and to match kiosk spacing standards.
+
+## Pickup method selection (kiosk)
+- Structure the screen with `PageHeader` plus a `Card` (tone `muted`, density `spacious`) centered in `PageContainer`/`PublicLayout`; cap width around 4xl so the two pickup options remain the focus.
+- Place the pickup methods inside a `selection-grid`; each uses `selection-tile` with a concise method label (`text-2xl`/semibold) and a short helper line (`text-base text-text-muted`) to explain what will happen. Keep tiles free of icons or secondary buttons.
+- Tiles are single-tap actions; do not add confirm buttons. Keep any supporting action (e.g., "Start over") below the grid using `selection-actions` + `stack-actions` so it never competes with the primary choices.
+- Maintain calm spacing by wrapping the body in `stack-page` and the card contents in `stack-section`; this preserves the approved vertical rhythm and works in both portrait and landscape kiosk orientations.
