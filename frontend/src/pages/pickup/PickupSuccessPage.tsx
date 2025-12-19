@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react'
 import Button from '@/components/Button'
 import Card from '@/components/Card'
 import PageHeader from '@/components/PageHeader'
@@ -17,38 +17,45 @@ const PickupSuccessPage = () => {
   }
 
   return (
-    <section className="flex flex-1 flex-col justify-center gap-6">
-      <PageHeader
-        title="รับพัสดุเรียบร้อย"
-        subtitle="ช่องได้ถูกเปิดแล้ว กรุณารับพัสดุออกจากตู้"
-        variant="public"
-      />
+    <section className="flex flex-1 justify-center">
+      <div className="stack-page w-full">
+        <PageHeader
+          title="Pickup confirmed"
+          subtitle="Your parcel is ready. No further steps are needed."
+          variant="public"
+        />
 
-      <Card>
-        <div className="flex flex-col items-center gap-4 text-center">
-          <div className="flex h-24 w-24 items-center justify-center rounded-pill bg-primary text-3xl">
-            ✅
+        <Card tone="muted" density="spacious" className="w-full max-w-3xl">
+          <div className="stack-section items-center text-center">
+            <div className="flex h-28 w-28 items-center justify-center rounded-panel bg-surface text-3xl font-semibold shadow-panel">
+              OK
+            </div>
+            <div className="stack-section">
+              <p className="text-3xl font-semibold text-text">Pickup complete</p>
+              <p className="text-lg text-text-muted">
+                You can close the locker and remove your parcel.
+              </p>
+            </div>
           </div>
-          <p className="text-base text-text-muted">
-            ขอบคุณที่ใช้บริการ Smart Parcel Locker
-          </p>
-        </div>
 
-        {selectedParcel && (
-          <div className="mt-6 rounded-control border border-border bg-surface/80 p-4 text-left">
-            <p className="text-sm text-text-subtle">รหัสพัสดุ</p>
-            <p className="text-xl font-semibold text-text">
-              {selectedParcel.parcel_code}
-            </p>
+          {selectedParcel && (
+            <div className="rounded-panel border border-border/70 bg-surface px-5 py-4">
+              <p className="text-sm font-semibold uppercase tracking-[0.12em] text-text-subtle">
+                Parcel code
+              </p>
+              <p className="mt-2 text-2xl font-semibold text-text">
+                {selectedParcel.parcel_code}
+              </p>
+            </div>
+          )}
+
+          <div className="section-divider stack-actions">
+            <Button fullWidth size="xl" onClick={handleBack}>
+              Finish
+            </Button>
           </div>
-        )}
-
-        <div className="mt-8">
-          <Button fullWidth onClick={handleBack}>
-            กลับหน้าแรก
-          </Button>
-        </div>
-      </Card>
+        </Card>
+      </div>
     </section>
   )
 }

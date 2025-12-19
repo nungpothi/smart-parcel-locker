@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import axios from 'axios'
+import clsx from 'clsx'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
@@ -14,8 +15,8 @@ import { usePickupStore } from '@/store/pickupStore'
 const formSchema = z.object({
   otp: z
     .string()
-    .length(6, 'กรุณากรอก OTP 6 หลัก')
-    .regex(/^[0-9]+$/, 'กรุณากรอกเฉพาะตัวเลข'),
+    .length(6, 'OTP must be 6 digits')
+    .regex(/^[0-9]+$/, 'OTP must contain only digits'),
 })
 
 type PickupOtpForm = z.infer<typeof formSchema>
@@ -55,7 +56,7 @@ const PickupOtpVerifyPage = () => {
 
   const onSubmit = async (values: PickupOtpForm) => {
     if (!phone || !otpRef) {
-      setError('กรุณาขอ OTP ใหม่อีกครั้ง')
+      setError('Please request a new code to continue.')
       return
     }
     setSubmitting(true)
@@ -73,20 +74,20 @@ const PickupOtpVerifyPage = () => {
       const status = axios.isAxiosError(err) ? err.response?.status : undefined
       switch (status) {
         case 400:
-          setError('OTP ไม่ถูกต้อง')
+          setError('Incorrect code. Please check and try again.')
           break
         case 404:
-          setError('ไม่พบ OTP')
+          setError('Code not found. Please request a new one.')
           break
         case 409:
-          setError('OTP ถูกใช้งานแล้ว')
+          setError('This code has already been used.')
           break
         case 410:
-          setError('OTP หมดอายุ กรุณาขอใหม่')
+          setError('This code has expired. Request a new code.')
           break
         case 500:
         default:
-          setError('ระบบขัดข้อง กรุณาลองใหม่')
+          setError('Something went wrong. Please try again.')
       }
     } finally {
       setSubmitting(false)
@@ -95,7 +96,7 @@ const PickupOtpVerifyPage = () => {
 
   const handleResend = async () => {
     if (!phone) {
-      setError('กรุณากลับไปกรอกเบอร์โทรใหม่')
+      setError('Please enter your phone number first.')
       return
     }
     setSubmitting(true)
@@ -111,14 +112,14 @@ const PickupOtpVerifyPage = () => {
       const status = axios.isAxiosError(err) ? err.response?.status : undefined
       switch (status) {
         case 400:
-          setError('กรุณากรอกเบอร์โทรให้ถูกต้อง')
+          setError('Invalid phone number. Please check and try again.')
           break
         case 429:
-          setError('ขอ OTP บ่อยเกินไป กรุณารอสักครู่')
+          setError('Too many requests. Please wait before requesting another code.')
           break
         case 500:
         default:
-          setError('ระบบขัดข้อง กรุณาลองใหม่')
+          setError('Something went wrong. Please try again.')
       }
     } finally {
       setSubmitting(false)
@@ -126,55 +127,74 @@ const PickupOtpVerifyPage = () => {
   }
 
   return (
-    <section className="flex flex-1 flex-col justify-center gap-6">
-      <PageHeader
-        title="ยืนยันรหัส OTP"
-        subtitle="กรอก OTP ที่ได้รับทางโทรศัพท์"
-        variant="public"
-      />
+    <section className="flex flex-1 justify-center">
+      <div className="stack-page w-full">
+        <PageHeader
+          title="Enter the verification code"
+          subtitle="We sent a 6-digit code to your phone. Enter it to continue your pickup."
+          variant="public"
+        />
 
-      <Card>
-        <p className="text-center text-sm text-text-subtle">
-          OTP ถูกส่งไปแล้ว
-        </p>
-
-        <form className="mt-6 space-y-5" onSubmit={handleSubmit(onSubmit)}>
-          <Input
-            label="OTP"
-            placeholder="กรอก OTP 6 หลัก"
-            inputMode="numeric"
-            {...register('otp')}
-            error={errors.otp?.message}
-          />
-          {errorMessage && (
-            <div className="rounded-control border border-danger bg-danger-soft px-4 py-3 text-sm text-danger">
-              {errorMessage}
+        <Card tone="muted" density="spacious" className="w-full max-w-3xl">
+          <form className="form-shell" onSubmit={handleSubmit(onSubmit)}>
+            <div className="stack-section">
+              <p className="text-center text-base text-text-muted">
+                We only use this code to confirm your identity.
+              </p>
+              <Input
+                label="6-digit code"
+                placeholder="000000"
+                inputMode="numeric"
+                autoComplete="one-time-code"
+                className="text-center text-3xl font-semibold tracking-[0.24em] leading-tight"
+                {...register('otp')}
+                error={errors.otp?.message}
+              />
+              <div
+                className={clsx(
+                  'field-support text-center',
+                  errorMessage && 'field-error',
+                )}
+                aria-live="polite"
+              >
+                {errorMessage ?? ' '}
+              </div>
             </div>
-          )}
-          <Button type="submit" fullWidth disabled={!isValid || isSubmitting}>
-            {isSubmitting ? 'กำลังยืนยัน...' : 'ยืนยัน OTP'}
-          </Button>
-        </form>
 
-        <div className="mt-6 flex flex-col items-center">
-          <Button
-            type="button"
-            variant="outline"
-            size="md"
-            className="w-full sm:w-auto"
-            onClick={handleResend}
-            disabled={isSubmitting}
-          >
-            ขอ OTP ใหม่
-          </Button>
-        </div>
+            <div className="stack-actions">
+              <Button
+                type="submit"
+                size="xl"
+                fullWidth
+                disabled={!isValid || isSubmitting}
+              >
+                {isSubmitting ? 'Verifying...' : 'Verify code'}
+              </Button>
+            </div>
+          </form>
 
-        <div className="mt-6">
-          <Button variant="secondary" fullWidth onClick={() => navigate('/pickup/phone')}>
-            ย้อนกลับ
-          </Button>
-        </div>
-      </Card>
+          <div className="section-divider stack-actions">
+            <Button
+              type="button"
+              variant="outline"
+              size="lg"
+              fullWidth
+              onClick={handleResend}
+              disabled={isSubmitting}
+            >
+              Resend code
+            </Button>
+            <Button
+              variant="secondary"
+              size="lg"
+              fullWidth
+              onClick={() => navigate('/pickup/phone')}
+            >
+              Start over
+            </Button>
+          </div>
+        </Card>
+      </div>
     </section>
   )
 }

@@ -38,31 +38,23 @@ const PickupParcelListPage = () => {
       const status = axios.isAxiosError(err) ? err.response?.status : undefined
       switch (status) {
         case 401:
-          setError('token ไม่ถูกต้อง กรุณายืนยัน OTP ใหม่')
+          setError('Session expired. Please verify again.')
           setPickupToken(null, null)
           navigate('/pickup/otp')
           break
         case 410:
-          setError('token หมดอายุ กรุณายืนยัน OTP ใหม่')
+          setError('Session expired. Please verify again.')
           setPickupToken(null, null)
           navigate('/pickup/otp')
           break
         case 500:
         default:
-          setError('ระบบขัดข้อง กรุณาลองใหม่')
+          setError('Something went wrong. Please try again.')
       }
     } finally {
       setLoadingParcels(false)
     }
-  }, [
-    navigate,
-    pickupToken,
-    selectParcel,
-    setError,
-    setLoadingParcels,
-    setParcels,
-    setPickupToken,
-  ])
+  }, [navigate, pickupToken, selectParcel, setError, setLoadingParcels, setParcels, setPickupToken])
 
   useEffect(() => {
     if (!pickupToken) {
@@ -83,126 +75,145 @@ const PickupParcelListPage = () => {
       const status = axios.isAxiosError(err) ? err.response?.status : undefined
       switch (status) {
         case 400:
-          setError('ข้อมูลไม่ถูกต้อง')
+          setError('This parcel cannot be picked up right now.')
           break
         case 401:
-          setError('token ไม่ถูกต้อง กรุณายืนยัน OTP ใหม่')
+          setError('Session expired. Please verify again.')
           setPickupToken(null, null)
           navigate('/pickup/otp')
           break
         case 403:
-          setError('คุณไม่มีสิทธิ์รับพัสดุนี้')
+          setError('You are not allowed to pick up this parcel.')
           break
         case 404:
-          setError('ไม่พบพัสดุ')
+          setError('Parcel not found.')
           break
         case 409:
-          setError('พัสดุถูกนำออกไปแล้ว หรือสถานะไม่ถูกต้อง')
+          setError('This parcel is already being picked up.')
           break
         case 410:
-          setError('token หมดอายุ กรุณายืนยัน OTP ใหม่')
+          setError('Session expired. Please verify again.')
           setPickupToken(null, null)
           navigate('/pickup/otp')
           break
         case 500:
         default:
-          setError('ระบบขัดข้อง กรุณาลองใหม่')
+          setError('Something went wrong. Please try again.')
       }
     } finally {
       setConfirming(false)
     }
   }
 
+  const hasParcels = parcels.length > 0
+
   return (
-    <section className="flex flex-1 flex-col gap-6">
-      <PageHeader
-        title="เลือกพัสดุ"
-        subtitle="เลือกพัสดุที่ต้องการเปิดรับ"
-        variant="public"
-      />
+    <section className="flex flex-1 justify-center">
+      <div className="stack-page w-full">
+        <PageHeader
+          title="Select your parcel"
+          subtitle="Choose the parcel you want to pick up now."
+          variant="public"
+        />
 
-      <Card>
-        <div className="space-y-4">
-          {isLoadingParcels && (
+        <Card tone="muted" density="spacious" className="w-full max-w-4xl">
+          <div className="stack-section">
             <p className="text-center text-base text-text-muted">
-              กำลังโหลด...
+              Tap the parcel that matches your pickup code.
             </p>
-          )}
-          {errorMessage && (
-            <div className="rounded-control border border-danger bg-danger-soft px-4 py-3 text-sm text-danger">
-              {errorMessage}
-            </div>
-          )}
-          {!isLoadingParcels && parcels.length === 0 && !errorMessage ? (
-            <p className="text-center text-base text-text-muted">
-              ไม่พบพัสดุสำหรับรับ
-            </p>
-          ) : (
-            parcels.map((parcel) => (
-              <Button
-                key={parcel.parcel_id}
-                type="button"
-                onClick={() => selectParcel(parcel.parcel_id)}
-                variant={selectedParcelId === parcel.parcel_id ? 'primary' : 'outline'}
-                size="lg"
-                className={clsx(
-                  'w-full justify-between rounded-control p-4 text-left sm:flex-row sm:items-center',
-                  selectedParcelId !== parcel.parcel_id && 'text-text',
-                  'flex-col sm:flex-row sm:gap-3',
-                )}
-              >
-                <div>
-                  <p className="text-lg font-semibold">{parcel.parcel_code}</p>
-                  {parcel.expires_at && (
-                    <p className="text-sm text-text-subtle">
-                      หมดอายุ {dayjs(parcel.expires_at).format('DD/MM/YYYY HH:mm')}
-                    </p>
-                  )}
-                </div>
-                <span className="rounded-pill bg-secondary px-4 py-2 text-sm font-semibold text-text">
-                  ขนาด {parcel.size}
-                </span>
+
+            {isLoadingParcels && (
+              <p className="text-center text-base text-text-muted">Loading parcels...</p>
+            )}
+
+            {errorMessage && (
+              <div className="rounded-panel border border-danger bg-danger-soft px-5 py-4 text-base text-danger text-center">
+                {errorMessage}
+              </div>
+            )}
+
+            {!isLoadingParcels && !errorMessage && !hasParcels && (
+              <p className="text-center text-base text-text-muted">
+                No parcels available right now.
+              </p>
+            )}
+
+            {hasParcels && (
+              <div className="stack-section" role="list">
+                {parcels.map((parcel) => {
+                  const isSelected = selectedParcelId === parcel.parcel_id
+                  return (
+                    <button
+                      key={parcel.parcel_id}
+                      type="button"
+                      role="listitem"
+                      className={clsx(
+                        'w-full rounded-panel border border-border/70 bg-surface px-6 py-5 text-left shadow-panel transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring',
+                        'flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between',
+                        isSelected && 'border-primary-strong bg-surface-alt shadow-panel focus-visible:outline-ring',
+                      )}
+                      onClick={() => selectParcel(parcel.parcel_id)}
+                      aria-pressed={isSelected}
+                      disabled={isConfirming}
+                    >
+                      <div className="space-y-1">
+                        <p className="text-xl font-semibold text-text">{parcel.parcel_code}</p>
+                        {parcel.expires_at && (
+                          <p className="text-base text-text-subtle">
+                            Expires {dayjs(parcel.expires_at).format('DD/MM/YYYY HH:mm')}
+                          </p>
+                        )}
+                      </div>
+                      <span className="rounded-pill bg-secondary px-4 py-2 text-sm font-semibold uppercase tracking-[0.12em] text-text">
+                        Size {parcel.size}
+                      </span>
+                    </button>
+                  )
+                })}
+              </div>
+            )}
+          </div>
+
+          <div className="section-divider stack-actions">
+            {!isLoadingParcels && !hasParcels && !errorMessage ? (
+              <Button fullWidth size="xl" onClick={() => navigate('/')}>
+                Start over
               </Button>
-            ))
-          )}
-        </div>
-
-        <div className="mt-8 space-y-3">
-          {!isLoadingParcels && parcels.length === 0 && !errorMessage ? (
-            <Button fullWidth onClick={() => navigate('/')}>
-              กลับหน้าแรก
-            </Button>
-          ) : (
-            <>
+            ) : (
               <Button
                 fullWidth
+                size="xl"
                 onClick={handleConfirm}
                 disabled={!selectedParcelId || isConfirming || isLoadingParcels}
               >
-                {isConfirming ? 'กำลังดำเนินการ...' : 'รับพัสดุ'}
+                {isConfirming ? 'Confirming...' : 'Continue'}
               </Button>
-              {errorMessage && (
-                <Button
-                  variant="secondary"
-                  fullWidth
-                  onClick={loadParcels}
-                  disabled={isLoadingParcels}
-                >
-                  ลองใหม่
-                </Button>
-              )}
-            </>
-          )}
-          <Button
-            variant="secondary"
-            fullWidth
-            onClick={() => navigate('/pickup/otp')}
-            disabled={isConfirming}
-          >
-            ย้อนกลับ
-          </Button>
-        </div>
-      </Card>
+            )}
+
+            {errorMessage && (
+              <Button
+                variant="secondary"
+                size="lg"
+                fullWidth
+                onClick={loadParcels}
+                disabled={isLoadingParcels}
+              >
+                Refresh list
+              </Button>
+            )}
+
+            <Button
+              variant="secondary"
+              size="lg"
+              fullWidth
+              onClick={() => navigate('/pickup/otp')}
+              disabled={isConfirming}
+            >
+              Back
+            </Button>
+          </div>
+        </Card>
+      </div>
     </section>
   )
 }

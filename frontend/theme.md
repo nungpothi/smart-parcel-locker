@@ -66,3 +66,24 @@ This app relies on Tailwind + CSS variables to generate all utility classes and 
 - Present helper copy above the input to explain how the number is used (e.g., sending an OTP). Keep it concise and low-emphasis (`text-text-muted`).
 - Surface validation or API errors via `field-support`/`field-error` below the input so the layout doesn't jump.
 - Keep a single primary CTA in a `stack-actions` block beneath the inputs; any optional supporting action belongs in a `section-divider` + `stack-actions` block to remain visually secondary.
+
+## OTP verification (public)
+- Follow the same shell as other secure steps: `PageHeader` plus a muted, spacious `Card` centered in `PageContainer`, capped near 3xl to keep the OTP field dominant.
+- Use `form-shell` with `stack-section` to separate helper text, the OTP input, and reserved hint/error space. Keep text centered for quick scan at kiosk distance.
+- Make the OTP input the hero element: centered large type such as `text-3xl font-semibold tracking-[0.24em] leading-tight`, `inputMode="numeric"`, and `autoComplete="one-time-code"` to surface numeric keyboards.
+- Reserve a `field-support` line beneath the input for API/validation errors or resend hints; avoid ad-hoc margins so spacing stays stable when messages appear.
+- Place a single primary CTA in `stack-actions` below the input. Keep any supporting actions (e.g., resend, start over) in a `section-divider` with `stack-actions` so they remain secondary and do not compete with the OTP field.
+
+## List selection (public)
+- Structure list picks with `PageHeader` and a muted, spacious `Card` centered in `PageContainer`; cap width near 4xl for readability on kiosks.
+- Use `stack-section` inside the card to space helper text, list content, and feedback blocks; keep loading/empty states centered and calm.
+- Render parcels as full-width tappable rows: `rounded-panel border border-border/70 bg-surface px-6 py-5 shadow-panel`, flexing to stack on mobile and align side-by-side on sm+.
+- Make selection obvious without relying solely on color by swapping to `bg-surface-alt`, strengthening the border, and keeping focus/outline rings for keyboard users.
+- Keep primary list text at least `text-xl` with semibold weight; supporting meta (e.g., expiry) at `text-base text-text-subtle`; use a pill for secondary attributes like size.
+- Place a single primary CTA beneath the list in a `section-divider` + `stack-actions` block; keep refresh/back or other secondary actions in the same block but visually secondary to avoid crowding the list.
+
+## Pickup success (public)
+- Use the same shell as other public screens: `PageHeader` plus a muted, spacious `Card` centered in `PageContainer`, capped near 3xl for focused reading.
+- Center the success message in a `stack-section` with a simple badge or glyph (no new icons required) and calm headline/body pairing (`text-3xl`/`text-lg`) to be readable at kiosk distance.
+- Keep any supporting parcel detail in a subtle bordered panel beneath the message; use uppercase label chips and semibold code text to confirm the right parcel without crowding the hero message.
+- Place a single primary end-of-flow CTA in a `section-divider` + `stack-actions` block to separate it from the message and maintain a low-density finish; avoid secondary actions.
