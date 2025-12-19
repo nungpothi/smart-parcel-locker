@@ -161,16 +161,7 @@ export const translations: Record<Language, TranslationTree> = {
           error: 'กรุณาเลือกขนาดและกรอกข้อมูลให้ครบ',
           submit: 'ยืนยัน',
           submitting: 'กำลังดำเนินการ...',
-        },
-        open: {
-          title: 'เปิดตู้ฝากพัสดุ',
-          subtitle: 'ตรวจสอบรหัสก่อนเปิดตู้',
-          headline: 'พร้อมเปิดตู้',
-          body: 'โปรดตรวจสอบรหัสและเตรียมพัสดุ',
-          parcelCodeLabel: 'รหัสพัสดุ',
-          pickupCodeLabel: 'รหัสรับพัสดุ',
-          openLocker: 'เปิดตู้ฝากพัสดุ',
-        },
+        },
         success: {
           title: 'ฝากพัสดุเรียบร้อย',
           subtitle: 'เราส่งรหัสรับให้ผู้รับเรียบร้อยแล้ว',
@@ -394,16 +385,7 @@ export const translations: Record<Language, TranslationTree> = {
           error: 'Please select a size and fill all details.',
           submit: 'Confirm',
           submitting: 'Submitting...',
-        },
-        open: {
-          title: 'Open locker to deposit',
-          subtitle: 'Review your codes before opening the locker.',
-          headline: 'Ready to open',
-          body: 'Check your codes and prepare your parcel.',
-          parcelCodeLabel: 'Parcel code',
-          pickupCodeLabel: 'Pickup code',
-          openLocker: 'Open locker',
-        },
+        },
         success: {
           title: 'Parcel deposited',
           subtitle: 'We sent the pickup code to the receiver.',
@@ -473,4 +455,5 @@ export const translations: Record<Language, TranslationTree> = {
     },
   },
 }
+
 

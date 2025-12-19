@@ -5,7 +5,6 @@ import AdminHomePage from '@/pages/admin/AdminHomePage'
 import AdminLockerCompartmentsPage from '@/pages/admin/AdminLockerCompartmentsPage'
 import AdminLockersPage from '@/pages/admin/AdminLockersPage'
 import AdminLocationsPage from '@/pages/admin/AdminLocationsPage'
-import DepositOpenPage from '@/pages/deposit/DepositOpenPage'
 import DepositPhonePage from '@/pages/deposit/DepositPhonePage'
 import DepositSizePage from '@/pages/deposit/DepositSizePage'
 import DepositSuccessPage from '@/pages/deposit/DepositSuccessPage'
@@ -24,7 +23,6 @@ const App = () => {
         <Route path="/" element={<WelcomePage />} />
         <Route path="/deposit" element={<DepositPhonePage />} />
         <Route path="/deposit/size" element={<DepositSizePage />} />
-        <Route path="/deposit/open" element={<DepositOpenPage />} />
         <Route path="/deposit/success" element={<DepositSuccessPage />} />
         <Route path="/pickup" element={<PickupHomePage />} />
         <Route path="/pickup/code" element={<PickupWithCodePage />} />

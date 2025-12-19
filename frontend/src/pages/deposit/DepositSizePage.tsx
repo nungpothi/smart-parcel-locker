@@ -51,7 +51,7 @@ const DepositSizePage = () => {
         payload.pickup_code ?? null,
         payload.status,
       )
-      navigate('/deposit/open')
+      navigate('/deposit/success')
     } catch (err) {
       const status = axios.isAxiosError(err) ? err.response?.status : undefined
       switch (status) {
