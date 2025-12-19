@@ -56,7 +56,7 @@ const AdminLocationsPage = () => {
   }
 
   return (
-    <section className="flex flex-1 flex-col gap-6">
+    <section className="flex flex-1 flex-col stack-admin-page">
       <PageHeader
         variant="admin"
         title={t('admin.locations.title')}
@@ -65,36 +65,39 @@ const AdminLocationsPage = () => {
       />
 
       <Card density="cozy">
-        <div className="space-y-4">
+        <div className="stack-admin-section">
           <Input
             label={t('admin.locations.codeLabel')}
             placeholder={t('admin.locations.codePlaceholder')}
             value={code}
             onChange={(event) => setCode(event.target.value)}
+            className="admin-control"
           />
           <Input
             label={t('admin.locations.nameLabel')}
             placeholder={t('admin.locations.namePlaceholder')}
             value={name}
             onChange={(event) => setName(event.target.value)}
+            className="admin-control"
           />
           <Input
             label={t('admin.locations.addressLabel')}
             placeholder={t('admin.locations.addressPlaceholder')}
             value={address}
             onChange={(event) => setAddress(event.target.value)}
+            className="admin-control"
           />
 
           {error && <p className="text-sm text-danger">{error}</p>}
 
-          <Button fullWidth onClick={handleCreate} disabled={loading}>
+          <Button size="md" fullWidth onClick={handleCreate} disabled={loading}>
             {t('admin.locations.create')}
           </Button>
         </div>
       </Card>
 
       <Card title={t('admin.locations.existingTitle')} density="cozy">
-        <div className="space-y-3">
+        <div className="stack-admin-section">
           {locations.length === 0 ? (
             <p className="text-sm text-text-muted">{t('admin.locations.empty')}</p>
           ) : (
@@ -118,11 +121,21 @@ const AdminLocationsPage = () => {
         </div>
       </Card>
 
-      <div className="space-y-3">
-        <Button variant="secondary" fullWidth onClick={() => navigate('/admin')}>
+      <div className="stack-admin-actions">
+        <Button
+          size="md"
+          variant="secondary"
+          fullWidth
+          onClick={() => navigate('/admin')}
+        >
           {t('common.actions.backToAdminHome')}
         </Button>
-        <Button variant="secondary" fullWidth onClick={() => navigate('/')}>
+        <Button
+          size="md"
+          variant="secondary"
+          fullWidth
+          onClick={() => navigate('/')}
+        >
           {t('common.actions.backToHome')}
         </Button>
       </div>

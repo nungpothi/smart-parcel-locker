@@ -9,7 +9,7 @@ const AdminHomePage = () => {
   const { t } = useTranslation()
 
   return (
-    <section className="flex flex-1 flex-col gap-6">
+    <section className="flex flex-1 flex-col stack-admin-page">
       <PageHeader
         variant="admin"
         title={t('admin.home.title')}
@@ -18,14 +18,19 @@ const AdminHomePage = () => {
       />
 
       <Card density="cozy">
-        <div className="space-y-4">
-          <Button fullWidth onClick={() => navigate('/admin/locations')}>
+        <div className="stack-admin-actions">
+          <Button size="md" fullWidth onClick={() => navigate('/admin/locations')}>
             {t('admin.home.locations')}
           </Button>
-          <Button fullWidth onClick={() => navigate('/admin/lockers')}>
+          <Button size="md" fullWidth onClick={() => navigate('/admin/lockers')}>
             {t('admin.home.lockers')}
           </Button>
-          <Button variant="secondary" fullWidth onClick={() => navigate('/')}>
+          <Button
+            size="md"
+            variant="secondary"
+            fullWidth
+            onClick={() => navigate('/')}
+          >
             {t('common.actions.backToHome')}
           </Button>
         </div>

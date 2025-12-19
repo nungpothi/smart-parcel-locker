@@ -70,7 +70,7 @@ const AdminLockersPage = () => {
   }
 
   return (
-    <section className="flex flex-1 flex-col gap-6">
+    <section className="flex flex-1 flex-col stack-admin-page">
       <PageHeader
         variant="admin"
         title={t('admin.lockers.title')}
@@ -79,13 +79,13 @@ const AdminLockersPage = () => {
       />
 
       <Card density="cozy">
-        <div className="space-y-4">
+        <div className="stack-admin-section">
           <label className="block text-left">
             <span className="text-sm font-semibold text-text-muted">
               {t('admin.lockers.locationLabel')}
             </span>
             <select
-              className="mt-2 min-h-[52px] w-full rounded-control border border-border bg-surface px-4 py-3 text-lg text-text focus:border-primary-strong focus:outline-none focus:ring-2 focus:ring-ring/30"
+              className="admin-select mt-2"
               value={locationId}
               onChange={(event) => setLocationId(event.target.value)}
             >
@@ -103,24 +103,26 @@ const AdminLockersPage = () => {
             placeholder={t('admin.lockers.lockerCodePlaceholder')}
             value={lockerCode}
             onChange={(event) => setLockerCode(event.target.value)}
+            className="admin-control"
           />
           <Input
             label={t('admin.lockers.nameLabel')}
             placeholder={t('admin.lockers.namePlaceholder')}
             value={name}
             onChange={(event) => setName(event.target.value)}
+            className="admin-control"
           />
 
           {error && <p className="text-sm text-danger">{error}</p>}
 
-          <Button fullWidth onClick={handleCreate} disabled={loading}>
+          <Button size="md" fullWidth onClick={handleCreate} disabled={loading}>
             {t('admin.lockers.create')}
           </Button>
         </div>
       </Card>
 
       <Card title={t('admin.lockers.existingTitle')} density="cozy">
-        <div className="space-y-3">
+        <div className="stack-admin-section">
           {lockers.length === 0 ? (
             <p className="text-sm text-text-muted">{t('admin.lockers.empty')}</p>
           ) : (
@@ -158,11 +160,21 @@ const AdminLockersPage = () => {
         </div>
       </Card>
 
-      <div className="space-y-3">
-        <Button variant="secondary" fullWidth onClick={() => navigate('/admin')}>
+      <div className="stack-admin-actions">
+        <Button
+          size="md"
+          variant="secondary"
+          fullWidth
+          onClick={() => navigate('/admin')}
+        >
           {t('common.actions.backToAdminHome')}
         </Button>
-        <Button variant="secondary" fullWidth onClick={() => navigate('/')}>
+        <Button
+          size="md"
+          variant="secondary"
+          fullWidth
+          onClick={() => navigate('/')}
+        >
           {t('common.actions.backToHome')}
         </Button>
       </div>

@@ -12,7 +12,7 @@ const AdminLayout = () => {
       <PageContainer
         as="div"
         width="wide"
-        paddingX="roomy"
+        paddingX="standard"
         paddingY="cozy"
         className="flex min-h-screen flex-col"
       >

@@ -30,6 +30,13 @@ This app relies on Tailwind + CSS variables to generate all utility classes and 
 - Dividers: use the `section-divider` helper (1px border with 1.5rem top padding, 1.75rem on sm+) to separate supporting/admin controls from primary flows while preserving breathing room.
 - Apply these spacing helpers consistently across pages; avoid embedding raw spacing utilities in individual screens so padding/spacing stays uniform and kiosk-friendly.
 
+## Admin layout & spacing
+- Admin pages live under `AdminLayout`, which provides the persistent header (title + language switch) and uses `PageContainer` with `paddingX="standard"` and `paddingY="cozy"` for denser content than kiosk flows.
+- Page structure: `PageHeader` (left-aligned) followed by content sections inside `Card` with `density="cozy"`; avoid kiosk-style `spacious` cards.
+- Use `stack-admin-page`, `stack-admin-section`, and `stack-admin-actions` for admin rhythm (tighter than public `stack-*` helpers).
+- Admin form controls should use `Input` with `className="admin-control"` to reduce height/padding; use `admin-select` for native selects.
+- Buttons remain the shared `Button` component but default to `size="md"` for admin actions; avoid kiosk `size="xl"` patterns.
+
 ## Deposit open runtime bug
 - Bug: `/deposit/open` crashed on render and showed a blank screen.
 - Root cause: `useNavigate` was imported from `react` instead of `react-router-dom`, so the hook was `undefined` at runtime.

@@ -89,7 +89,7 @@ const AdminLockerCompartmentsPage = () => {
   }
 
   return (
-    <section className="flex flex-1 flex-col gap-6">
+    <section className="flex flex-1 flex-col stack-admin-page">
       <PageHeader
         variant="admin"
         title={t('admin.compartments.title')}
@@ -98,7 +98,7 @@ const AdminLockerCompartmentsPage = () => {
       />
 
       <Card density="cozy">
-        <div className="space-y-4">
+        <div className="stack-admin-section">
           {rows.map((row, index) => (
             <div
               key={`row-${index}`}
@@ -113,6 +113,7 @@ const AdminLockerCompartmentsPage = () => {
                   onChange={(event) =>
                     updateRow(index, 'compartmentNo', event.target.value)
                   }
+                  className="admin-control"
                 />
               </div>
               <label className="block w-full sm:w-40">
@@ -120,7 +121,7 @@ const AdminLockerCompartmentsPage = () => {
                   {t('admin.compartments.sizeLabel')}
                 </span>
                 <select
-                  className="mt-2 min-h-[52px] w-full rounded-control border border-border bg-surface px-4 py-3 text-lg text-text focus:border-primary-strong focus:outline-none focus:ring-2 focus:ring-ring/30"
+                  className="admin-select mt-2"
                   value={row.size}
                   onChange={(event) => updateRow(index, 'size', event.target.value)}
                 >
@@ -140,20 +141,20 @@ const AdminLockerCompartmentsPage = () => {
             </div>
           ))}
 
-          <Button variant="secondary" fullWidth onClick={addRow}>
+          <Button size="md" variant="secondary" fullWidth onClick={addRow}>
             {t('admin.compartments.addRow')}
           </Button>
 
           {error && <p className="text-sm text-danger">{error}</p>}
 
-          <Button fullWidth onClick={handleGenerate} disabled={loading}>
+          <Button size="md" fullWidth onClick={handleGenerate} disabled={loading}>
             {t('admin.compartments.generate')}
           </Button>
         </div>
       </Card>
 
       <Card title={t('admin.compartments.existingTitle')} density="cozy">
-        <div className="space-y-3">
+        <div className="stack-admin-section">
           {compartments.length === 0 ? (
             <p className="text-sm text-text-muted">{t('admin.compartments.empty')}</p>
           ) : (
@@ -177,11 +178,21 @@ const AdminLockerCompartmentsPage = () => {
         </div>
       </Card>
 
-      <div className="space-y-3">
-        <Button variant="secondary" fullWidth onClick={() => navigate('/admin/lockers')}>
+      <div className="stack-admin-actions">
+        <Button
+          size="md"
+          variant="secondary"
+          fullWidth
+          onClick={() => navigate('/admin/lockers')}
+        >
           {t('admin.compartments.backLockers')}
         </Button>
-        <Button variant="secondary" fullWidth onClick={() => navigate('/admin')}>
+        <Button
+          size="md"
+          variant="secondary"
+          fullWidth
+          onClick={() => navigate('/admin')}
+        >
           {t('common.actions.backToAdminHome')}
         </Button>
       </div>
