@@ -51,3 +51,10 @@ This app relies on Tailwind + CSS variables to generate all utility classes and 
 - Place the pickup methods inside a `selection-grid`; each uses `selection-tile` with a concise method label (`text-2xl`/semibold) and a short helper line (`text-base text-text-muted`) to explain what will happen. Keep tiles free of icons or secondary buttons.
 - Tiles are single-tap actions; do not add confirm buttons. Keep any supporting action (e.g., "Start over") below the grid using `selection-actions` + `stack-actions` so it never competes with the primary choices.
 - Maintain calm spacing by wrapping the body in `stack-page` and the card contents in `stack-section`; this preserves the approved vertical rhythm and works in both portrait and landscape kiosk orientations.
+
+## Secure code entry (public)
+- Use `PageHeader` above a muted, spacious `Card` centered in `PageContainer` to keep inputs off the edges; cap width near 3xl for focused reading.
+- Wrap the form in `form-shell` and group inputs with `stack-section` so labels, helpers, and fields stay separated and do not crowd the card padding.
+- Make the primary code input visually dominant with a centered, large text style (e.g., `text-3xl font-semibold tracking-[0.24em] leading-tight`) and numeric input mode/OTP autocomplete to support kiosk keyboards.
+- Reserve error space with `field-support`/`field-error` built into `Input`; do not add ad-hoc margins when errors appear.
+- Place a single primary CTA beneath the inputs inside `stack-actions`; any supporting/secondary action should sit in a `section-divider` + `stack-actions` block to stay visually secondary.

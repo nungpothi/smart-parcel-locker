@@ -10,12 +10,12 @@ import { usePickupStore } from '@/store/pickupStore'
 
 const phoneSchema = z
   .string()
-  .min(9, 'กรุณากรอกอย่างน้อย 9 หลัก')
-  .regex(/^[0-9]+$/, 'กรุณากรอกเฉพาะตัวเลข')
+  .min(9, 'Phone number must be at least 9 digits')
+  .regex(/^[0-9]+$/, 'Phone number must contain only digits')
 
 const formSchema = z.object({
   phone: phoneSchema,
-  pickupCode: z.string().min(4, 'กรุณากรอกรหัสอย่างน้อย 4 ตัว'),
+  pickupCode: z.string().min(4, 'Pickup code must be at least 4 characters'),
 })
 
 type PickupWithCodeForm = z.infer<typeof formSchema>
@@ -45,39 +45,55 @@ const PickupWithCodePage = () => {
   }
 
   return (
-    <section className="flex flex-1 flex-col justify-center gap-6">
-      <PageHeader
-        title="รับพัสดุด้วยรหัส"
-        subtitle="ยืนยันเบอร์โทรและรหัสรับพัสดุ"
-        variant="public"
-      />
+    <section className="flex flex-1 justify-center">
+      <div className="stack-page w-full">
+        <PageHeader
+          title="Enter your pickup code"
+          subtitle="Use the code we sent you to unlock your parcel safely."
+          variant="public"
+        />
 
-      <Card>
-        <form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
-          <Input
-            label="เบอร์โทร"
-            placeholder="กรอกเบอร์โทร"
-            inputMode="numeric"
-            {...register('phone')}
-            error={errors.phone?.message}
-          />
-          <Input
-            label="รหัสรับพัสดุ"
-            placeholder="กรอกรหัส"
-            {...register('pickupCode')}
-            error={errors.pickupCode?.message}
-          />
-          <Button type="submit" fullWidth disabled={!isValid}>
-            ยืนยัน
-          </Button>
-        </form>
+        <Card tone="muted" density="spacious" className="w-full max-w-3xl">
+          <form className="form-shell" onSubmit={handleSubmit(onSubmit)}>
+            <div className="stack-section">
+              <Input
+                label="Pickup code"
+                placeholder="000000"
+                inputMode="numeric"
+                autoComplete="one-time-code"
+                className="text-center text-3xl font-semibold tracking-[0.24em] leading-tight"
+                {...register('pickupCode')}
+                error={errors.pickupCode?.message}
+              />
+              <Input
+                label="Phone number"
+                placeholder="Enter phone number"
+                inputMode="tel"
+                autoComplete="tel"
+                {...register('phone')}
+                error={errors.phone?.message}
+              />
+            </div>
 
-        <div className="mt-6">
-          <Button variant="secondary" fullWidth onClick={() => navigate('/pickup')}>
-            ย้อนกลับ
-          </Button>
-        </div>
-      </Card>
+            <div className="stack-actions">
+              <Button type="submit" size="xl" fullWidth disabled={!isValid}>
+                Continue
+              </Button>
+            </div>
+          </form>
+
+          <div className="section-divider stack-actions">
+            <Button
+              variant="secondary"
+              size="lg"
+              fullWidth
+              onClick={() => navigate('/pickup')}
+            >
+              Start over
+            </Button>
+          </div>
+        </Card>
+      </div>
     </section>
   )
 }
