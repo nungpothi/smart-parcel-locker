@@ -37,6 +37,13 @@ This app relies on Tailwind + CSS variables to generate all utility classes and 
 - Admin form controls should use `Input` with `className="admin-control"` to reduce height/padding; use `admin-select` for native selects.
 - Buttons remain the shared `Button` component but default to `size="md"` for admin actions; avoid kiosk `size="xl"` patterns.
 
+## Admin list page pattern
+- Use a `Card` (density `cozy`) for create/edit controls, then a second `Card` for the list/table section; keep both inside the `stack-admin-page` rhythm.
+- Form fields can be arranged with a compact grid (`sm:grid-cols-2`) to increase information density while staying readable.
+- Empty states should render a bordered, muted surface block instead of plain text so the layout still feels intentional.
+- List rows should use consistent padding (`p-4`), clear separation (`border border-border`), and a two-column layout (`sm:grid-cols-[minmax(0,1fr)_auto]`) so labels and status remain scannable.
+- For relational lists (e.g., lockers tied to locations), keep the related entity in a muted secondary column and reserve a right-aligned actions column for short admin actions.
+
 ## Deposit open runtime bug
 - Bug: `/deposit/open` crashed on render and showed a blank screen.
 - Root cause: `useNavigate` was imported from `react` instead of `react-router-dom`, so the hook was `undefined` at runtime.

@@ -66,66 +66,93 @@ const AdminLocationsPage = () => {
 
       <Card density="cozy">
         <div className="stack-admin-section">
-          <Input
-            label={t('admin.locations.codeLabel')}
-            placeholder={t('admin.locations.codePlaceholder')}
-            value={code}
-            onChange={(event) => setCode(event.target.value)}
-            className="admin-control"
-          />
-          <Input
-            label={t('admin.locations.nameLabel')}
-            placeholder={t('admin.locations.namePlaceholder')}
-            value={name}
-            onChange={(event) => setName(event.target.value)}
-            className="admin-control"
-          />
-          <Input
-            label={t('admin.locations.addressLabel')}
-            placeholder={t('admin.locations.addressPlaceholder')}
-            value={address}
-            onChange={(event) => setAddress(event.target.value)}
-            className="admin-control"
-          />
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Input
+              label={t('admin.locations.codeLabel')}
+              placeholder={t('admin.locations.codePlaceholder')}
+              value={code}
+              onChange={(event) => setCode(event.target.value)}
+              className="admin-control"
+            />
+            <Input
+              label={t('admin.locations.nameLabel')}
+              placeholder={t('admin.locations.namePlaceholder')}
+              value={name}
+              onChange={(event) => setName(event.target.value)}
+              className="admin-control"
+            />
+            <Input
+              label={t('admin.locations.addressLabel')}
+              placeholder={t('admin.locations.addressPlaceholder')}
+              value={address}
+              onChange={(event) => setAddress(event.target.value)}
+              className="admin-control sm:col-span-2"
+            />
+          </div>
 
           {error && <p className="text-sm text-danger">{error}</p>}
 
-          <Button size="md" fullWidth onClick={handleCreate} disabled={loading}>
-            {t('admin.locations.create')}
-          </Button>
+          <div className="stack-admin-actions sm:flex-row sm:items-center">
+            <Button size="md" onClick={handleCreate} disabled={loading}>
+              {t('admin.locations.create')}
+            </Button>
+          </div>
         </div>
       </Card>
 
-      <Card title={t('admin.locations.existingTitle')} density="cozy">
-        <div className="stack-admin-section">
-          {locations.length === 0 ? (
-            <p className="text-sm text-text-muted">{t('admin.locations.empty')}</p>
-          ) : (
-            locations.map((location) => (
-              <div
-                key={location.location_id}
-                className="flex flex-wrap items-center justify-between gap-2 rounded-control border border-border bg-surface/80 p-4"
-              >
-                <div>
-                  <p className="text-base font-semibold">{location.code}</p>
-                  <p className="text-sm text-text-muted">{location.name}</p>
-                </div>
-                <span className="rounded-pill bg-secondary px-4 py-2 text-xs font-semibold text-text">
-                  {location.is_active
-                    ? t('admin.locations.active')
-                    : t('admin.locations.inactive')}
-                </span>
+      <div className="p-2 sm:p-3">
+        <Card title={t('admin.locations.existingTitle')} density="cozy">
+          <div className="stack-admin-section">
+            {locations.length === 0 ? (
+              <div className="rounded-control border border-dashed border-border/80 bg-surface/60 p-4 text-sm text-text-muted">
+                {t('admin.locations.empty')}
               </div>
-            ))
-          )}
-        </div>
-      </Card>
+            ) : (
+              <div className="overflow-hidden rounded-[10px] border border-border bg-surface/80">
+                <table className="w-full border-collapse text-left text-sm text-text">
+                  <thead className="bg-surface-alt text-xs font-semibold uppercase tracking-[0.08em] text-text-subtle">
+                    <tr>
+                      <th className="px-4 py-3">{t('admin.locations.codeLabel')}</th>
+                      <th className="px-4 py-3">{t('admin.locations.nameLabel')}</th>
+                      <th className="px-4 py-3">{t('admin.locations.addressLabel')}</th>
+                      <th className="px-4 py-3 text-right">
+                        {t('admin.locations.statusLabel')}
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-border/70">
+                    {locations.map((location) => (
+                      <tr key={location.location_id} className="bg-surface/80">
+                        <td className="px-4 py-3 text-base font-semibold">
+                          {location.code}
+                        </td>
+                        <td className="px-4 py-3 text-sm text-text-muted">
+                          {location.name}
+                        </td>
+                        <td className="px-4 py-3 text-sm text-text-muted">
+                          {location.address || '—'}
+                        </td>
+                        <td className="px-4 py-3 text-right">
+                          <span className="rounded-pill bg-secondary px-4 py-2 text-xs font-semibold text-text">
+                            {location.is_active
+                              ? t('admin.locations.active')
+                              : t('admin.locations.inactive')}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        </Card>
+      </div>
 
-      <div className="stack-admin-actions">
+      <div className="stack-admin-actions sm:flex-row sm:items-center sm:justify-between">
         <Button
           size="md"
           variant="secondary"
-          fullWidth
           onClick={() => navigate('/admin')}
         >
           {t('common.actions.backToAdminHome')}
@@ -133,7 +160,6 @@ const AdminLocationsPage = () => {
         <Button
           size="md"
           variant="secondary"
-          fullWidth
           onClick={() => navigate('/')}
         >
           {t('common.actions.backToHome')}

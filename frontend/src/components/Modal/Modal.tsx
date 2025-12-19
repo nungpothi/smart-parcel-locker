@@ -12,7 +12,8 @@ type ModalProps = {
 }
 
 const modalClasses = {
-  popup: 'rounded-panel border border-border bg-surface text-left text-text shadow-panel',
+  popup:
+    'rounded-panel border border-border bg-surface p-5 sm:p-6 text-left text-text shadow-panel',
   confirmButton:
     'rounded-pill bg-primary px-6 py-3 text-base font-semibold text-text shadow-lift',
 }

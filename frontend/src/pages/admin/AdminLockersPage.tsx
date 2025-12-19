@@ -80,91 +80,127 @@ const AdminLockersPage = () => {
 
       <Card density="cozy">
         <div className="stack-admin-section">
-          <label className="block text-left">
-            <span className="text-sm font-semibold text-text-muted">
-              {t('admin.lockers.locationLabel')}
-            </span>
-            <select
-              className="admin-select mt-2"
-              value={locationId}
-              onChange={(event) => setLocationId(event.target.value)}
-            >
-              <option value="">{t('admin.lockers.locationPlaceholder')}</option>
-              {locations.map((location) => (
-                <option key={location.location_id} value={location.location_id}>
-                  {location.code} - {location.name}
-                </option>
-              ))}
-            </select>
-          </label>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <label className="block text-left">
+              <span className="text-sm font-semibold text-text-muted">
+                {t('admin.lockers.locationLabel')}
+              </span>
+              <select
+                className="admin-select mt-2"
+                value={locationId}
+                onChange={(event) => setLocationId(event.target.value)}
+              >
+                <option value="">{t('admin.lockers.locationPlaceholder')}</option>
+                {locations.map((location) => (
+                  <option key={location.location_id} value={location.location_id}>
+                    {location.code} - {location.name}
+                  </option>
+                ))}
+              </select>
+            </label>
 
-          <Input
-            label={t('admin.lockers.lockerCodeLabel')}
-            placeholder={t('admin.lockers.lockerCodePlaceholder')}
-            value={lockerCode}
-            onChange={(event) => setLockerCode(event.target.value)}
-            className="admin-control"
-          />
-          <Input
-            label={t('admin.lockers.nameLabel')}
-            placeholder={t('admin.lockers.namePlaceholder')}
-            value={name}
-            onChange={(event) => setName(event.target.value)}
-            className="admin-control"
-          />
+            <Input
+              label={t('admin.lockers.lockerCodeLabel')}
+              placeholder={t('admin.lockers.lockerCodePlaceholder')}
+              value={lockerCode}
+              onChange={(event) => setLockerCode(event.target.value)}
+              className="admin-control"
+            />
+            <Input
+              label={t('admin.lockers.nameLabel')}
+              placeholder={t('admin.lockers.namePlaceholder')}
+              value={name}
+              onChange={(event) => setName(event.target.value)}
+              className="admin-control sm:col-span-2"
+            />
+          </div>
 
           {error && <p className="text-sm text-danger">{error}</p>}
 
-          <Button size="md" fullWidth onClick={handleCreate} disabled={loading}>
-            {t('admin.lockers.create')}
-          </Button>
+          <div className="stack-admin-actions sm:flex-row sm:items-center">
+            <Button size="md" onClick={handleCreate} disabled={loading}>
+              {t('admin.lockers.create')}
+            </Button>
+          </div>
         </div>
       </Card>
 
-      <Card title={t('admin.lockers.existingTitle')} density="cozy">
-        <div className="stack-admin-section">
-          {lockers.length === 0 ? (
-            <p className="text-sm text-text-muted">{t('admin.lockers.empty')}</p>
-          ) : (
-            lockers.map((locker) => {
-              const location = locationMap.get(locker.location_id)
-              return (
-                <div
-                  key={locker.locker_id}
-                  className="flex flex-wrap items-center justify-between gap-3 rounded-control border border-border bg-surface/80 p-4"
-                >
-                  <div>
-                    <p className="text-base font-semibold">{locker.locker_code}</p>
-                    <p className="text-sm text-text-muted">
-                      {location ? location.name : locker.location_id}
-                    </p>
-                  </div>
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span className="rounded-pill bg-secondary px-4 py-2 text-xs font-semibold text-text">
-                      {locker.status}
-                    </span>
-                    <Button
-                      variant="secondary"
-                      size="md"
-                      onClick={() =>
-                        navigate(`/admin/lockers/${locker.locker_id}/compartments`)
-                      }
-                    >
-                      {t('admin.lockers.manageCompartments')}
-                    </Button>
-                  </div>
-                </div>
-              )
-            })
-          )}
-        </div>
-      </Card>
+      <div className="p-2 sm:p-3">
+        <Card title={t('admin.lockers.existingTitle')} density="cozy">
+          <div className="stack-admin-section">
+            {lockers.length === 0 ? (
+              <div className="rounded-control border border-dashed border-border/80 bg-surface/60 p-4 text-sm text-text-muted">
+                {t('admin.lockers.empty')}
+              </div>
+            ) : (
+              <div className="overflow-hidden rounded-[10px] border border-border bg-surface/80">
+                <table className="w-full border-collapse text-left text-sm text-text">
+                  <thead className="bg-surface-alt text-xs font-semibold uppercase tracking-[0.08em] text-text-subtle">
+                    <tr>
+                      <th className="px-4 py-3">
+                        {t('admin.lockers.lockerCodeLabel')}
+                      </th>
+                      <th className="px-4 py-3">{t('admin.lockers.nameLabel')}</th>
+                      <th className="px-4 py-3">
+                        {t('admin.lockers.locationLabel')}
+                      </th>
+                      <th className="px-4 py-3 text-right">
+                        {t('admin.lockers.statusLabel')}
+                      </th>
+                      <th className="px-4 py-3 text-right">
+                        {t('admin.lockers.actionsLabel')}
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-border/70">
+                    {lockers.map((locker) => {
+                      const location = locationMap.get(locker.location_id)
+                      return (
+                        <tr key={locker.locker_id} className="bg-surface/80">
+                          <td className="px-4 py-3 text-base font-semibold">
+                            {locker.locker_code}
+                          </td>
+                          <td className="px-4 py-3 text-sm text-text-muted">
+                            {locker.name || '—'}
+                          </td>
+                          <td className="px-4 py-3 text-sm text-text-muted">
+                            {location
+                              ? `${location.code} — ${location.name}`
+                              : locker.location_id}
+                          </td>
+                          <td className="px-4 py-3 text-right">
+                            <span className="rounded-pill bg-secondary px-4 py-2 text-xs font-semibold text-text">
+                              {locker.status}
+                            </span>
+                          </td>
+                          <td className="px-4 py-3 text-right">
+                            <Button
+                              variant="secondary"
+                              size="md"
+                              onClick={() =>
+                                navigate(
+                                  `/admin/lockers/${locker.locker_id}/compartments`,
+                                )
+                              }
+                            >
+                              {t('admin.lockers.manageCompartments')}
+                            </Button>
+                          </td>
+                        </tr>
+                      )
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        </Card>
+      </div>
 
-      <div className="stack-admin-actions">
+      <div className="stack-admin-actions sm:flex-row sm:items-center sm:justify-between">
         <Button
           size="md"
           variant="secondary"
-          fullWidth
           onClick={() => navigate('/admin')}
         >
           {t('common.actions.backToAdminHome')}
@@ -172,7 +208,6 @@ const AdminLockersPage = () => {
         <Button
           size="md"
           variant="secondary"
-          fullWidth
           onClick={() => navigate('/')}
         >
           {t('common.actions.backToHome')}

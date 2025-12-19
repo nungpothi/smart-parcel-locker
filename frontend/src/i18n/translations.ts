@@ -28,7 +28,7 @@ export const translations: Record<Language, TranslationTree> = {
         generate: 'สร้าง',
         createLocation: 'สร้างสถานที่',
         createLocker: 'สร้างล็อกเกอร์',
-        manageCompartments: 'จัดการช่อง',
+
         resendCode: 'ส่งรหัสอีกครั้ง',
       },
       status: {
@@ -203,6 +203,8 @@ export const translations: Record<Language, TranslationTree> = {
         empty: 'ยังไม่มีสถานที่',
         active: 'เปิดใช้งาน',
         inactive: 'ปิดใช้งาน',
+
+        statusLabel: 'สถานะ',
         backAdmin: 'กลับหน้าแอดมิน',
       },
       lockers: {
@@ -217,6 +219,9 @@ export const translations: Record<Language, TranslationTree> = {
         create: 'สร้างตู้',
         existingTitle: 'ตู้ที่มีอยู่',
         empty: 'ยังไม่มีตู้',
+
+        statusLabel: 'สถานะ',
+        actionsLabel: 'การจัดการ',
         manageCompartments: 'จัดการช่อง',
       },
       compartments: {
@@ -255,7 +260,7 @@ export const translations: Record<Language, TranslationTree> = {
         generate: 'Generate',
         createLocation: 'Create Location',
         createLocker: 'Create Locker',
-        manageCompartments: 'Manage Compartments',
+
         resendCode: 'Resend code',
       },
       status: {
@@ -431,6 +436,8 @@ export const translations: Record<Language, TranslationTree> = {
         empty: 'No locations yet.',
         active: 'Active',
         inactive: 'Inactive',
+
+        statusLabel: 'Status',
         backAdmin: 'Back to Admin Home',
       },
       lockers: {
@@ -445,6 +452,9 @@ export const translations: Record<Language, TranslationTree> = {
         create: 'Create Locker',
         existingTitle: 'Existing Lockers',
         empty: 'No lockers yet.',
+
+        statusLabel: 'Status',
+        actionsLabel: 'Actions',
         manageCompartments: 'Manage Compartments',
       },
       compartments: {
@@ -463,3 +473,4 @@ export const translations: Record<Language, TranslationTree> = {
     },
   },
 }
+
