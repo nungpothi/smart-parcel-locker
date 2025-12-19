@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import axios from 'axios'
+import clsx from 'clsx'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
@@ -13,8 +14,8 @@ import { usePickupStore } from '@/store/pickupStore'
 
 const phoneSchema = z
   .string()
-  .min(9, 'กรุณากรอกอย่างน้อย 9 หลัก')
-  .regex(/^[0-9]+$/, 'กรุณากรอกเฉพาะตัวเลข')
+  .min(9, 'Phone number must be at least 9 digits')
+  .regex(/^[0-9]+$/, 'Phone number must contain only digits')
 
 const formSchema = z.object({
   phone: phoneSchema,
@@ -71,14 +72,14 @@ const PickupWithPhonePage = () => {
       const status = axios.isAxiosError(err) ? err.response?.status : undefined
       switch (status) {
         case 400:
-          setError('กรุณากรอกเบอร์โทรให้ถูกต้อง')
+          setError('Invalid phone number. Please check and try again.')
           break
         case 429:
-          setError('ขอ OTP บ่อยเกินไป กรุณารอสักครู่')
+          setError('Too many requests. Please wait before requesting another code.')
           break
         case 500:
         default:
-          setError('ระบบขัดข้อง กรุณาลองใหม่')
+          setError('Something went wrong. Please try again.')
       }
     } finally {
       setSubmitting(false)
@@ -86,38 +87,64 @@ const PickupWithPhonePage = () => {
   }
 
   return (
-    <section className="flex flex-1 flex-col justify-center gap-6">
-      <PageHeader
-        title="รับพัสดุด้วยเบอร์โทร"
-        subtitle="ขอ OTP เพื่อรับพัสดุอย่างปลอดภัย"
-        variant="public"
-      />
+    <section className="flex flex-1 justify-center">
+      <div className="stack-page w-full">
+        <PageHeader
+          title="Verify with your phone number"
+          subtitle="Enter your phone number to receive a one-time code for pickup."
+          variant="public"
+        />
 
-      <Card>
-        <form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
-          <Input
-            label="เบอร์โทร"
-            placeholder="กรอกเบอร์โทร"
-            inputMode="numeric"
-            {...register('phone')}
-            error={errors.phone?.message}
-          />
-          {errorMessage && (
-            <div className="rounded-control border border-danger bg-danger-soft px-4 py-3 text-sm text-danger">
-              {errorMessage}
+        <Card tone="muted" density="spacious" className="w-full max-w-3xl">
+          <form className="form-shell" onSubmit={handleSubmit(onSubmit)}>
+            <div className="stack-section">
+              <p className="text-base text-text-muted">
+                We only use this number to send your pickup code.
+              </p>
+              <Input
+                label="Phone number"
+                placeholder="Enter phone number"
+                inputMode="tel"
+                autoComplete="tel"
+                className="text-center text-2xl font-semibold tracking-[0.12em]"
+                {...register('phone')}
+                error={errors.phone?.message}
+              />
+              <div
+                className={clsx(
+                  'field-support text-center',
+                  errorMessage && 'field-error',
+                )}
+                aria-live="polite"
+              >
+                {errorMessage ?? ' '}
+              </div>
             </div>
-          )}
-          <Button type="submit" fullWidth disabled={!isValid || isSubmitting}>
-            {isSubmitting ? 'กำลังขอ OTP...' : 'ขอ OTP'}
-          </Button>
-        </form>
 
-        <div className="mt-6">
-          <Button variant="secondary" fullWidth onClick={() => navigate('/pickup')}>
-            ย้อนกลับ
-          </Button>
-        </div>
-      </Card>
+            <div className="stack-actions">
+              <Button
+                type="submit"
+                size="xl"
+                fullWidth
+                disabled={!isValid || isSubmitting}
+              >
+                {isSubmitting ? 'Sending code...' : 'Send code'}
+              </Button>
+            </div>
+          </form>
+
+          <div className="section-divider stack-actions">
+            <Button
+              variant="secondary"
+              size="lg"
+              fullWidth
+              onClick={() => navigate('/pickup')}
+            >
+              Start over
+            </Button>
+          </div>
+        </Card>
+      </div>
     </section>
   )
 }

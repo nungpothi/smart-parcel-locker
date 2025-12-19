@@ -58,3 +58,11 @@ This app relies on Tailwind + CSS variables to generate all utility classes and 
 - Make the primary code input visually dominant with a centered, large text style (e.g., `text-3xl font-semibold tracking-[0.24em] leading-tight`) and numeric input mode/OTP autocomplete to support kiosk keyboards.
 - Reserve error space with `field-support`/`field-error` built into `Input`; do not add ad-hoc margins when errors appear.
 - Place a single primary CTA beneath the inputs inside `stack-actions`; any supporting/secondary action should sit in a `section-divider` + `stack-actions` block to stay visually secondary.
+
+## Phone identification (public)
+- Mirror the secure input shell: `PageHeader` + muted `Card` (spacious) centered in `PageContainer`, capped around 3xl to keep focus on the phone field.
+- Use `form-shell` with `stack-section` to separate helper text, phone input, and reserved error space; keep inputs off the edges and avoid dense stacking.
+- Make the phone field touch-friendly and readable with larger centered text (e.g., `text-2xl font-semibold tracking-[0.12em]`), `inputMode="tel"`, and `autoComplete="tel"` to align the kiosk keyboard.
+- Present helper copy above the input to explain how the number is used (e.g., sending an OTP). Keep it concise and low-emphasis (`text-text-muted`).
+- Surface validation or API errors via `field-support`/`field-error` below the input so the layout doesn't jump.
+- Keep a single primary CTA in a `stack-actions` block beneath the inputs; any optional supporting action belongs in a `section-divider` + `stack-actions` block to remain visually secondary.
