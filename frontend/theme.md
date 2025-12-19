@@ -30,6 +30,12 @@ This app relies on Tailwind + CSS variables to generate all utility classes and 
 - Dividers: use the `section-divider` helper (1px border with 1.5rem top padding, 1.75rem on sm+) to separate supporting/admin controls from primary flows while preserving breathing room.
 - Apply these spacing helpers consistently across pages; avoid embedding raw spacing utilities in individual screens so padding/spacing stays uniform and kiosk-friendly.
 
+## Deposit open runtime bug
+- Bug: `/deposit/open` crashed on render and showed a blank screen.
+- Root cause: `useNavigate` was imported from `react` instead of `react-router-dom`, so the hook was `undefined` at runtime.
+- Why it occurred: a page-specific import typo bypassed compile-time checks and only surfaced when the component rendered.
+- Avoidance: always import router hooks from `react-router-dom` and verify page-level imports against working sibling pages in the same flow.
+
 ## Form layout rules (public)
 - Form shell: wrap public-facing forms in `form-shell` to establish base vertical rhythm (1.75rem gaps) and avoid ad-hoc spacing.
 - Form shell padding: `form-shell` includes 0.75rem inner padding to keep controls slightly inset from the card edges while maintaining spacious card padding.
