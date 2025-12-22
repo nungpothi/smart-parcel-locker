@@ -50,8 +50,35 @@ func (r *GormRepository) CreateBulk(ctx context.Context, compartments []compartm
 func (r *GormRepository) FindAvailableByLockerAndSizeForUpdate(ctx context.Context, lockerID uuid.UUID, size string) (*compartment.Compartment, error) {
 	var model gormmodels.Compartment
 	if err := r.db.WithContext(ctx).
-		Clauses(clause.Locking{Strength: "UPDATE"}).
+		Clauses(clause.Locking{Strength: "UPDATE", Options: "SKIP LOCKED"}).
 		Where("locker_id = ? AND size = ? AND status = ?", lockerID, size, compartment.StatusAvailable).
+		Order("compartment_no asc").
+		Limit(1).
+		Take(&model).Error; err != nil {
+		return nil, err
+	}
+	return &compartment.Compartment{
+		ID:            model.ID,
+		LockerID:      model.LockerID,
+		CompartmentNo: model.CompartmentNo,
+		Size:          model.Size,
+		Status:        model.Status,
+		CreatedAt:     model.CreatedAt,
+		UpdatedAt:     model.UpdatedAt,
+	}, nil
+}
+
+func (r *GormRepository) FindAvailableByLockerSizesForUpdate(ctx context.Context, lockerID uuid.UUID, sizes []string) (*compartment.Compartment, error) {
+	if len(sizes) == 0 {
+		return nil, gorm.ErrRecordNotFound
+	}
+	sizeOrder := "CASE size WHEN 'S' THEN 1 WHEN 'M' THEN 2 WHEN 'L' THEN 3 ELSE 4 END"
+	var model gormmodels.Compartment
+	// Lock and skip competing rows so concurrent deposits don't select the same compartment.
+	if err := r.db.WithContext(ctx).
+		Clauses(clause.Locking{Strength: "UPDATE", Options: "SKIP LOCKED"}).
+		Where("locker_id = ? AND size IN ? AND status = ?", lockerID, sizes, compartment.StatusAvailable).
+		Order(sizeOrder).
 		Order("compartment_no asc").
 		Limit(1).
 		Take(&model).Error; err != nil {

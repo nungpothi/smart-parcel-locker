@@ -4,7 +4,7 @@ import PageContainer from '@/components/PageContainer'
 
 const PublicLayout = () => {
   return (
-    <div className="min-h-screen bg-base font-body text-lg leading-relaxed text-text">
+    <div className="min-h-screen bg-base font-body text-lg leading-relaxed text-text p-[20px]">
       <PageContainer
         as="div"
         width="default"

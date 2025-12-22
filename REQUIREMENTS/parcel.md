@@ -31,5 +31,10 @@
 - No user accounts are involved.
 - One request creates one parcel.
 - Parcel status after deposit is `READY_FOR_PICKUP`.
-- The system allocates an AVAILABLE compartment matching size and marks it OCCUPIED.
+- The system allocates an AVAILABLE compartment using Best-fit:
+  - Requested `S` can use `S`, `M`, `L` (prefer `S`).
+  - Requested `M` can use `M`, `L` (prefer `M`).
+  - Requested `L` can use `L` only.
+- The selected compartment is reserved (status `RESERVED`) and then marked `OCCUPIED` within the same transaction before commit.
+- Selection is concurrency-safe: deposits lock the chosen row and skip locked rows to prevent two requests from getting the same compartment.
 - A `parcel_event` is created with `event_type = READY_FOR_PICKUP`.

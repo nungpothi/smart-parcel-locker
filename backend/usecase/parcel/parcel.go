@@ -3,7 +3,9 @@ package parcel
 import (
 	"context"
 	"crypto/rand"
+	"log"
 	"math/big"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -112,15 +114,27 @@ func (uc *UseCase) Deposit(ctx context.Context, input DepositInput) (*DepositRes
 			return locker.ErrLockerInactive
 		}
 
-		comp, err := compartmentRepo.FindAvailableByLockerAndSizeForUpdate(ctx, input.LockerID, input.Size)
+		// Best-fit selection: try the smallest compartment that can fit the requested size.
+		candidateSizes := bestFitSizes(input.Size)
+		log.Printf("deposit best-fit requested_size=%s candidates=%s", input.Size, strings.Join(candidateSizes, ","))
+		comp, err := compartmentRepo.FindAvailableByLockerSizesForUpdate(ctx, input.LockerID, candidateSizes)
 		if err != nil {
 			if err == gorm.ErrRecordNotFound {
 				return locker.ErrNoAvailableSlot
 			}
 			return err
 		}
+		log.Printf("deposit compartment selected compartment_id=%s size=%s", comp.ID.String(), comp.Size)
 
 		parcelID := uuid.New()
+		if err := comp.Reserve(parcelID); err != nil {
+			return err
+		}
+		if _, err := compartmentRepo.Update(ctx, comp); err != nil {
+			return err
+		}
+		log.Printf("deposit compartment reserved compartment_id=%s status=%s", comp.ID.String(), comp.Status)
+
 		if err := comp.Occupy(parcelID); err != nil {
 			return err
 		}
@@ -170,6 +184,19 @@ func (uc *UseCase) Deposit(ctx context.Context, input DepositInput) (*DepositRes
 		return nil, err
 	}
 	return result, nil
+}
+
+func bestFitSizes(requested string) []string {
+	switch requested {
+	case "S":
+		return []string{"S", "M", "L"}
+	case "M":
+		return []string{"M", "L"}
+	case "L":
+		return []string{"L"}
+	default:
+		return nil
+	}
 }
 
 func validateDepositInput(input DepositInput) error {

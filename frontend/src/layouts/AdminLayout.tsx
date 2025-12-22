@@ -8,7 +8,7 @@ const AdminLayout = () => {
   const { t } = useTranslation()
 
   return (
-    <div className="min-h-screen bg-base font-body text-text">
+    <div className="min-h-screen bg-base font-body text-text p-[20px]">
       <PageContainer
         as="div"
         width="wide"
