@@ -61,10 +61,10 @@ func write(ctx context.Context, level, msg string, infoMap map[string]interface{
 			TransactionID: transactionID(ctx),
 		}
 		fallbackPayload, _ := json.Marshal(fallback)
-		log.Print(string(fallbackPayload))
+		writeLine(fallbackPayload)
 		return
 	}
-	log.Print(string(payload))
+	writeLine(payload)
 }
 
 func encodeInfo(infoMap map[string]interface{}) string {
@@ -79,11 +79,11 @@ func encodeInfo(infoMap map[string]interface{}) string {
 }
 
 var loggerInitOnce sync.Once
+var stdLogger *log.Logger
 
 func initLogger() {
 	loggerInitOnce.Do(func() {
-		log.SetFlags(0)
-		log.SetOutput(os.Stdout)
+		stdLogger = log.New(os.Stdout, "", 0)
 	})
 }
 
@@ -140,4 +140,12 @@ func transactionID(ctx context.Context) string {
 		return "unknown"
 	}
 	return value
+}
+
+func writeLine(payload []byte) {
+	if _, err := os.Stdout.WriteString(string(payload) + "\n"); err != nil {
+		initLogger()
+		stdLogger.Println(string(payload))
+	}
+	_ = os.Stdout.Sync()
 }
