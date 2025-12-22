@@ -7,7 +7,6 @@ COPY package.json package-lock.json ./
 RUN npm install
 
 COPY . .
-ENV VITE_API_BASE_URL=https://smart-locker.givemebug.online/api/v1
 RUN npm run build
 
 # Stage 2: Serve the application with Nginx
