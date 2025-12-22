@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Button from '@/components/Button'
 import Card from '@/components/Card'
@@ -8,10 +9,19 @@ import { usePickupStore } from '@/store/pickupStore'
 const PickupSuccessPage = () => {
   const navigate = useNavigate()
   const { t } = useTranslation()
-  const { parcels, selectedParcelId, resetPickup } = usePickupStore()
+  const { parcels, selectedParcelId, overdueDays, overdueFee, resetPickup } = usePickupStore()
   const selectedParcel = parcels.find(
     (parcel) => parcel.parcel_id === selectedParcelId,
   )
+  const safeOverdueDays = Number.isFinite(overdueDays) ? overdueDays : 0
+  const safeOverdueFee = Number.isFinite(overdueFee) ? overdueFee : 0
+
+  useEffect(() => {
+    console.info('pickup success rendered', {
+      overdue_days: safeOverdueDays,
+      overdue_fee: safeOverdueFee,
+    })
+  }, [safeOverdueDays, safeOverdueFee])
 
   const handleBack = () => {
     resetPickup()
@@ -52,6 +62,20 @@ const PickupSuccessPage = () => {
               </p>
             </div>
           )}
+
+          <div className="rounded-panel border border-border/70 bg-surface px-5 py-4 p-[10px]">
+            <p className="text-sm font-semibold uppercase tracking-[0.12em] text-text-subtle">
+              Overdue fee
+            </p>
+            {safeOverdueDays === 0 ? (
+              <p className="mt-2 text-lg font-semibold text-text">No overdue fee</p>
+            ) : (
+              <div className="mt-2 space-y-1 text-lg font-semibold text-text">
+                <p>Overdue: {safeOverdueDays} days</p>
+                <p>Overdue fee: {safeOverdueFee}</p>
+              </div>
+            )}
+          </div>
 
           <div className="section-divider stack-actions">
             <Button fullWidth size="xl" onClick={handleBack}>

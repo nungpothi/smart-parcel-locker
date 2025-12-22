@@ -14,9 +14,10 @@ import {
 type Row = {
   compartmentNo: string
   size: 'S' | 'M' | 'L'
+  overdueFeePerDay: string
 }
 
-const emptyRow = (): Row => ({ compartmentNo: '', size: 'S' })
+const emptyRow = (): Row => ({ compartmentNo: '', size: 'S', overdueFeePerDay: '0' })
 
 const AdminLockerCompartmentsPage = () => {
   const navigate = useNavigate()
@@ -63,10 +64,20 @@ const AdminLockerCompartmentsPage = () => {
       setError(t('common.errors.generic'))
       return
     }
+    const hasInvalidOverdueFee = rows.some((row) => {
+      const trimmed = row.overdueFeePerDay.trim()
+      return trimmed !== '' && !/^\d+$/.test(trimmed)
+    })
+    if (hasInvalidOverdueFee) {
+      return
+    }
     const payloadRows = rows
       .map((row) => ({
         compartment_no: Number(row.compartmentNo),
         size: row.size,
+        overdue_fee_per_day: row.overdueFeePerDay.trim() === ''
+          ? 0
+          : Number(row.overdueFeePerDay),
       }))
       .filter((row) => Number.isFinite(row.compartment_no) && row.compartment_no > 0)
 
@@ -99,48 +110,73 @@ const AdminLockerCompartmentsPage = () => {
 
       <Card density="cozy" className=" p-[10px]">
         <div className="stack-admin-section">
-          {rows.map((row, index) => (
-            <div
-              key={`row-${index}`}
-              className="flex flex-col gap-3 rounded-control border border-border bg-surface/80 p-4 sm:flex-row sm:items-end p-[10px]"
-            >
-              <div className="flex-1">
-                <Input
-                  label={t('admin.compartments.compartmentNoLabel')}
-                  placeholder={t('admin.compartments.compartmentNoPlaceholder')}
-                  inputMode="numeric"
-                  value={row.compartmentNo}
-                  onChange={(event) =>
-                    updateRow(index, 'compartmentNo', event.target.value)
-                  }
-                  className="admin-control"
-                />
-              </div>
-              <label className="block w-full sm:w-40">
-                <span className="text-sm font-semibold text-text-muted">
-                  {t('admin.compartments.sizeLabel')}
-                </span>
-                <select
-                  className="admin-select mt-2"
-                  value={row.size}
-                  onChange={(event) => updateRow(index, 'size', event.target.value)}
-                >
-                  <option value="S">{t('common.sizes.S')}</option>
-                  <option value="M">{t('common.sizes.M')}</option>
-                  <option value="L">{t('common.sizes.L')}</option>
-                </select>
-              </label>
-              <hr/>
-              <Button
-                variant="secondary"
-                size="md"
-                onClick={() => removeRow(index)}
-                disabled={rows.length === 1}
+          {rows.map((row, index) => {
+            const trimmedOverdueFee = row.overdueFeePerDay.trim()
+            const overdueFeeError =
+              trimmedOverdueFee !== '' && !/^\d+$/.test(trimmedOverdueFee)
+                ? 'Must be a non-negative integer'
+                : undefined
+            return (
+              <div
+                key={`row-${index}`}
+                className="flex flex-col gap-3 rounded-control border border-border bg-surface/80 p-4 sm:flex-row sm:items-end p-[10px]"
               >
-                {t('admin.compartments.removeRow')}
-              </Button>
-            </div>
-          ))}
+                <div className="flex-1">
+                  <Input
+                    label={t('admin.compartments.compartmentNoLabel')}
+                    placeholder={t('admin.compartments.compartmentNoPlaceholder')}
+                    inputMode="numeric"
+                    value={row.compartmentNo}
+                    onChange={(event) =>
+                      updateRow(index, 'compartmentNo', event.target.value)
+                    }
+                    className="admin-control"
+                  />
+                </div>
+                <div className="flex-1">
+                  <Input
+                    label="Overdue fee per day"
+                    type="number"
+                    inputMode="numeric"
+                    min={0}
+                    step={1}
+                    value={row.overdueFeePerDay}
+                    onChange={(event) =>
+                      updateRow(index, 'overdueFeePerDay', event.target.value)
+                    }
+                    className="admin-control"
+                    error={overdueFeeError}
+                  />
+                  <p className="field-support text-text-muted">
+                    Optional. Fee charged per day if parcel is picked up after 24 hours.
+                  </p>
+                </div>
+                <label className="block w-full sm:w-40">
+                  <span className="text-sm font-semibold text-text-muted">
+                    {t('admin.compartments.sizeLabel')}
+                  </span>
+                  <select
+                    className="admin-select mt-2"
+                    value={row.size}
+                    onChange={(event) => updateRow(index, 'size', event.target.value)}
+                  >
+                    <option value="S">{t('common.sizes.S')}</option>
+                    <option value="M">{t('common.sizes.M')}</option>
+                    <option value="L">{t('common.sizes.L')}</option>
+                  </select>
+                </label>
+                <hr/>
+                <Button
+                  variant="secondary"
+                  size="md"
+                  onClick={() => removeRow(index)}
+                  disabled={rows.length === 1}
+                >
+                  {t('admin.compartments.removeRow')}
+                </Button>
+              </div>
+            )
+          })}
 
           <Button size="md" variant="secondary" fullWidth onClick={addRow}>
             {t('admin.compartments.addRow')}

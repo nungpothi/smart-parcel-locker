@@ -26,6 +26,7 @@ const PickupParcelListPage = () => {
     setConfirming,
     setError,
     setPickupToken,
+    setOverdueInfo,
   } = usePickupStore()
 
   const loadParcels = useCallback(async () => {
@@ -67,7 +68,13 @@ const PickupParcelListPage = () => {
     setConfirming(true)
     setError(null)
     try {
-      await confirmPickup(pickupToken, selectedParcelId)
+      const response = await confirmPickup(pickupToken, selectedParcelId)
+      const data = response.data?.data
+      const overdueDays =
+        typeof data?.overdue_days === 'number' ? data.overdue_days : 0
+      const overdueFee =
+        typeof data?.overdue_fee === 'number' ? data.overdue_fee : 0
+      setOverdueInfo(overdueDays, overdueFee)
       navigate('/pickup/success')
     } catch (err) {
       const status = axios.isAxiosError(err) ? err.response?.status : undefined
