@@ -1,8 +1,9 @@
 package main
 
 import (
+	"context"
 	"fmt"
-	"log"
+	"os"
 
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
@@ -24,6 +25,7 @@ import (
 	parcelinfra "smart-parcel-locker/backend/infrastructure/parcel"
 	pickupinfra "smart-parcel-locker/backend/infrastructure/pickup"
 	"smart-parcel-locker/backend/pkg/config"
+	"smart-parcel-locker/backend/pkg/logger"
 	adminusecase "smart-parcel-locker/backend/usecase/admin"
 	adminopsusecase "smart-parcel-locker/backend/usecase/adminops"
 	lockerqueryusecase "smart-parcel-locker/backend/usecase/lockerquery"
@@ -35,24 +37,38 @@ import (
 func main() {
 	cfg, err := config.Load(".env")
 	if err != nil {
-		log.Fatalf("failed to load config: %v", err)
+		logger.Error(context.Background(), "server config load failed", map[string]interface{}{
+			"error": err.Error(),
+		}, "")
+		os.Exit(1)
 	}
 
 	db, err := database.NewPostgres(cfg.Database)
 	if err != nil {
-		log.Fatalf("failed to init database: %v", err)
+		logger.Error(context.Background(), "server database init failed", map[string]interface{}{
+			"error": err.Error(),
+		}, "")
+		os.Exit(1)
 	}
 	if err := database.Prepare(db); err != nil {
-		log.Fatalf("failed to prepare database: %v", err)
+		logger.Error(context.Background(), "server database prepare failed", map[string]interface{}{
+			"error": err.Error(),
+		}, "")
+		os.Exit(1)
 	}
 
 	app := httpserver.NewFiberApp(cfg)
 	wireModules(app, db)
 
 	addr := fmt.Sprintf(":%d", cfg.HTTP.Port)
-	log.Printf("starting server on %s", addr)
+	logger.Info(context.Background(), "server starting", map[string]interface{}{
+		"addr": addr,
+	}, "")
 	if err := app.Listen(addr); err != nil {
-		log.Fatalf("server stopped: %v", err)
+		logger.Error(context.Background(), "server stopped", map[string]interface{}{
+			"error": err.Error(),
+		}, "")
+		os.Exit(1)
 	}
 }
 

@@ -7,6 +7,7 @@ import (
 
 	"smart-parcel-locker/backend/domain/location"
 	"smart-parcel-locker/backend/domain/locker"
+	"smart-parcel-locker/backend/pkg/logger"
 )
 
 // UseCase provides query-style operations for lockers.
@@ -32,12 +33,19 @@ func NewUseCase(lockerRepo locker.Repository, locationRepo location.Repository) 
 
 // ListAvailable returns all active lockers with their location names.
 func (uc *UseCase) ListAvailable(ctx context.Context) ([]AvailableLocker, error) {
+	logger.Info(ctx, "locker query usecase list available started", map[string]interface{}{}, "")
 	lockers, err := uc.lockerRepo.List(ctx)
 	if err != nil {
+		logger.Error(ctx, "locker query usecase list lockers failed unexpectedly", map[string]interface{}{
+			"error": err.Error(),
+		}, "")
 		return nil, err
 	}
 	locations, err := uc.locationRepo.List(ctx)
 	if err != nil {
+		logger.Error(ctx, "locker query usecase list locations failed unexpectedly", map[string]interface{}{
+			"error": err.Error(),
+		}, "")
 		return nil, err
 	}
 	locationByID := make(map[uuid.UUID]string, len(locations))
@@ -56,5 +64,8 @@ func (uc *UseCase) ListAvailable(ctx context.Context) ([]AvailableLocker, error)
 			LocationName: locationByID[l.LocationID],
 		})
 	}
+	logger.Info(ctx, "locker query usecase list available completed", map[string]interface{}{
+		"count": len(result),
+	}, "")
 	return result, nil
 }

@@ -5,7 +5,6 @@ import (
 	"crypto/rand"
 	"crypto/sha256"
 	"encoding/hex"
-	"log"
 	"math/big"
 	"sync"
 	"time"
@@ -17,6 +16,7 @@ import (
 	pickupdomain "smart-parcel-locker/backend/domain/pickup"
 	"smart-parcel-locker/backend/infrastructure/database"
 	"smart-parcel-locker/backend/pkg/errorx"
+	"smart-parcel-locker/backend/pkg/logger"
 )
 
 const otpTTL = 5 * time.Minute
@@ -83,11 +83,20 @@ func NewUseCase(
 
 // RequestOTP generates and stores an OTP, then notifies the user.
 func (uc *UseCase) RequestOTP(ctx context.Context, phone string) (*RequestResult, error) {
+	logger.Info(ctx, "otp usecase request started", map[string]interface{}{
+		"receiverPhone": phone,
+	}, "")
 	if !isValidPhone(phone) {
+		logger.Warn(ctx, "otp usecase request invalid phone", map[string]interface{}{
+			"receiverPhone": phone,
+		}, "")
 		return nil, otp.ErrInvalidRequest
 	}
 
 	if !uc.rateLimiter.Allow(phone, uc.now()) {
+		logger.Warn(ctx, "otp usecase request rate limited", map[string]interface{}{
+			"receiverPhone": phone,
+		}, "")
 		return nil, errorx.Error{Code: "TOO_MANY_REQUESTS", Message: "too many requests"}
 	}
 
@@ -105,15 +114,27 @@ func (uc *UseCase) RequestOTP(ctx context.Context, phone string) (*RequestResult
 
 	created, err := uc.repo.Create(ctx, entity)
 	if err != nil {
+		logger.Error(ctx, "otp usecase create failed unexpectedly", map[string]interface{}{
+			"receiverPhone": phone,
+			"error":         err.Error(),
+		}, "")
 		return nil, err
 	}
 
-	log.Printf("otp requested for phone=%s ref=%s", phone, created.OtpRef)
+	logger.Info(ctx, "otp usecase created", map[string]interface{}{
+		"receiverPhone": phone,
+		"otpRef":        created.OtpRef,
+	}, "")
 
 	if err := uc.notifier.SendOTP(ctx, phone, otpCode); err != nil {
-		log.Printf("otp webhook error for phone=%s: %v", phone, err)
+		logger.Warn(ctx, "otp usecase notify failed", map[string]interface{}{
+			"receiverPhone": phone,
+			"error":         err.Error(),
+		}, "")
 	} else {
-		log.Printf("otp sent to discord for phone=%s", phone)
+		logger.Info(ctx, "otp usecase notified", map[string]interface{}{
+			"receiverPhone": phone,
+		}, "")
 	}
 
 	return &RequestResult{
@@ -124,10 +145,22 @@ func (uc *UseCase) RequestOTP(ctx context.Context, phone string) (*RequestResult
 
 // VerifyOTP checks OTP code and marks it as verified.
 func (uc *UseCase) VerifyOTP(ctx context.Context, phone string, otpRef string, otpCode string) (*VerifyResult, error) {
+	logger.Info(ctx, "otp usecase verify started", map[string]interface{}{
+		"receiverPhone": phone,
+		"otpRef":        otpRef,
+	}, "")
 	if otpRef == "" || otpCode == "" || !isValidPhone(phone) || !isNumeric(otpCode) {
+		logger.Warn(ctx, "otp usecase verify invalid request", map[string]interface{}{
+			"receiverPhone": phone,
+			"otpRef":        otpRef,
+		}, "")
 		return nil, otp.ErrInvalidRequest
 	}
 	if len(otpCode) != 6 {
+		logger.Warn(ctx, "otp usecase verify invalid otp length", map[string]interface{}{
+			"receiverPhone": phone,
+			"otpRef":        otpRef,
+		}, "")
 		return nil, errorx.Error{Code: "INVALID_REQUEST", Message: "otp must be 6 digits"}
 	}
 
@@ -140,16 +173,33 @@ func (uc *UseCase) VerifyOTP(ctx context.Context, phone string, otpRef string, o
 		record, err := repo.GetByRefAndPhone(ctx, otpRef, phone)
 		if err != nil {
 			if err == gorm.ErrRecordNotFound {
+				logger.Warn(ctx, "otp usecase verify not found", map[string]interface{}{
+					"receiverPhone": phone,
+					"otpRef":        otpRef,
+				}, "")
 				return otp.ErrNotFound
 			}
+			logger.Error(ctx, "otp usecase verify load failed unexpectedly", map[string]interface{}{
+				"receiverPhone": phone,
+				"otpRef":        otpRef,
+				"error":         err.Error(),
+			}, "")
 			return err
 		}
 
 		now := uc.now()
 		switch record.Status {
 		case otp.StatusVerified:
+			logger.Warn(ctx, "otp usecase verify already used", map[string]interface{}{
+				"receiverPhone": phone,
+				"otpRef":        otpRef,
+			}, "")
 			return otp.ErrAlreadyUsed
 		case otp.StatusExpired:
+			logger.Warn(ctx, "otp usecase verify expired", map[string]interface{}{
+				"receiverPhone": phone,
+				"otpRef":        otpRef,
+			}, "")
 			return otp.ErrExpired
 		}
 
@@ -157,18 +207,36 @@ func (uc *UseCase) VerifyOTP(ctx context.Context, phone string, otpRef string, o
 			record.Status = otp.StatusExpired
 			record.VerifiedAt = nil
 			if _, err := repo.Update(ctx, record); err != nil {
+				logger.Error(ctx, "otp usecase verify update expired failed unexpectedly", map[string]interface{}{
+					"receiverPhone": phone,
+					"otpRef":        otpRef,
+					"error":         err.Error(),
+				}, "")
 				return err
 			}
+			logger.Warn(ctx, "otp usecase verify expired after lookup", map[string]interface{}{
+				"receiverPhone": phone,
+				"otpRef":        otpRef,
+			}, "")
 			return otp.ErrExpired
 		}
 
 		if hashOTP(otpCode) != record.OtpHash {
+			logger.Warn(ctx, "otp usecase verify invalid otp", map[string]interface{}{
+				"receiverPhone": phone,
+				"otpRef":        otpRef,
+			}, "")
 			return otp.ErrInvalidOTP
 		}
 
 		record.Status = otp.StatusVerified
 		record.VerifiedAt = &now
 		if _, err := repo.Update(ctx, record); err != nil {
+			logger.Error(ctx, "otp usecase verify update failed unexpectedly", map[string]interface{}{
+				"receiverPhone": phone,
+				"otpRef":        otpRef,
+				"error":         err.Error(),
+			}, "")
 			return err
 		}
 
@@ -181,10 +249,25 @@ func (uc *UseCase) VerifyOTP(ctx context.Context, phone string, otpRef string, o
 		return nil
 	})
 	if err != nil {
-		log.Printf("otp verify failed for phone=%s ref=%s: %v", phone, otpRef, err)
+		if err == otp.ErrNotFound || err == otp.ErrInvalidOTP || err == otp.ErrAlreadyUsed || err == otp.ErrExpired || err == otp.ErrInvalidRequest {
+			logger.Warn(ctx, "otp usecase verify failed", map[string]interface{}{
+				"receiverPhone": phone,
+				"otpRef":        otpRef,
+				"error":         err.Error(),
+			}, "")
+		} else {
+			logger.Error(ctx, "otp usecase verify failed unexpectedly", map[string]interface{}{
+				"receiverPhone": phone,
+				"otpRef":        otpRef,
+				"error":         err.Error(),
+			}, "")
+		}
 		return nil, err
 	}
-	log.Printf("otp verified for phone=%s ref=%s", phone, otpRef)
+	logger.Info(ctx, "otp usecase verified", map[string]interface{}{
+		"receiverPhone": phone,
+		"otpRef":        otpRef,
+	}, "")
 	return result, nil
 }
 

@@ -11,6 +11,7 @@ import (
 	"smart-parcel-locker/backend/domain/parcel"
 	pickupdomain "smart-parcel-locker/backend/domain/pickup"
 	"smart-parcel-locker/backend/pkg/errorx"
+	"smart-parcel-locker/backend/pkg/logger"
 	"smart-parcel-locker/backend/pkg/response"
 	otpusecase "smart-parcel-locker/backend/usecase/otp"
 	pickupusecase "smart-parcel-locker/backend/usecase/pickup"
@@ -31,15 +32,38 @@ type requestOTPRequest struct {
 }
 
 func (h *Handler) RequestOTP(c *fiber.Ctx) error {
+	requestURL := c.OriginalURL()
 	var req requestOTPRequest
 	if err := c.BodyParser(&req); err != nil {
+		logger.Warn(c.Context(), "pickup otp request invalid body", map[string]interface{}{
+			"error": err.Error(),
+		}, requestURL)
 		return writeError(c, fiber.StatusBadRequest, "INVALID_REQUEST", "invalid request body")
 	}
+	logger.Info(c.Context(), "pickup otp request received", map[string]interface{}{
+		"receiverPhone": req.Phone,
+	}, requestURL)
 
 	result, err := h.otpUC.RequestOTP(c.Context(), req.Phone)
 	if err != nil {
+		code, msg := extractError(err)
+		if code == "INTERNAL_ERROR" {
+			logger.Error(c.Context(), "pickup otp request failed unexpectedly", map[string]interface{}{
+				"receiverPhone": req.Phone,
+				"error":         msg,
+			}, requestURL)
+		} else {
+			logger.Warn(c.Context(), "pickup otp request failed", map[string]interface{}{
+				"receiverPhone": req.Phone,
+				"error":         msg,
+			}, requestURL)
+		}
 		return mapError(c, err)
 	}
+	logger.Info(c.Context(), "pickup otp request succeeded", map[string]interface{}{
+		"receiverPhone": req.Phone,
+		"otpRef":        result.OtpRef,
+	}, requestURL)
 
 	return c.JSON(response.APIResponse{
 		Success: true,
@@ -57,15 +81,41 @@ type verifyOTPRequest struct {
 }
 
 func (h *Handler) VerifyOTP(c *fiber.Ctx) error {
+	requestURL := c.OriginalURL()
 	var req verifyOTPRequest
 	if err := c.BodyParser(&req); err != nil {
+		logger.Warn(c.Context(), "pickup otp verify invalid body", map[string]interface{}{
+			"error": err.Error(),
+		}, requestURL)
 		return writeError(c, fiber.StatusBadRequest, "INVALID_REQUEST", "invalid request body")
 	}
+	logger.Info(c.Context(), "pickup otp verify request received", map[string]interface{}{
+		"receiverPhone": req.Phone,
+		"otpRef":        req.OtpRef,
+	}, requestURL)
 
 	result, err := h.otpUC.VerifyOTP(c.Context(), req.Phone, req.OtpRef, req.Otp)
 	if err != nil {
+		code, msg := extractError(err)
+		if code == "INTERNAL_ERROR" {
+			logger.Error(c.Context(), "pickup otp verify failed unexpectedly", map[string]interface{}{
+				"receiverPhone": req.Phone,
+				"otpRef":        req.OtpRef,
+				"error":         msg,
+			}, requestURL)
+		} else {
+			logger.Warn(c.Context(), "pickup otp verify failed", map[string]interface{}{
+				"receiverPhone": req.Phone,
+				"otpRef":        req.OtpRef,
+				"error":         msg,
+			}, requestURL)
+		}
 		return mapError(c, err)
 	}
+	logger.Info(c.Context(), "pickup otp verified", map[string]interface{}{
+		"receiverPhone": req.Phone,
+		"otpRef":        req.OtpRef,
+	}, requestURL)
 
 	return c.JSON(response.APIResponse{
 		Success: true,
@@ -77,9 +127,23 @@ func (h *Handler) VerifyOTP(c *fiber.Ctx) error {
 }
 
 func (h *Handler) ListParcels(c *fiber.Ctx) error {
+	requestURL := c.OriginalURL()
 	token := c.Get("X-Pickup-Token")
+	logger.Info(c.Context(), "pickup parcel list request received", map[string]interface{}{
+		"tokenPresent": token != "",
+	}, requestURL)
 	result, err := h.pickupUC.ListParcels(c.Context(), token)
 	if err != nil {
+		code, msg := extractError(err)
+		if code == "INTERNAL_ERROR" {
+			logger.Error(c.Context(), "pickup parcel list failed unexpectedly", map[string]interface{}{
+				"error": msg,
+			}, requestURL)
+		} else {
+			logger.Warn(c.Context(), "pickup parcel list failed", map[string]interface{}{
+				"error": msg,
+			}, requestURL)
+		}
 		return mapError(c, err)
 	}
 	items := make([]map[string]interface{}, 0, len(result))
@@ -93,6 +157,9 @@ func (h *Handler) ListParcels(c *fiber.Ctx) error {
 			"expires_at":     p.ExpiresAt,
 		})
 	}
+	logger.Info(c.Context(), "pickup parcel list succeeded", map[string]interface{}{
+		"count": len(items),
+	}, requestURL)
 	return c.JSON(response.APIResponse{
 		Success: true,
 		Data:    items,
@@ -104,22 +171,52 @@ type confirmPickupRequest struct {
 }
 
 func (h *Handler) ConfirmPickup(c *fiber.Ctx) error {
+	requestURL := c.OriginalURL()
 	token := c.Get("X-Pickup-Token")
 	var req confirmPickupRequest
 	if err := c.BodyParser(&req); err != nil {
+		logger.Warn(c.Context(), "pickup confirm invalid body", map[string]interface{}{
+			"error": err.Error(),
+		}, requestURL)
 		return writeError(c, fiber.StatusBadRequest, "INVALID_REQUEST", "invalid request body")
 	}
 	if req.ParcelID == "" {
+		logger.Warn(c.Context(), "pickup confirm missing parcel_id", map[string]interface{}{
+			"parcelId": "",
+		}, requestURL)
 		return writeError(c, fiber.StatusBadRequest, "INVALID_REQUEST", "parcel_id is required")
 	}
 	parcelID, err := uuid.Parse(req.ParcelID)
 	if err != nil {
+		logger.Warn(c.Context(), "pickup confirm invalid parcel_id", map[string]interface{}{
+			"parcelId": req.ParcelID,
+			"error":    err.Error(),
+		}, requestURL)
 		return writeError(c, fiber.StatusBadRequest, "INVALID_REQUEST", "invalid parcel_id")
 	}
+	logger.Info(c.Context(), "pickup confirm request received", map[string]interface{}{
+		"parcelId": parcelID.String(),
+	}, requestURL)
 	result, err := h.pickupUC.ConfirmPickup(c.Context(), token, parcelID)
 	if err != nil {
+		code, msg := extractError(err)
+		if code == "INTERNAL_ERROR" {
+			logger.Error(c.Context(), "pickup confirm failed unexpectedly", map[string]interface{}{
+				"parcelId": parcelID.String(),
+				"error":    msg,
+			}, requestURL)
+		} else {
+			logger.Warn(c.Context(), "pickup confirm failed", map[string]interface{}{
+				"parcelId": parcelID.String(),
+				"error":    msg,
+			}, requestURL)
+		}
 		return mapError(c, err)
 	}
+	logger.Info(c.Context(), "pickup confirmed", map[string]interface{}{
+		"parcelId": result.ParcelID,
+		"status":   result.Status,
+	}, requestURL)
 	return c.JSON(response.APIResponse{
 		Success: true,
 		Data: map[string]interface{}{
