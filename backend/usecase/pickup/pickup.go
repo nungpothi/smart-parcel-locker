@@ -2,7 +2,6 @@ package pickup
 
 import (
 	"context"
-	"math"
 	"time"
 
 	"github.com/google/uuid"
@@ -173,16 +172,7 @@ func (uc *UseCase) ConfirmPickup(ctx context.Context, token string, parcelID uui
 			return err
 		}
 		now := uc.now()
-		overdueDays := 0
-		overdueFee := 0
-		if entity.DepositedAt != nil {
-			overdueDuration := now.Sub(*entity.DepositedAt)
-			if overdueDuration > 24*time.Hour {
-				overdueHours := overdueDuration.Hours()
-				overdueDays = int(math.Ceil(overdueHours / 24))
-				overdueFee = overdueDays * comp.OverdueFeePerDay
-			}
-		}
+		overdueDays, overdueFee := parcel.CalculateOverdue(entity.DepositedAt, now, comp.OverdueFeePerDay)
 		logger.Info(ctx, "pickup usecase confirm request received", map[string]interface{}{
 			"parcelId":      parcelID.String(),
 			"compartmentId": comp.ID.String(),
