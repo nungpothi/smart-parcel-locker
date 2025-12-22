@@ -33,12 +33,13 @@ func (r *GormRepository) CreateBulk(ctx context.Context, compartments []compartm
 	now := time.Now()
 	for _, c := range compartments {
 		models = append(models, gormmodels.Compartment{
-			ID:            c.ID,
-			LockerID:      c.LockerID,
-			CompartmentNo: c.CompartmentNo,
-			Size:          c.Size,
-			Status:        c.Status,
-			CreatedAt:     now,
+			ID:               c.ID,
+			LockerID:         c.LockerID,
+			CompartmentNo:    c.CompartmentNo,
+			Size:             c.Size,
+			Status:           c.Status,
+			OverdueFeePerDay: c.OverdueFeePerDay,
+			CreatedAt:        now,
 		})
 	}
 	if err := r.db.WithContext(ctx).Create(&models).Error; err != nil {
@@ -58,13 +59,14 @@ func (r *GormRepository) FindAvailableByLockerAndSizeForUpdate(ctx context.Conte
 		return nil, err
 	}
 	return &compartment.Compartment{
-		ID:            model.ID,
-		LockerID:      model.LockerID,
-		CompartmentNo: model.CompartmentNo,
-		Size:          model.Size,
-		Status:        model.Status,
-		CreatedAt:     model.CreatedAt,
-		UpdatedAt:     model.UpdatedAt,
+		ID:               model.ID,
+		LockerID:         model.LockerID,
+		CompartmentNo:    model.CompartmentNo,
+		Size:             model.Size,
+		Status:           model.Status,
+		OverdueFeePerDay: model.OverdueFeePerDay,
+		CreatedAt:        model.CreatedAt,
+		UpdatedAt:        model.UpdatedAt,
 	}, nil
 }
 
@@ -84,13 +86,14 @@ func (r *GormRepository) FindAvailableByLockerSizesForUpdate(ctx context.Context
 		return nil, err
 	}
 	return &compartment.Compartment{
-		ID:            model.ID,
-		LockerID:      model.LockerID,
-		CompartmentNo: model.CompartmentNo,
-		Size:          model.Size,
-		Status:        model.Status,
-		CreatedAt:     model.CreatedAt,
-		UpdatedAt:     model.UpdatedAt,
+		ID:               model.ID,
+		LockerID:         model.LockerID,
+		CompartmentNo:    model.CompartmentNo,
+		Size:             model.Size,
+		Status:           model.Status,
+		OverdueFeePerDay: model.OverdueFeePerDay,
+		CreatedAt:        model.CreatedAt,
+		UpdatedAt:        model.UpdatedAt,
 	}, nil
 }
 
@@ -102,13 +105,14 @@ func (r *GormRepository) GetByIDForUpdate(ctx context.Context, id uuid.UUID) (*c
 		return nil, err
 	}
 	return &compartment.Compartment{
-		ID:            model.ID,
-		LockerID:      model.LockerID,
-		CompartmentNo: model.CompartmentNo,
-		Size:          model.Size,
-		Status:        model.Status,
-		CreatedAt:     model.CreatedAt,
-		UpdatedAt:     model.UpdatedAt,
+		ID:               model.ID,
+		LockerID:         model.LockerID,
+		CompartmentNo:    model.CompartmentNo,
+		Size:             model.Size,
+		Status:           model.Status,
+		OverdueFeePerDay: model.OverdueFeePerDay,
+		CreatedAt:        model.CreatedAt,
+		UpdatedAt:        model.UpdatedAt,
 	}, nil
 }
 
@@ -118,12 +122,13 @@ func (r *GormRepository) Update(ctx context.Context, comp *compartment.Compartme
 	}
 	now := time.Now()
 	model := gormmodels.Compartment{
-		ID:            comp.ID,
-		LockerID:      comp.LockerID,
-		CompartmentNo: comp.CompartmentNo,
-		Status:        comp.Status,
-		Size:          comp.Size,
-		UpdatedAt:     &now,
+		ID:               comp.ID,
+		LockerID:         comp.LockerID,
+		CompartmentNo:    comp.CompartmentNo,
+		Status:           comp.Status,
+		Size:             comp.Size,
+		OverdueFeePerDay: comp.OverdueFeePerDay,
+		UpdatedAt:        &now,
 	}
 	if err := r.db.WithContext(ctx).
 		Model(&gormmodels.Compartment{}).
@@ -145,13 +150,14 @@ func (r *GormRepository) ListByLocker(ctx context.Context, lockerID uuid.UUID) (
 	result := make([]compartment.Compartment, 0, len(models))
 	for _, m := range models {
 		c := compartment.Compartment{
-			ID:            m.ID,
-			LockerID:      m.LockerID,
-			CompartmentNo: m.CompartmentNo,
-			Size:          m.Size,
-			Status:        m.Status,
-			CreatedAt:     m.CreatedAt,
-			UpdatedAt:     m.UpdatedAt,
+			ID:               m.ID,
+			LockerID:         m.LockerID,
+			CompartmentNo:    m.CompartmentNo,
+			Size:             m.Size,
+			Status:           m.Status,
+			OverdueFeePerDay: m.OverdueFeePerDay,
+			CreatedAt:        m.CreatedAt,
+			UpdatedAt:        m.UpdatedAt,
 		}
 		result = append(result, c)
 	}

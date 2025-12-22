@@ -120,11 +120,12 @@ func (r *GormRepository) GetLockerWithCompartments(ctx context.Context, lockerID
 
 func (r *GormRepository) UpdateCompartment(ctx context.Context, c *compartment.Compartment) (*compartment.Compartment, error) {
 	model := gormmodels.Compartment{
-		ID:            c.ID,
-		LockerID:      c.LockerID,
-		CompartmentNo: c.CompartmentNo,
-		Status:        c.Status,
-		Size:          c.Size,
+		ID:               c.ID,
+		LockerID:         c.LockerID,
+		CompartmentNo:    c.CompartmentNo,
+		Status:           c.Status,
+		Size:             c.Size,
+		OverdueFeePerDay: c.OverdueFeePerDay,
 	}
 
 	if err := r.db.WithContext(ctx).Model(&gormmodels.Compartment{}).Where("id = ?", c.ID).Updates(model).Error; err != nil {
@@ -137,12 +138,13 @@ func mapLockerModelToDomain(model gormmodels.Locker, compartments []gormmodels.C
 	comps := make([]compartment.Compartment, 0, len(compartments))
 	for _, c := range compartments {
 		comp := compartment.Compartment{
-			ID:            c.ID,
-			LockerID:      c.LockerID,
-			CompartmentNo: c.CompartmentNo,
-			Size:          c.Size,
-			Status:        c.Status,
-			CreatedAt:     c.CreatedAt,
+			ID:               c.ID,
+			LockerID:         c.LockerID,
+			CompartmentNo:    c.CompartmentNo,
+			Size:             c.Size,
+			Status:           c.Status,
+			OverdueFeePerDay: c.OverdueFeePerDay,
+			CreatedAt:        c.CreatedAt,
 		}
 		if c.UpdatedAt != nil {
 			comp.UpdatedAt = c.UpdatedAt

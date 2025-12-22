@@ -71,14 +71,20 @@
 - Load parcel and lock row for update.
 - Require status `READY_FOR_PICKUP`.
 - Require token phone matches receiver or sender.
+- Calculate overdue fee using the compartment's `overdue_fee_per_day` and `deposited_at`:
+  - If stored for 24 hours or less: `overdue_days = 0`, `overdue_fee = 0`.
+  - If stored longer than 24 hours: `overdue_days = ceil(hours / 24)` and `overdue_fee = overdue_days * overdue_fee_per_day`.
 - Set parcel status to `PICKED_UP` and `picked_up_at = now`.
 - Release compartment to `AVAILABLE`.
 - Create parcel event `PICKED_UP`.
+- Overdue fee is informational only at this stage; pickup is not blocked and no payment is taken.
 
 **Response**
 - `parcel_id`
 - `status = PICKED_UP`
 - `picked_up_at`
+- `overdue_days`
+- `overdue_fee`
 
 ## Error Codes
 - `INVALID_REQUEST` (400)

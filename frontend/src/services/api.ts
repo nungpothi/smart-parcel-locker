@@ -112,7 +112,9 @@ export const fetchCompartments = (lockerId: string) => {
 
 export const createCompartments = (
   lockerId: string,
-  payload: { compartments: { compartment_no: number; size: string }[] },
+  payload: {
+    compartments: { compartment_no: number; size: string; overdue_fee_per_day?: number }[]
+  },
 ) => {
   return apiClient.post(`/admin/lockers/${lockerId}/compartments`, payload)
 }

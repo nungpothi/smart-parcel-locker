@@ -214,8 +214,10 @@ func (h *Handler) ConfirmPickup(c *fiber.Ctx) error {
 		return mapError(c, err)
 	}
 	logger.Info(c.Context(), "pickup confirmed", map[string]interface{}{
-		"parcelId": result.ParcelID,
-		"status":   result.Status,
+		"parcelId":    result.ParcelID,
+		"status":      result.Status,
+		"overdueDays": result.OverdueDays,
+		"overdueFee":  result.OverdueFee,
 	}, requestURL)
 	return c.JSON(response.APIResponse{
 		Success: true,
@@ -223,6 +225,8 @@ func (h *Handler) ConfirmPickup(c *fiber.Ctx) error {
 			"parcel_id":    result.ParcelID,
 			"status":       result.Status,
 			"picked_up_at": result.PickedUpAt,
+			"overdue_days": result.OverdueDays,
+			"overdue_fee":  result.OverdueFee,
 		},
 	})
 }

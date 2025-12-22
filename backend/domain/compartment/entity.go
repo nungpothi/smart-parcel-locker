@@ -15,14 +15,15 @@ const (
 
 // Compartment represents an individual locker compartment.
 type Compartment struct {
-	ID            uuid.UUID
-	LockerID      uuid.UUID
-	CompartmentNo int
-	Size          string // S | M | L
-	Status        string
-	ParcelID      *uuid.UUID
-	CreatedAt     time.Time
-	UpdatedAt     *time.Time
+	ID               uuid.UUID
+	LockerID         uuid.UUID
+	CompartmentNo    int
+	Size             string // S | M | L
+	Status           string
+	OverdueFeePerDay int
+	ParcelID         *uuid.UUID
+	CreatedAt        time.Time
+	UpdatedAt        *time.Time
 }
 
 // Reserve sets the compartment to reserved when available.

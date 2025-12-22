@@ -228,6 +228,27 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PickupConfirmResponse'
+              examples:
+                no_overdue:
+                  summary: No overdue fee
+                  value:
+                    success: true
+                    data:
+                      parcel_id: "d290f1ee-6c54-4b01-90e6-d701748f0851"
+                      status: PICKED_UP
+                      picked_up_at: "2025-01-01T11:00:00Z"
+                      overdue_days: 0
+                      overdue_fee: 0
+                overdue:
+                  summary: Overdue fee applies
+                  value:
+                    success: true
+                    data:
+                      parcel_id: "d290f1ee-6c54-4b01-90e6-d701748f0851"
+                      status: PICKED_UP
+                      picked_up_at: "2025-01-03T12:00:00Z"
+                      overdue_days: 2
+                      overdue_fee: 100
         '400':
           description: Invalid request
           content:
@@ -596,6 +617,14 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CompartmentBatchCreateRequest'
+            example:
+              compartments:
+                - compartment_no: 1
+                  size: S
+                  overdue_fee_per_day: 0
+                - compartment_no: 2
+                  size: M
+                  overdue_fee_per_day: 50
       responses:
         '201':
           description: Compartments created
@@ -860,7 +889,7 @@ components:
           properties:
             data:
               type: object
-              required: [parcel_id, status, picked_up_at]
+              required: [parcel_id, status, picked_up_at, overdue_days, overdue_fee]
               properties:
                 parcel_id:
                   type: string
@@ -871,12 +900,18 @@ components:
                 picked_up_at:
                   type: string
                   format: date-time
+                overdue_days:
+                  type: integer
+                overdue_fee:
+                  type: integer
       example:
         success: true
         data:
           parcel_id: "d290f1ee-6c54-4b01-90e6-d701748f0851"
           status: PICKED_UP
           picked_up_at: "2025-01-01T11:00:00Z"
+          overdue_days: 0
+          overdue_fee: 0
 
     Admin:
       type: object
@@ -1210,6 +1245,10 @@ components:
               size:
                 type: string
                 enum: [S, M, L]
+              overdue_fee_per_day:
+                type: integer
+                minimum: 0
+                default: 0
 
     CompartmentBatchCreateResponse:
       allOf:

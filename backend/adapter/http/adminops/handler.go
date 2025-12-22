@@ -316,8 +316,9 @@ func (h *Handler) CreateCompartments(c *fiber.Ctx) error {
 	}
 	var req struct {
 		Compartments []struct {
-			CompartmentNo int    `json:"compartment_no"`
-			Size          string `json:"size"`
+			CompartmentNo    int    `json:"compartment_no"`
+			Size             string `json:"size"`
+			OverdueFeePerDay *int   `json:"overdue_fee_per_day"`
 		} `json:"compartments"`
 	}
 	if err := c.BodyParser(&req); err != nil {
@@ -334,6 +335,7 @@ func (h *Handler) CreateCompartments(c *fiber.Ctx) error {
 		return opsInvalidRequest(c, "compartments are required")
 	}
 	specs := make([]adminopsusecase.CompartmentSpec, 0, len(req.Compartments))
+	overdueFees := make([]int, 0, len(req.Compartments))
 	for _, cpt := range req.Compartments {
 		if cpt.CompartmentNo <= 0 {
 			logger.Warn(c.Context(), "admin compartment create invalid compartment_no", map[string]interface{}{
@@ -350,14 +352,29 @@ func (h *Handler) CreateCompartments(c *fiber.Ctx) error {
 			}, requestURL)
 			return opsInvalidInput(c, "size must be one of S, M, L")
 		}
+		overdueFeePerDay := 0
+		if cpt.OverdueFeePerDay != nil {
+			overdueFeePerDay = *cpt.OverdueFeePerDay
+		}
+		if overdueFeePerDay < 0 {
+			logger.Warn(c.Context(), "admin compartment create invalid overdue_fee_per_day", map[string]interface{}{
+				"lockerId":         lockerIDStr,
+				"compartmentNo":    cpt.CompartmentNo,
+				"overdueFeePerDay": overdueFeePerDay,
+			}, requestURL)
+			return opsInvalidInput(c, "overdue_fee_per_day must be greater than or equal to 0")
+		}
 		specs = append(specs, adminopsusecase.CompartmentSpec{
-			CompartmentNo: cpt.CompartmentNo,
-			Size:          cpt.Size,
+			CompartmentNo:    cpt.CompartmentNo,
+			Size:             cpt.Size,
+			OverdueFeePerDay: overdueFeePerDay,
 		})
+		overdueFees = append(overdueFees, overdueFeePerDay)
 	}
 	logger.Info(c.Context(), "admin compartment create request received", map[string]interface{}{
-		"lockerId": lockerIDStr,
-		"count":    len(specs),
+		"lockerId":         lockerIDStr,
+		"count":            len(specs),
+		"overdueFeePerDay": overdueFees,
 	}, requestURL)
 	createdCount, err := h.uc.CreateCompartments(c.Context(), adminopsusecase.CreateCompartmentsInput{
 		LockerID:     lockerID,
@@ -386,8 +403,9 @@ func (h *Handler) CreateCompartments(c *fiber.Ctx) error {
 		return handleError(c, err)
 	}
 	logger.Info(c.Context(), "admin compartment created", map[string]interface{}{
-		"lockerId":     lockerIDStr,
-		"createdCount": createdCount,
+		"lockerId":         lockerIDStr,
+		"createdCount":     createdCount,
+		"overdueFeePerDay": overdueFees,
 	}, requestURL)
 	return c.Status(fiber.StatusCreated).JSON(response.APIResponse{
 		Success: true,

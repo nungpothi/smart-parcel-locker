@@ -2,6 +2,7 @@ package pickup
 
 import (
 	"context"
+	"math"
 	"time"
 
 	"github.com/google/uuid"
@@ -90,9 +91,11 @@ func (uc *UseCase) ListParcels(ctx context.Context, token string) ([]*parcel.Par
 }
 
 type ConfirmResult struct {
-	ParcelID   uuid.UUID
-	Status     parcel.Status
-	PickedUpAt time.Time
+	ParcelID    uuid.UUID
+	Status      parcel.Status
+	PickedUpAt  time.Time
+	OverdueDays int
+	OverdueFee  int
 }
 
 // ConfirmPickup updates parcel and compartment status after pickup.
@@ -169,6 +172,29 @@ func (uc *UseCase) ConfirmPickup(ctx context.Context, token string, parcelID uui
 			}, "")
 			return err
 		}
+		now := uc.now()
+		overdueDays := 0
+		overdueFee := 0
+		if entity.DepositedAt != nil {
+			overdueDuration := now.Sub(*entity.DepositedAt)
+			if overdueDuration > 24*time.Hour {
+				overdueHours := overdueDuration.Hours()
+				overdueDays = int(math.Ceil(overdueHours / 24))
+				overdueFee = overdueDays * comp.OverdueFeePerDay
+			}
+		}
+		logger.Info(ctx, "pickup usecase confirm request received", map[string]interface{}{
+			"parcelId":      parcelID.String(),
+			"compartmentId": comp.ID.String(),
+			"overdueDays":   overdueDays,
+			"overdueFee":    overdueFee,
+		}, "")
+		logger.Info(ctx, "pickup usecase confirm overdue fee calculated", map[string]interface{}{
+			"parcelId":      parcelID.String(),
+			"compartmentId": comp.ID.String(),
+			"overdueDays":   overdueDays,
+			"overdueFee":    overdueFee,
+		}, "")
 		if err := comp.Release(); err != nil {
 			logger.Warn(ctx, "pickup usecase confirm invalid compartment transition", map[string]interface{}{
 				"parcelId":      parcelID.String(),
@@ -178,7 +204,6 @@ func (uc *UseCase) ConfirmPickup(ctx context.Context, token string, parcelID uui
 			return err
 		}
 
-		now := uc.now()
 		entity.Status = parcel.StatusPickedUp
 		entity.PickedUpAt = &now
 		if _, err := parcelRepo.Update(ctx, entity); err != nil {
@@ -210,9 +235,11 @@ func (uc *UseCase) ConfirmPickup(ctx context.Context, token string, parcelID uui
 		}
 
 		result = &ConfirmResult{
-			ParcelID:   entity.ID,
-			Status:     entity.Status,
-			PickedUpAt: now,
+			ParcelID:    entity.ID,
+			Status:      entity.Status,
+			PickedUpAt:  now,
+			OverdueDays: overdueDays,
+			OverdueFee:  overdueFee,
 		}
 		logger.Info(ctx, "pickup usecase confirm completed", map[string]interface{}{
 			"parcelId": parcelID.String(),

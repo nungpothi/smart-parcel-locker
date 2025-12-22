@@ -16,6 +16,8 @@ type PickupState = {
   pickupCode: string | null
   pickupToken: string | null
   pickupTokenExpiresAt: string | null
+  overdueDays: number
+  overdueFee: number
   isSubmitting: boolean
   isLoadingParcels: boolean
   isConfirming: boolean
@@ -27,6 +29,7 @@ type PickupState = {
   setOtpCode: (otpCode: string) => void
   setPickupCode: (pickupCode: string | null) => void
   setPickupToken: (pickupToken: string | null, expiresAt: string | null) => void
+  setOverdueInfo: (overdueDays: number, overdueFee: number) => void
   setLoadingParcels: (isLoadingParcels: boolean) => void
   setConfirming: (isConfirming: boolean) => void
   setSubmitting: (isSubmitting: boolean) => void
@@ -43,6 +46,8 @@ export const usePickupStore = create<PickupState>((set) => ({
   pickupCode: null,
   pickupToken: null,
   pickupTokenExpiresAt: null,
+  overdueDays: 0,
+  overdueFee: 0,
   isSubmitting: false,
   isLoadingParcels: false,
   isConfirming: false,
@@ -55,6 +60,7 @@ export const usePickupStore = create<PickupState>((set) => ({
   setPickupCode: (pickupCode) => set({ pickupCode }),
   setPickupToken: (pickupToken, pickupTokenExpiresAt) =>
     set({ pickupToken, pickupTokenExpiresAt }),
+  setOverdueInfo: (overdueDays, overdueFee) => set({ overdueDays, overdueFee }),
   setLoadingParcels: (isLoadingParcels) => set({ isLoadingParcels }),
   setConfirming: (isConfirming) => set({ isConfirming }),
   setSubmitting: (isSubmitting) => set({ isSubmitting }),
@@ -69,6 +75,8 @@ export const usePickupStore = create<PickupState>((set) => ({
       pickupCode: null,
       pickupToken: null,
       pickupTokenExpiresAt: null,
+      overdueDays: 0,
+      overdueFee: 0,
       isSubmitting: false,
       isLoadingParcels: false,
       isConfirming: false,

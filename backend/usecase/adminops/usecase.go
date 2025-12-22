@@ -49,8 +49,9 @@ type UpdateLockerStatusInput struct {
 }
 
 type CompartmentSpec struct {
-	CompartmentNo int
-	Size          string
+	CompartmentNo    int
+	Size             string
+	OverdueFeePerDay int
 }
 
 type CreateCompartmentsInput struct {
@@ -333,12 +334,13 @@ func (uc *UseCase) CreateCompartments(ctx context.Context, input CreateCompartme
 		comps := make([]compartment.Compartment, 0, len(input.Compartments))
 		for _, c := range input.Compartments {
 			comps = append(comps, compartment.Compartment{
-				ID:            uuid.New(),
-				LockerID:      input.LockerID,
-				CompartmentNo: c.CompartmentNo,
-				Size:          c.Size,
-				Status:        compartment.StatusAvailable,
-				CreatedAt:     now,
+				ID:               uuid.New(),
+				LockerID:         input.LockerID,
+				CompartmentNo:    c.CompartmentNo,
+				Size:             c.Size,
+				Status:           compartment.StatusAvailable,
+				OverdueFeePerDay: c.OverdueFeePerDay,
+				CreatedAt:        now,
 			})
 		}
 		count, err := repos.compRepo.CreateBulk(ctx, comps)
