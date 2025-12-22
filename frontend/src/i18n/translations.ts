@@ -1,6 +1,8 @@
 export type Language = 'th' | 'en'
 
-type TranslationTree = Record<string, string | TranslationTree>
+interface TranslationTree {
+  [key: string]: string | TranslationTree
+}
 
 export const DEFAULT_LANGUAGE: Language = 'th'
 export const FALLBACK_LANGUAGE: Language = 'en'
@@ -457,5 +459,4 @@ export const translations: Record<Language, TranslationTree> = {
     },
   },
 }
-
 
