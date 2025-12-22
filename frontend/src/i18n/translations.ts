@@ -30,6 +30,7 @@ export const translations: Record<Language, TranslationTree> = {
         generate: 'สร้าง',
         createLocation: 'สร้างสถานที่',
         createLocker: 'สร้างล็อกเกอร์',
+        ok: 'ตกลง',
 
         resendCode: 'ส่งรหัสอีกครั้ง',
       },
@@ -61,6 +62,8 @@ export const translations: Record<Language, TranslationTree> = {
         selectLocker: 'กรุณาเลือกตู้',
         missingData: 'กรุณากรอกข้อมูลให้ครบ',
       },
+      coming_soon_title: 'เร็วๆ นี้',
+      pickup_code_coming_soon_message: 'การรับพัสดุด้วยรหัสยังไม่พร้อมใช้งาน',
     },
     public: {
       welcome: {
@@ -254,6 +257,7 @@ export const translations: Record<Language, TranslationTree> = {
         generate: 'Generate',
         createLocation: 'Create Location',
         createLocker: 'Create Locker',
+        ok: 'OK',
 
         resendCode: 'Resend code',
       },
@@ -285,6 +289,8 @@ export const translations: Record<Language, TranslationTree> = {
         selectLocker: 'Please select a locker.',
         missingData: 'Please fill in all required details.',
       },
+      coming_soon_title: 'Coming soon',
+      pickup_code_coming_soon_message: 'Pickup by code is not available yet',
     },
     public: {
       welcome: {
