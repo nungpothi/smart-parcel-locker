@@ -3,7 +3,6 @@ package parcel
 import (
 	"context"
 	"crypto/rand"
-	"log"
 	"math/big"
 	"strings"
 	"time"
@@ -16,6 +15,7 @@ import (
 	"smart-parcel-locker/backend/domain/parcel"
 	"smart-parcel-locker/backend/infrastructure/database"
 	"smart-parcel-locker/backend/pkg/errorx"
+	"smart-parcel-locker/backend/pkg/logger"
 )
 
 type parcelRepository interface {
@@ -46,6 +46,7 @@ type DepositInput struct {
 	Size          string
 	ReceiverPhone string
 	SenderPhone   string
+	RequestURL    string
 }
 
 type DepositResult struct {
@@ -116,15 +117,28 @@ func (uc *UseCase) Deposit(ctx context.Context, input DepositInput) (*DepositRes
 
 		// Best-fit selection: try the smallest compartment that can fit the requested size.
 		candidateSizes := bestFitSizes(input.Size)
-		log.Printf("deposit best-fit requested_size=%s candidates=%s", input.Size, strings.Join(candidateSizes, ","))
+		logger.Info(ctx, "deposit best-fit candidates prepared", map[string]interface{}{
+			"lockerId":      input.LockerID.String(),
+			"requestedSize": input.Size,
+			"candidates":    strings.Join(candidateSizes, ","),
+		}, input.RequestURL)
 		comp, err := compartmentRepo.FindAvailableByLockerSizesForUpdate(ctx, input.LockerID, candidateSizes)
 		if err != nil {
 			if err == gorm.ErrRecordNotFound {
+				logger.Warn(ctx, "no available compartment for deposit", map[string]interface{}{
+					"lockerId":      input.LockerID.String(),
+					"requestedSize": input.Size,
+				}, input.RequestURL)
 				return locker.ErrNoAvailableSlot
 			}
 			return err
 		}
-		log.Printf("deposit compartment selected compartment_id=%s size=%s", comp.ID.String(), comp.Size)
+		logger.Info(ctx, "deposit compartment selected", map[string]interface{}{
+			"lockerId":        input.LockerID.String(),
+			"requestedSize":   input.Size,
+			"compartmentId":   comp.ID.String(),
+			"compartmentSize": comp.Size,
+		}, input.RequestURL)
 
 		parcelID := uuid.New()
 		if err := comp.Reserve(parcelID); err != nil {
@@ -133,7 +147,12 @@ func (uc *UseCase) Deposit(ctx context.Context, input DepositInput) (*DepositRes
 		if _, err := compartmentRepo.Update(ctx, comp); err != nil {
 			return err
 		}
-		log.Printf("deposit compartment reserved compartment_id=%s status=%s", comp.ID.String(), comp.Status)
+		logger.Info(ctx, "deposit compartment reserved", map[string]interface{}{
+			"lockerId":      input.LockerID.String(),
+			"parcelId":      parcelID.String(),
+			"compartmentId": comp.ID.String(),
+			"status":        comp.Status,
+		}, input.RequestURL)
 
 		if err := comp.Occupy(parcelID); err != nil {
 			return err
@@ -178,6 +197,12 @@ func (uc *UseCase) Deposit(ctx context.Context, input DepositInput) (*DepositRes
 			PickupCode: created.PickupCode,
 			Status:     created.Status,
 		}
+		logger.Info(ctx, "deposit completed", map[string]interface{}{
+			"lockerId":      input.LockerID.String(),
+			"parcelId":      created.ID.String(),
+			"compartmentId": comp.ID.String(),
+			"requestedSize": input.Size,
+		}, input.RequestURL)
 		return nil
 	})
 	if err != nil {

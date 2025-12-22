@@ -9,6 +9,7 @@ import (
 
 	"smart-parcel-locker/backend/domain/parcel"
 	"smart-parcel-locker/backend/pkg/errorx"
+	"smart-parcel-locker/backend/pkg/logger"
 	"smart-parcel-locker/backend/pkg/response"
 	parcelusecase "smart-parcel-locker/backend/usecase/parcel"
 )
@@ -41,14 +42,29 @@ func (h *Handler) Deposit(c *fiber.Ctx) error {
 	if err != nil {
 		return writeError(c, fiber.StatusBadRequest, "INVALID_REQUEST", "invalid locker_id")
 	}
+	requestURL := c.OriginalURL()
+	requestCtx := logger.WithTransactionID(c.Context(), uuid.New().String())
+	logger.Info(requestCtx, "deposit request received", map[string]interface{}{
+		"lockerId":      lockerID.String(),
+		"requestedSize": req.Size,
+	}, requestURL)
 
-	result, err := h.uc.Deposit(c.Context(), parcelusecase.DepositInput{
+	result, err := h.uc.Deposit(requestCtx, parcelusecase.DepositInput{
 		LockerID:      lockerID,
 		Size:          req.Size,
 		ReceiverPhone: req.ReceiverPhone,
 		SenderPhone:   req.SenderPhone,
+		RequestURL:    requestURL,
 	})
 	if err != nil {
+		code, msg := extractError(err)
+		if code == "INTERNAL_ERROR" {
+			logger.Error(requestCtx, "deposit failed unexpectedly", map[string]interface{}{
+				"lockerId":      lockerID.String(),
+				"requestedSize": req.Size,
+				"error":         msg,
+			}, requestURL)
+		}
 		return mapError(c, err)
 	}
 	return c.Status(fiber.StatusCreated).JSON(response.APIResponse{
