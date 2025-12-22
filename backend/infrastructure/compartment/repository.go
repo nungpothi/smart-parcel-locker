@@ -79,7 +79,6 @@ func (r *GormRepository) FindAvailableByLockerSizesForUpdate(ctx context.Context
 		Clauses(clause.Locking{Strength: "UPDATE", Options: "SKIP LOCKED"}).
 		Where("locker_id = ? AND size IN ? AND status = ?", lockerID, sizes, compartment.StatusAvailable).
 		Order(sizeOrder).
-		Order("compartment_no asc").
 		Limit(1).
 		Take(&model).Error; err != nil {
 		return nil, err
