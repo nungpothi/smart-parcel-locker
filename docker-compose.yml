@@ -3,8 +3,8 @@ version: '3.3'
 services:
   frontend:
     build:
-      context: ./frontend
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: frontend/Dockerfile
     expose:
       - "80"
     networks:
