@@ -9,6 +9,7 @@ services:
       - "80"
     networks:
       - app-network
+      - webproxy
     env_file:
       - .env
     environment:
@@ -26,6 +27,7 @@ services:
       - "8080"
     networks:
       - app-network
+      - webproxy
     env_file:
       - .env
     environment:
@@ -37,6 +39,8 @@ services:
 networks:
   app-network:
     driver: bridge
+  webproxy:
+    external: true
 
 volumes:
   certbot-web:
