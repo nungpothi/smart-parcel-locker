@@ -1,0 +1,64 @@
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    expose:
+      - "80"
+    networks:
+      - app-network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    expose:
+      - "8080"
+    env_file:
+      - .env
+    networks:
+      - app-network
+
+  nginx:
+    image: nginx:stable-alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - certbot-web:/var/www/certbot
+      - certbot-etc:/etc/letsencrypt
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - app-network
+    # This command reloads Nginx every 6 hours to pick up renewed certificates.
+    # On initial run, it will start Nginx even if certs are not yet available.
+    # A more robust solution might involve an Nginx entrypoint script that waits for certs.
+    command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
+
+  certbot:
+    image: certbot/certbot
+    volumes:
+      - certbot-web:/var/www/certbot
+      - certbot-etc:/etc/letsencrypt
+    # IMPORTANT: Replace your-email@example.com with your actual email.
+    # For testing, add the --staging flag to avoid hitting Let's Encrypt rate limits:
+    # command: certbot certonly --webroot -w /var/www/certbot --email ${CERTBOT_EMAIL} --agree-tos --no-eff-email -d smart-locker.givemebug.online --force-renewal --staging
+    command: certbot certonly --webroot -w /var/www/certbot --email ${CERTBOT_EMAIL} --agree-tos --no-eff-email -d smart-locker.givemebug.online --force-renewal
+    networks:
+      - app-network
+    # Uncomment the entrypoint below and comment out the 'command' above for automatic certificate renewal.
+    # entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  certbot-web:
+  certbot-etc:
