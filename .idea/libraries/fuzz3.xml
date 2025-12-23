@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="fuzz3">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/backend/.gocache/github.com/klauspost/compress@v1.17.0/zstd/testdata/fuzz/encode-corpus-encoded.zip!/" />
+      <root url="jar://$PROJECT_DIR$/backend/.gocache/github.com/klauspost/compress@v1.17.0/zstd/testdata/fuzz/decode-corpus-encoded.zip!/" />
+      <root url="jar://$PROJECT_DIR$/backend/.gocache/github.com/klauspost/compress@v1.17.0/zstd/testdata/fuzz/decode-oss.zip!/" />
+      <root url="jar://$PROJECT_DIR$/backend/.gocache/github.com/klauspost/compress@v1.17.0/zstd/testdata/fuzz/encode-corpus-raw.zip!/" />
+      <root url="jar://$PROJECT_DIR$/backend/.gocache/github.com/klauspost/compress@v1.17.0/zstd/testdata/fuzz/decode-corpus-raw.zip!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

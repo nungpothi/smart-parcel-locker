@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="fuzz">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/backend/.gocache/github.com/klauspost/compress@v1.17.0/s2/testdata/fuzz/lz4-convert-corpus-raw.zip!/" />
+      <root url="jar://$PROJECT_DIR$/backend/.gocache/github.com/klauspost/compress@v1.17.0/s2/testdata/fuzz/block-corpus-raw.zip!/" />
+      <root url="jar://$PROJECT_DIR$/backend/.gocache/github.com/klauspost/compress@v1.17.0/s2/testdata/fuzz/FuzzLZ4Block.zip!/" />
+      <root url="jar://$PROJECT_DIR$/backend/.gocache/github.com/klauspost/compress@v1.17.0/s2/testdata/fuzz/block-corpus-enc.zip!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

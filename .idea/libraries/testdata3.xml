@@ -1,0 +1,39 @@
+<component name="libraryTable">
+  <library name="testdata3">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/backend/.gocache/github.com/klauspost/compress@v1.17.0/zip/testdata/time-winrar.zip!/" />
+      <root url="jar://$PROJECT_DIR$/backend/.gocache/github.com/klauspost/compress@v1.17.0/zip/testdata/FuzzReader-enc.zip!/" />
+      <root url="jar://$PROJECT_DIR$/backend/.gocache/github.com/klauspost/compress@v1.17.0/zip/testdata/time-7zip.zip!/" />
+      <root url="jar://$PROJECT_DIR$/backend/.gocache/github.com/klauspost/compress@v1.17.0/zip/testdata/zip64.zip!/" />
+      <root url="jar://$PROJECT_DIR$/backend/.gocache/github.com/klauspost/compress@v1.17.0/zip/testdata/time-winzip.zip!/" />
+      <root url="jar://$PROJECT_DIR$/backend/.gocache/github.com/klauspost/compress@v1.17.0/zip/testdata/test-trailing-junk.zip!/" />
+      <root url="jar://$PROJECT_DIR$/backend/.gocache/github.com/klauspost/compress@v1.17.0/zip/testdata/zip64-2.zip!/" />
+      <root url="jar://$PROJECT_DIR$/backend/.gocache/github.com/klauspost/compress@v1.17.0/zip/testdata/go-with-datadesc-sig.zip!/" />
+      <root url="jar://$PROJECT_DIR$/backend/.gocache/github.com/klauspost/compress@v1.17.0/zip/testdata/utf8-winrar.zip!/" />
+      <root url="jar://$PROJECT_DIR$/backend/.gocache/github.com/klauspost/compress@v1.17.0/zip/testdata/test.zip!/" />
+      <root url="jar://$PROJECT_DIR$/backend/.gocache/github.com/klauspost/compress@v1.17.0/zip/testdata/test-prefix.zip!/" />
+      <root url="jar://$PROJECT_DIR$/backend/.gocache/github.com/klauspost/compress@v1.17.0/zip/testdata/readme.zip!/" />
+      <root url="jar://$PROJECT_DIR$/backend/.gocache/github.com/klauspost/compress@v1.17.0/zip/testdata/time-osx.zip!/" />
+      <root url="jar://$PROJECT_DIR$/backend/.gocache/github.com/klauspost/compress@v1.17.0/zip/testdata/subdir.zip!/" />
+      <root url="jar://$PROJECT_DIR$/backend/.gocache/github.com/klauspost/compress@v1.17.0/zip/testdata/time-infozip.zip!/" />
+      <root url="jar://$PROJECT_DIR$/backend/.gocache/github.com/klauspost/compress@v1.17.0/zip/testdata/utf8-winzip.zip!/" />
+      <root url="jar://$PROJECT_DIR$/backend/.gocache/github.com/klauspost/compress@v1.17.0/zip/testdata/test-baddirsz.zip!/" />
+      <root url="jar://$PROJECT_DIR$/backend/.gocache/github.com/klauspost/compress@v1.17.0/zip/testdata/go-no-datadesc-sig.zip!/" />
+      <root url="jar://$PROJECT_DIR$/backend/.gocache/github.com/klauspost/compress@v1.17.0/zip/testdata/utf8-infozip.zip!/" />
+      <root url="jar://$PROJECT_DIR$/backend/.gocache/github.com/klauspost/compress@v1.17.0/zip/testdata/unix.zip!/" />
+      <root url="jar://$PROJECT_DIR$/backend/.gocache/github.com/klauspost/compress@v1.17.0/zip/testdata/utf8-7zip.zip!/" />
+      <root url="jar://$PROJECT_DIR$/backend/.gocache/github.com/klauspost/compress@v1.17.0/zip/testdata/dd.zip!/" />
+      <root url="jar://$PROJECT_DIR$/backend/.gocache/github.com/klauspost/compress@v1.17.0/zip/testdata/time-go.zip!/" />
+      <root url="jar://$PROJECT_DIR$/backend/.gocache/github.com/klauspost/compress@v1.17.0/zip/testdata/time-22738.zip!/" />
+      <root url="jar://$PROJECT_DIR$/backend/.gocache/github.com/klauspost/compress@v1.17.0/zip/testdata/utf8-osx.zip!/" />
+      <root url="jar://$PROJECT_DIR$/backend/.gocache/github.com/klauspost/compress@v1.17.0/zip/testdata/winxp.zip!/" />
+      <root url="jar://$PROJECT_DIR$/backend/.gocache/github.com/klauspost/compress@v1.17.0/zip/testdata/dupdir.zip!/" />
+      <root url="jar://$PROJECT_DIR$/backend/.gocache/github.com/klauspost/compress@v1.17.0/zip/testdata/time-win7.zip!/" />
+      <root url="jar://$PROJECT_DIR$/backend/.gocache/github.com/klauspost/compress@v1.17.0/zip/testdata/FuzzReader-raw.zip!/" />
+      <root url="jar://$PROJECT_DIR$/backend/.gocache/github.com/klauspost/compress@v1.17.0/zip/testdata/crc32-not-streamed.zip!/" />
+      <root url="jar://$PROJECT_DIR$/backend/.gocache/github.com/klauspost/compress@v1.17.0/zip/testdata/symlink.zip!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
