@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="regression">
-    <CLASSES>
-      <root url="jar://$PROJECT_DIR$/backend/.gocache/github.com/klauspost/compress@v1.17.0/flate/testdata/regression.zip!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>
