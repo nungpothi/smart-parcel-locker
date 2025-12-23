@@ -179,12 +179,6 @@ func (uc *UseCase) ConfirmPickup(ctx context.Context, token string, parcelID uui
 			"overdueDays":   overdueDays,
 			"overdueFee":    overdueFee,
 		}, "")
-		logger.Info(ctx, "pickup usecase confirm overdue fee calculated", map[string]interface{}{
-			"parcelId":      parcelID.String(),
-			"compartmentId": comp.ID.String(),
-			"overdueDays":   overdueDays,
-			"overdueFee":    overdueFee,
-		}, "")
 		if err := comp.Release(); err != nil {
 			logger.Warn(ctx, "pickup usecase confirm invalid compartment transition", map[string]interface{}{
 				"parcelId":      parcelID.String(),
